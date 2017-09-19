@@ -13,6 +13,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#define	NON_BLOCKING_SERIALIO	1
+
 /* Initialise asynchronous interface to operate at BAUDRATE,8,n,1 */
 void _init_uart(int baudrate);
 

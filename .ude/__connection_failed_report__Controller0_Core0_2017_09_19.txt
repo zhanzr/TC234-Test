@@ -1,0 +1,1022 @@
+----------------------------------------------------------
+
+  Connection Failed Report from
+  Basic UDE Target Interface, Version: 1.14.1
+  created: 09/19/17, 16:47:05
+
+----------------------------------------------------------
+
+Windows version:
+  Win8 ()
+  Admin: yes
+
+UDE version:
+  Release:  4.08.00
+  Build:    8011
+  Path:     C:\Program Files (x86)\pls\UDE Starterkit 4.8
+
+Target configuration file:
+  C:\Users\zzr\workspace\HelloSerialInterrupt_AppKit-TC234TFT\.ude\.target\AppKit_TC234.cfg
+
+Error messages:
+  Tc2CoreTargIntf: Can't connect target !
+  Tc2CoreTargIntf: Can't connect JTAG target
+
+Settings:
+  PortType:  DAS
+  CommDevSel:  
+  TargetPort:  Default
+  TargetPortId:  553582592
+  DasIsDefault:  n
+  MaxJtagClk:  5000
+  CheckJtagId:  y
+  ScanJTAG:  n
+  Ocds1ViaPod:  n
+  EtksArbiterMode:  None
+  RefreshJtag:  n
+  RefreshHarr:  n
+  ReenableOcds:  n
+  ReduceJtagClock:  n
+  UseDap:  y
+  DapMode:  2PIN
+  JtagMuxPort:  -1
+  UseNewJtagEngine:  y
+  ConnOption:  Default
+  SetDebugEnableAb1DisablePin:  n
+  ResetWaitTime:  500
+  ResetMode:  Default
+  OpenDrainReset:  n
+  DiswdtOnReset:  n
+  SetPllOnReset:  0x00000000
+  SetPllOnReset2:  0x00000000
+  ExecInitCmds:  y
+  InitScript Script:
+    ; Workaround for TLF35584 B/C-Step Bug
+    
+    # QSPI2_CLC: Enable QSPI module. DISR=0,EDIS=1
+    SET 0xF0001E00 0x8
+    
+    # QSPI2_GLOBALCON: Set the Global time quantum and Expect phase timeout in GLOBALCON register.
+    # Also, enable Master mode.  MS=0, STROBE=15, EXPECT=12, TQ=0
+    SET 0xF0001E10 0xF3000
+    
+    # QSPI2_PISEL: Select the Master Mode Receive Input in the PISEL register. Here, it is
+    # input A (MRST0A). MRIS=0
+    SET 0xF0001E04 0x0
+    
+    # QSPI2_GLOBALCON1: Enable the Single Move Mode in the GLOBALCON1 register.
+    # TXFM=1, RXFM=1
+    SET 0xF0001E14 0x14050000
+    
+    # QSPI2_ECON1: Enable Parity, and set values for Q, B and C fields in the ECON4 register
+    #(since chip-select output 1, SLSO21 is used here). PAREN=1, C=0, B=2, A=1, Q=9
+    SET 0xF0001E24 0x4249
+    
+    # QSPI2_SSOC: Enable the slave select output (Here SLSO21) and make the corresponding
+    # signal active level low, in the SSOC register. OEN=0x80, AOL=0
+    SET 0xF0001E48 0x00020000
+    
+    # P14_IOCR0: P14.2=SLSO21;
+    SET 0xF003B410 0x00980000
+    # P15_IOCR0: P15.3=SCLK2;
+    SET 0xF003B510 0x98000000
+    # P15_IOCR4: P15.5=MTSR2, P15.7=MRST2B
+    SET 0xF003B514 0x00009800
+    
+    # QSPI2_FLAGSCLEAR
+    SET 0xF0001E54 0xFFF
+    
+    # QSPI2_BACONENTRY: In the BACON register: Set the current frame as the last frame, and data
+    # length in bits (Short frame mode). Data length is 15 bits + parity, MSB is shifted
+    # first. The channel is selected properly (Here, channel 1 for SLSO21) Set
+    # the trailing delay. CS=QSPI_SLSO,DL=14,BYTE=0,MSB=1,UINT=0,PARTYP=0,TRAIL=0,
+    # TPRE=3,LEAD=0,LPRE=3,IDLE=0,IPRE=3,LAST=1
+    SET 0xF0001E60 0x17206187
+    
+    # QSPI2_GLOBALCON: Put the QSPI module to RUN state.  MS=0, STROBE=15, EXPECT=12, TQ=0, EN=1
+    SET 0xF0001E10 0x010F3000
+    
+    # QSPI2_DATAENTRY0: Write w parity   0x43AB,0x43EF,0x4356,0x4312,0x4693,0x4500,0x43DF,0x4334,0x43BE,0x43CA
+    # UNLOCK1
+    SET 0xF0001E64 0x43AB
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK2
+    SET 0xF0001E64 0x43EF
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK3
+    SET 0xF0001E64 0x4356
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK4
+    SET 0xF0001E64 0x4312
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: WWD off
+    SET 0xF0001E64 0x4693
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: ERR-pin monitoring off
+    SET 0xF0001E64 0x4500
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK1
+    SET 0xF0001E64 0x43DF
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK2
+    SET 0xF0001E64 0x4334
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK3
+    SET 0xF0001E64 0x43BE
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK4
+    SET 0xF0001E64 0x43CA
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    
+    ; switch off FLASH error traps
+    SET 0xF80020A8 0x8000
+    SET 0xF80020AC 0x8000
+    
+  ExecOnConnectCmds:  n
+  OnConnectScript Script:
+    Script is empty
+  FailOnResetMalfunction:  n
+  ResetPulseLen:  10
+  AddResetDelay:  0
+  UseTrstOnReset:  n
+  ExecEmemInitOnReset:  0x00000000
+  SimHsmBootEnabled:  n
+  UnlockInterface:  n
+  BootPasswd0:  0x00000000
+  BootPasswd1:  0x00000000
+  BootPasswd2:  0x00000000
+  BootPasswd3:  0x00000000
+  BootPasswd4:  0x00000000
+  BootPasswd5:  0x00000000
+  BootPasswd6:  0x00000000
+  BootPasswd7:  0x00000000
+  PasswordFile:  
+  HandleBmiHeader:  n
+  SetAutOkOnConnect:  n
+  DontUseWdtSusp:  n
+  MaxTry:  1
+  ForceEdMode:  -1
+  UseDflashAccessFilter:  y
+  UseTranslateAddr:  y
+  DownloadToAllRams:  y
+  HaltAfterReset:  y
+  TargetAppHandshakeMode:  None
+  TargetAppHandshakeTimeout:  100
+  TargetAppHandshakeParameter0:  0x00000000
+  TargetAppHandshakeParameter1:  0x00000000
+  TargetAppHandshakeParameter2:  0x00000000
+  TargetAppHandshakeParameter3:  0x00000000
+  SimioAddr:  g_JtagSimioAccess
+  UseStmForPtm:  1
+  ExecOnStartCmds:  n
+  OnStartScript Script:
+    
+  ExecOnHaltCmds:  n
+  OnHaltScript Script:
+    
+  UseTriggerToBreak:  y
+  UseTL2OnHalt:  y
+  UseOstateStable:  y
+  AllowJtagResetWhileRunning:  y
+  MaxAccRetry:  1
+  AccRetryDelay:  100
+  DefOcdsReserved:  
+  UseRestartWhileRunningHandling:  n
+  DebugResetOnDisconnect:  n
+  IgnoreEmemAccessErrors:  n
+  RemapEmemAccess:  n
+  EnableAutomaticHsmStart:  n
+  EnableAutomaticHsmRunControl:  n
+  ReadPmcsrWhileRunning:  n
+  IvIcacheOnHalt:  y
+  IvPlbOnHalt:  y
+  SuspendSlaveCores:  n
+  FilterMemAcc:  y
+  DasDllPath:  das_api.dll
+  DasHost:  
+  DasTryStartSrv:  y
+  DasSrvPath:  servers\udas\udas.exe
+  DasStopSrv:  y
+  DasResetHelperBreakAddr:  main
+  DasResetMode:  2
+  DasRemoveLogFile:  n
+  DasForwardSerNum:  n
+  DasSrvSel:  -1
+  DasPortType:  0
+  DasPortSel:  0
+  DasCmdTimeout:  1000
+
+Settings:
+  PortType:  DAS
+  CommDevSel:  
+  TargetPort:  Default
+  TargetPortId:  553582592
+  DasIsDefault:  n
+  MaxJtagClk:  5000
+  CheckJtagId:  y
+  ScanJTAG:  n
+  Ocds1ViaPod:  n
+  EtksArbiterMode:  None
+  RefreshJtag:  n
+  RefreshHarr:  n
+  ReenableOcds:  n
+  ReduceJtagClock:  n
+  UseDap:  y
+  DapMode:  2PIN
+  JtagMuxPort:  -1
+  UseNewJtagEngine:  y
+  ConnOption:  Default
+  SetDebugEnableAb1DisablePin:  n
+  ResetWaitTime:  500
+  ResetMode:  Default
+  OpenDrainReset:  n
+  DiswdtOnReset:  n
+  SetPllOnReset:  0x00000000
+  SetPllOnReset2:  0x00000000
+  ExecInitCmds:  y
+  InitScript Script:
+    ; Workaround for TLF35584 B/C-Step Bug
+    
+    # QSPI2_CLC: Enable QSPI module. DISR=0,EDIS=1
+    SET 0xF0001E00 0x8
+    
+    # QSPI2_GLOBALCON: Set the Global time quantum and Expect phase timeout in GLOBALCON register.
+    # Also, enable Master mode.  MS=0, STROBE=15, EXPECT=12, TQ=0
+    SET 0xF0001E10 0xF3000
+    
+    # QSPI2_PISEL: Select the Master Mode Receive Input in the PISEL register. Here, it is
+    # input A (MRST0A). MRIS=0
+    SET 0xF0001E04 0x0
+    
+    # QSPI2_GLOBALCON1: Enable the Single Move Mode in the GLOBALCON1 register.
+    # TXFM=1, RXFM=1
+    SET 0xF0001E14 0x14050000
+    
+    # QSPI2_ECON1: Enable Parity, and set values for Q, B and C fields in the ECON4 register
+    #(since chip-select output 1, SLSO21 is used here). PAREN=1, C=0, B=2, A=1, Q=9
+    SET 0xF0001E24 0x4249
+    
+    # QSPI2_SSOC: Enable the slave select output (Here SLSO21) and make the corresponding
+    # signal active level low, in the SSOC register. OEN=0x80, AOL=0
+    SET 0xF0001E48 0x00020000
+    
+    # P14_IOCR0: P14.2=SLSO21;
+    SET 0xF003B410 0x00980000
+    # P15_IOCR0: P15.3=SCLK2;
+    SET 0xF003B510 0x98000000
+    # P15_IOCR4: P15.5=MTSR2, P15.7=MRST2B
+    SET 0xF003B514 0x00009800
+    
+    # QSPI2_FLAGSCLEAR
+    SET 0xF0001E54 0xFFF
+    
+    # QSPI2_BACONENTRY: In the BACON register: Set the current frame as the last frame, and data
+    # length in bits (Short frame mode). Data length is 15 bits + parity, MSB is shifted
+    # first. The channel is selected properly (Here, channel 1 for SLSO21) Set
+    # the trailing delay. CS=QSPI_SLSO,DL=14,BYTE=0,MSB=1,UINT=0,PARTYP=0,TRAIL=0,
+    # TPRE=3,LEAD=0,LPRE=3,IDLE=0,IPRE=3,LAST=1
+    SET 0xF0001E60 0x17206187
+    
+    # QSPI2_GLOBALCON: Put the QSPI module to RUN state.  MS=0, STROBE=15, EXPECT=12, TQ=0, EN=1
+    SET 0xF0001E10 0x010F3000
+    
+    # QSPI2_DATAENTRY0: Write w parity   0x43AB,0x43EF,0x4356,0x4312,0x4693,0x4500,0x43DF,0x4334,0x43BE,0x43CA
+    # UNLOCK1
+    SET 0xF0001E64 0x43AB
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK2
+    SET 0xF0001E64 0x43EF
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK3
+    SET 0xF0001E64 0x4356
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK4
+    SET 0xF0001E64 0x4312
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: WWD off
+    SET 0xF0001E64 0x4693
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: ERR-pin monitoring off
+    SET 0xF0001E64 0x4500
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK1
+    SET 0xF0001E64 0x43DF
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK2
+    SET 0xF0001E64 0x4334
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK3
+    SET 0xF0001E64 0x43BE
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK4
+    SET 0xF0001E64 0x43CA
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    
+    ; switch off FLASH error traps
+    SET 0xF80020A8 0x8000
+    SET 0xF80020AC 0x8000
+    
+  ExecOnConnectCmds:  n
+  OnConnectScript Script:
+    Script is empty
+  FailOnResetMalfunction:  n
+  ResetPulseLen:  10
+  AddResetDelay:  0
+  UseTrstOnReset:  n
+  ExecEmemInitOnReset:  0x00000000
+  SimHsmBootEnabled:  n
+  UnlockInterface:  n
+  BootPasswd0:  0x00000000
+  BootPasswd1:  0x00000000
+  BootPasswd2:  0x00000000
+  BootPasswd3:  0x00000000
+  BootPasswd4:  0x00000000
+  BootPasswd5:  0x00000000
+  BootPasswd6:  0x00000000
+  BootPasswd7:  0x00000000
+  PasswordFile:  
+  HandleBmiHeader:  n
+  SetAutOkOnConnect:  n
+  DontUseWdtSusp:  n
+  MaxTry:  1
+  ForceEdMode:  -1
+  UseDflashAccessFilter:  y
+  UseTranslateAddr:  y
+  DownloadToAllRams:  y
+  HaltAfterReset:  y
+  TargetAppHandshakeMode:  None
+  TargetAppHandshakeTimeout:  100
+  TargetAppHandshakeParameter0:  0x00000000
+  TargetAppHandshakeParameter1:  0x00000000
+  TargetAppHandshakeParameter2:  0x00000000
+  TargetAppHandshakeParameter3:  0x00000000
+  SimioAddr:  g_JtagSimioAccess
+  UseStmForPtm:  1
+  ExecOnStartCmds:  n
+  OnStartScript Script:
+    
+  ExecOnHaltCmds:  n
+  OnHaltScript Script:
+    
+  UseTriggerToBreak:  y
+  UseTL2OnHalt:  y
+  UseOstateStable:  y
+  AllowJtagResetWhileRunning:  y
+  MaxAccRetry:  1
+  AccRetryDelay:  100
+  DefOcdsReserved:  
+  UseRestartWhileRunningHandling:  n
+  DebugResetOnDisconnect:  n
+  IgnoreEmemAccessErrors:  n
+  RemapEmemAccess:  n
+  EnableAutomaticHsmStart:  n
+  EnableAutomaticHsmRunControl:  n
+  ReadPmcsrWhileRunning:  n
+  IvIcacheOnHalt:  y
+  IvPlbOnHalt:  y
+  SuspendSlaveCores:  n
+  FilterMemAcc:  y
+  DasDllPath:  das_api.dll
+  DasHost:  
+  DasTryStartSrv:  y
+  DasSrvPath:  servers\udas\udas.exe
+  DasStopSrv:  y
+  DasResetHelperBreakAddr:  main
+  DasResetMode:  2
+  DasRemoveLogFile:  n
+  DasForwardSerNum:  n
+  DasSrvSel:  -1
+  DasPortType:  0
+  DasPortSel:  0
+  DasCmdTimeout:  1000
+
+JTAG target infos:
+  JTAG-ID:           0x00000000
+  UsedJtagClk:       0 MHz
+  ExtVoltage:        0.0 V
+  IntVoltageUsed:    n
+  STSTAT:            0x493DA6C4
+
+DAS related information:
+  DAS DLL Version:        
+  Server started by UDE:  C:\Program Files (x86)\DAS\servers\udas\udas.exe
+  Server name:            UDAS
+  Server manufacturer:    Infineon
+  Server version:         V3.8
+  DAS-API version:        V4.1
+  Server lib version:     V3.0
+  last DAS error:         4
+  last DAS function:      connect_to_device
+
+
+----------------------------------------------------------
+
+  Connection Failed Report from
+  Basic UDE Target Interface, Version: 1.14.1
+  created: 09/19/17, 16:47:40
+
+----------------------------------------------------------
+
+Windows version:
+  Win8 ()
+  Admin: yes
+
+UDE version:
+  Release:  4.08.00
+  Build:    8011
+  Path:     C:\Program Files (x86)\pls\UDE Starterkit 4.8
+
+Target configuration file:
+  C:\Users\zzr\workspace\HelloSerialInterrupt_AppKit-TC234TFT\.ude\.target\AppKit_TC234.cfg
+
+Error messages:
+  Tc2CoreTargIntf: Can't connect target !
+  Tc2CoreTargIntf: Can't connect JTAG target
+
+Settings:
+  PortType:  DAS
+  CommDevSel:  
+  TargetPort:  Default
+  TargetPortId:  0
+  DasIsDefault:  n
+  MaxJtagClk:  5000
+  CheckJtagId:  y
+  ScanJTAG:  n
+  Ocds1ViaPod:  n
+  EtksArbiterMode:  None
+  RefreshJtag:  n
+  RefreshHarr:  n
+  ReenableOcds:  n
+  ReduceJtagClock:  n
+  UseDap:  y
+  DapMode:  2PIN
+  JtagMuxPort:  -1
+  UseNewJtagEngine:  y
+  ConnOption:  Default
+  SetDebugEnableAb1DisablePin:  n
+  ResetWaitTime:  500
+  ResetMode:  Default
+  OpenDrainReset:  n
+  DiswdtOnReset:  n
+  SetPllOnReset:  0x00000000
+  SetPllOnReset2:  0x00000000
+  ExecInitCmds:  y
+  InitScript Script:
+    ; Workaround for TLF35584 B/C-Step Bug
+    
+    # QSPI2_CLC: Enable QSPI module. DISR=0,EDIS=1
+    SET 0xF0001E00 0x8
+    
+    # QSPI2_GLOBALCON: Set the Global time quantum and Expect phase timeout in GLOBALCON register.
+    # Also, enable Master mode.  MS=0, STROBE=15, EXPECT=12, TQ=0
+    SET 0xF0001E10 0xF3000
+    
+    # QSPI2_PISEL: Select the Master Mode Receive Input in the PISEL register. Here, it is
+    # input A (MRST0A). MRIS=0
+    SET 0xF0001E04 0x0
+    
+    # QSPI2_GLOBALCON1: Enable the Single Move Mode in the GLOBALCON1 register.
+    # TXFM=1, RXFM=1
+    SET 0xF0001E14 0x14050000
+    
+    # QSPI2_ECON1: Enable Parity, and set values for Q, B and C fields in the ECON4 register
+    #(since chip-select output 1, SLSO21 is used here). PAREN=1, C=0, B=2, A=1, Q=9
+    SET 0xF0001E24 0x4249
+    
+    # QSPI2_SSOC: Enable the slave select output (Here SLSO21) and make the corresponding
+    # signal active level low, in the SSOC register. OEN=0x80, AOL=0
+    SET 0xF0001E48 0x00020000
+    
+    # P14_IOCR0: P14.2=SLSO21;
+    SET 0xF003B410 0x00980000
+    # P15_IOCR0: P15.3=SCLK2;
+    SET 0xF003B510 0x98000000
+    # P15_IOCR4: P15.5=MTSR2, P15.7=MRST2B
+    SET 0xF003B514 0x00009800
+    
+    # QSPI2_FLAGSCLEAR
+    SET 0xF0001E54 0xFFF
+    
+    # QSPI2_BACONENTRY: In the BACON register: Set the current frame as the last frame, and data
+    # length in bits (Short frame mode). Data length is 15 bits + parity, MSB is shifted
+    # first. The channel is selected properly (Here, channel 1 for SLSO21) Set
+    # the trailing delay. CS=QSPI_SLSO,DL=14,BYTE=0,MSB=1,UINT=0,PARTYP=0,TRAIL=0,
+    # TPRE=3,LEAD=0,LPRE=3,IDLE=0,IPRE=3,LAST=1
+    SET 0xF0001E60 0x17206187
+    
+    # QSPI2_GLOBALCON: Put the QSPI module to RUN state.  MS=0, STROBE=15, EXPECT=12, TQ=0, EN=1
+    SET 0xF0001E10 0x010F3000
+    
+    # QSPI2_DATAENTRY0: Write w parity   0x43AB,0x43EF,0x4356,0x4312,0x4693,0x4500,0x43DF,0x4334,0x43BE,0x43CA
+    # UNLOCK1
+    SET 0xF0001E64 0x43AB
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK2
+    SET 0xF0001E64 0x43EF
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK3
+    SET 0xF0001E64 0x4356
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK4
+    SET 0xF0001E64 0x4312
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: WWD off
+    SET 0xF0001E64 0x4693
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: ERR-pin monitoring off
+    SET 0xF0001E64 0x4500
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK1
+    SET 0xF0001E64 0x43DF
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK2
+    SET 0xF0001E64 0x4334
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK3
+    SET 0xF0001E64 0x43BE
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK4
+    SET 0xF0001E64 0x43CA
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    
+    ; switch off FLASH error traps
+    SET 0xF80020A8 0x8000
+    SET 0xF80020AC 0x8000
+    
+  ExecOnConnectCmds:  n
+  OnConnectScript Script:
+    Script is empty
+  FailOnResetMalfunction:  n
+  ResetPulseLen:  10
+  AddResetDelay:  0
+  UseTrstOnReset:  n
+  ExecEmemInitOnReset:  0x00000000
+  SimHsmBootEnabled:  n
+  UnlockInterface:  n
+  BootPasswd0:  0x00000000
+  BootPasswd1:  0x00000000
+  BootPasswd2:  0x00000000
+  BootPasswd3:  0x00000000
+  BootPasswd4:  0x00000000
+  BootPasswd5:  0x00000000
+  BootPasswd6:  0x00000000
+  BootPasswd7:  0x00000000
+  PasswordFile:  
+  HandleBmiHeader:  n
+  SetAutOkOnConnect:  n
+  DontUseWdtSusp:  n
+  MaxTry:  1
+  ForceEdMode:  -1
+  UseDflashAccessFilter:  y
+  UseTranslateAddr:  y
+  DownloadToAllRams:  y
+  HaltAfterReset:  y
+  TargetAppHandshakeMode:  None
+  TargetAppHandshakeTimeout:  100
+  TargetAppHandshakeParameter0:  0x00000000
+  TargetAppHandshakeParameter1:  0x00000000
+  TargetAppHandshakeParameter2:  0x00000000
+  TargetAppHandshakeParameter3:  0x00000000
+  SimioAddr:  g_JtagSimioAccess
+  UseStmForPtm:  1
+  ExecOnStartCmds:  n
+  OnStartScript Script:
+    
+  ExecOnHaltCmds:  n
+  OnHaltScript Script:
+    
+  UseTriggerToBreak:  y
+  UseTL2OnHalt:  y
+  UseOstateStable:  y
+  AllowJtagResetWhileRunning:  y
+  MaxAccRetry:  1
+  AccRetryDelay:  100
+  DefOcdsReserved:  
+  UseRestartWhileRunningHandling:  n
+  DebugResetOnDisconnect:  n
+  IgnoreEmemAccessErrors:  n
+  RemapEmemAccess:  n
+  EnableAutomaticHsmStart:  n
+  EnableAutomaticHsmRunControl:  n
+  ReadPmcsrWhileRunning:  n
+  IvIcacheOnHalt:  y
+  IvPlbOnHalt:  y
+  SuspendSlaveCores:  n
+  FilterMemAcc:  y
+  DasDllPath:  das_api.dll
+  DasHost:  
+  DasTryStartSrv:  y
+  DasSrvPath:  servers\udas\udas.exe
+  DasStopSrv:  y
+  DasResetHelperBreakAddr:  main
+  DasResetMode:  2
+  DasRemoveLogFile:  n
+  DasForwardSerNum:  n
+  DasSrvSel:  -1
+  DasPortType:  0
+  DasPortSel:  0
+  DasCmdTimeout:  1000
+
+Settings:
+  PortType:  DAS
+  CommDevSel:  
+  TargetPort:  Default
+  TargetPortId:  0
+  DasIsDefault:  n
+  MaxJtagClk:  5000
+  CheckJtagId:  y
+  ScanJTAG:  n
+  Ocds1ViaPod:  n
+  EtksArbiterMode:  None
+  RefreshJtag:  n
+  RefreshHarr:  n
+  ReenableOcds:  n
+  ReduceJtagClock:  n
+  UseDap:  y
+  DapMode:  2PIN
+  JtagMuxPort:  -1
+  UseNewJtagEngine:  y
+  ConnOption:  Default
+  SetDebugEnableAb1DisablePin:  n
+  ResetWaitTime:  500
+  ResetMode:  Default
+  OpenDrainReset:  n
+  DiswdtOnReset:  n
+  SetPllOnReset:  0x00000000
+  SetPllOnReset2:  0x00000000
+  ExecInitCmds:  y
+  InitScript Script:
+    ; Workaround for TLF35584 B/C-Step Bug
+    
+    # QSPI2_CLC: Enable QSPI module. DISR=0,EDIS=1
+    SET 0xF0001E00 0x8
+    
+    # QSPI2_GLOBALCON: Set the Global time quantum and Expect phase timeout in GLOBALCON register.
+    # Also, enable Master mode.  MS=0, STROBE=15, EXPECT=12, TQ=0
+    SET 0xF0001E10 0xF3000
+    
+    # QSPI2_PISEL: Select the Master Mode Receive Input in the PISEL register. Here, it is
+    # input A (MRST0A). MRIS=0
+    SET 0xF0001E04 0x0
+    
+    # QSPI2_GLOBALCON1: Enable the Single Move Mode in the GLOBALCON1 register.
+    # TXFM=1, RXFM=1
+    SET 0xF0001E14 0x14050000
+    
+    # QSPI2_ECON1: Enable Parity, and set values for Q, B and C fields in the ECON4 register
+    #(since chip-select output 1, SLSO21 is used here). PAREN=1, C=0, B=2, A=1, Q=9
+    SET 0xF0001E24 0x4249
+    
+    # QSPI2_SSOC: Enable the slave select output (Here SLSO21) and make the corresponding
+    # signal active level low, in the SSOC register. OEN=0x80, AOL=0
+    SET 0xF0001E48 0x00020000
+    
+    # P14_IOCR0: P14.2=SLSO21;
+    SET 0xF003B410 0x00980000
+    # P15_IOCR0: P15.3=SCLK2;
+    SET 0xF003B510 0x98000000
+    # P15_IOCR4: P15.5=MTSR2, P15.7=MRST2B
+    SET 0xF003B514 0x00009800
+    
+    # QSPI2_FLAGSCLEAR
+    SET 0xF0001E54 0xFFF
+    
+    # QSPI2_BACONENTRY: In the BACON register: Set the current frame as the last frame, and data
+    # length in bits (Short frame mode). Data length is 15 bits + parity, MSB is shifted
+    # first. The channel is selected properly (Here, channel 1 for SLSO21) Set
+    # the trailing delay. CS=QSPI_SLSO,DL=14,BYTE=0,MSB=1,UINT=0,PARTYP=0,TRAIL=0,
+    # TPRE=3,LEAD=0,LPRE=3,IDLE=0,IPRE=3,LAST=1
+    SET 0xF0001E60 0x17206187
+    
+    # QSPI2_GLOBALCON: Put the QSPI module to RUN state.  MS=0, STROBE=15, EXPECT=12, TQ=0, EN=1
+    SET 0xF0001E10 0x010F3000
+    
+    # QSPI2_DATAENTRY0: Write w parity   0x43AB,0x43EF,0x4356,0x4312,0x4693,0x4500,0x43DF,0x4334,0x43BE,0x43CA
+    # UNLOCK1
+    SET 0xF0001E64 0x43AB
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK2
+    SET 0xF0001E64 0x43EF
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK3
+    SET 0xF0001E64 0x4356
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: UNLOCK4
+    SET 0xF0001E64 0x4312
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: WWD off
+    SET 0xF0001E64 0x4693
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: ERR-pin monitoring off
+    SET 0xF0001E64 0x4500
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK1
+    SET 0xF0001E64 0x43DF
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK2
+    SET 0xF0001E64 0x4334
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK3
+    SET 0xF0001E64 0x43BE
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    # QSPI2_DATAENTRY0: LOCK4
+    SET 0xF0001E64 0x43CA
+    
+    # QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+    SET 0xF0001E54 0x200
+    
+    # QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+    SET 0xF0001E54 0x400
+    
+    ; switch off FLASH error traps
+    SET 0xF80020A8 0x8000
+    SET 0xF80020AC 0x8000
+    
+  ExecOnConnectCmds:  n
+  OnConnectScript Script:
+    Script is empty
+  FailOnResetMalfunction:  n
+  ResetPulseLen:  10
+  AddResetDelay:  0
+  UseTrstOnReset:  n
+  ExecEmemInitOnReset:  0x00000000
+  SimHsmBootEnabled:  n
+  UnlockInterface:  n
+  BootPasswd0:  0x00000000
+  BootPasswd1:  0x00000000
+  BootPasswd2:  0x00000000
+  BootPasswd3:  0x00000000
+  BootPasswd4:  0x00000000
+  BootPasswd5:  0x00000000
+  BootPasswd6:  0x00000000
+  BootPasswd7:  0x00000000
+  PasswordFile:  
+  HandleBmiHeader:  n
+  SetAutOkOnConnect:  n
+  DontUseWdtSusp:  n
+  MaxTry:  1
+  ForceEdMode:  -1
+  UseDflashAccessFilter:  y
+  UseTranslateAddr:  y
+  DownloadToAllRams:  y
+  HaltAfterReset:  y
+  TargetAppHandshakeMode:  None
+  TargetAppHandshakeTimeout:  100
+  TargetAppHandshakeParameter0:  0x00000000
+  TargetAppHandshakeParameter1:  0x00000000
+  TargetAppHandshakeParameter2:  0x00000000
+  TargetAppHandshakeParameter3:  0x00000000
+  SimioAddr:  g_JtagSimioAccess
+  UseStmForPtm:  1
+  ExecOnStartCmds:  n
+  OnStartScript Script:
+    
+  ExecOnHaltCmds:  n
+  OnHaltScript Script:
+    
+  UseTriggerToBreak:  y
+  UseTL2OnHalt:  y
+  UseOstateStable:  y
+  AllowJtagResetWhileRunning:  y
+  MaxAccRetry:  1
+  AccRetryDelay:  100
+  DefOcdsReserved:  
+  UseRestartWhileRunningHandling:  n
+  DebugResetOnDisconnect:  n
+  IgnoreEmemAccessErrors:  n
+  RemapEmemAccess:  n
+  EnableAutomaticHsmStart:  n
+  EnableAutomaticHsmRunControl:  n
+  ReadPmcsrWhileRunning:  n
+  IvIcacheOnHalt:  y
+  IvPlbOnHalt:  y
+  SuspendSlaveCores:  n
+  FilterMemAcc:  y
+  DasDllPath:  das_api.dll
+  DasHost:  
+  DasTryStartSrv:  y
+  DasSrvPath:  servers\udas\udas.exe
+  DasStopSrv:  y
+  DasResetHelperBreakAddr:  main
+  DasResetMode:  2
+  DasRemoveLogFile:  n
+  DasForwardSerNum:  n
+  DasSrvSel:  -1
+  DasPortType:  0
+  DasPortSel:  0
+  DasCmdTimeout:  1000
+
+JTAG target infos:
+  JTAG-ID:           0x00000000
+  UsedJtagClk:       0 MHz
+  ExtVoltage:        0.0 V
+  IntVoltageUsed:    n
+  STSTAT:            0x493DA6C4
+
+DAS related information:
+  DAS DLL Version:        
+  Server started by UDE:  C:\Program Files (x86)\DAS\servers\udas\udas.exe
+  Server name:            UDAS
+  Server manufacturer:    Infineon
+  Server version:         V3.8
+  DAS-API version:        V4.1
+  Server lib version:     V3.0
+  last DAS error:         4
+  last DAS function:      connect_to_device
+
+

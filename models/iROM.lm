@@ -110,6 +110,8 @@
     <ObjectFile Name="src\uart_init_int.o"/>
     <ObjectFile Name="src\uart_int.o"/>
     <ObjectFile Name="src\usr_sprintf.o"/>
+    <ObjectFile Name="src\dhry_2.o"/>
+    <ObjectFile Name="src\timer.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>
