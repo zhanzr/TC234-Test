@@ -39,9 +39,7 @@
 
 #define BUFSIZE		128
 
-#ifndef BAUDRATE
-#define BAUDRATE	38400
-#endif /* BAUDRATE */
+#define BAUDRATE	115200
 
 static const char *my_str = "Hello world!";
 
