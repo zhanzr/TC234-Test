@@ -38,10 +38,10 @@ __LMU_SRAM_BEGIN = 0x90000000;
 __LMU_SRAM_SIZE = 32K;
 
 
-__USTACK_SIZE = DEFINED (__USTACK_SIZE) ? __USTACK_SIZE : 8K;  /* Section for ustack*/ 
-__ISTACK_SIZE = DEFINED (__ISTACK_SIZE) ? __ISTACK_SIZE : 2K;  /* Section for istack*/ 
-__HEAP_SIZE = DEFINED (__HEAP_SIZE) ? __HEAP_SIZE : 8K;  /* Section for heap*/ 
-__CSA_SIZE = DEFINED (__CSA_SIZE) ? __CSA_SIZE : 32K;  /* Section for CSA*/ 
+__USTACK_SIZE = DEFINED (__USTACK_SIZE) ? __USTACK_SIZE : 4K;  /* Section for ustack*/ 
+__ISTACK_SIZE = DEFINED (__ISTACK_SIZE) ? __ISTACK_SIZE : 1K;  /* Section for istack*/ 
+__HEAP_SIZE = DEFINED (__HEAP_SIZE) ? __HEAP_SIZE : 4K;  /* Section for heap*/ 
+__CSA_SIZE = DEFINED (__CSA_SIZE) ? __CSA_SIZE : 16K;  /* Section for CSA*/ 
 
 /**
  *	User defined global region

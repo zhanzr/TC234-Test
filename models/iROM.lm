@@ -104,14 +104,12 @@
   </Input>
   <Files>
     <ObjectFile Name="src\cint_tc23x.o"/>
-    <ObjectFile Name="src\hello.o"/>
     <ObjectFile Name="src\interrupts.o"/>
     <ObjectFile Name="src\system_tc23x.o"/>
     <ObjectFile Name="src\uart_init_int.o"/>
     <ObjectFile Name="src\uart_int.o"/>
-    <ObjectFile Name="src\usr_sprintf.o"/>
-    <ObjectFile Name="src\dhry_2.o"/>
     <ObjectFile Name="src\timer.o"/>
+    <ObjectFile Name="src\main.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>
