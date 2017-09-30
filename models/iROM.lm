@@ -110,6 +110,12 @@
     <ObjectFile Name="src\uart_int.o"/>
     <ObjectFile Name="src\timer.o"/>
     <ObjectFile Name="src\main.o"/>
+    <ObjectFile Name="src\coremark_v1.0\core_list_join.o"/>
+    <ObjectFile Name="src\coremark_v1.0\core_main.o"/>
+    <ObjectFile Name="src\coremark_v1.0\core_matrix.o"/>
+    <ObjectFile Name="src\coremark_v1.0\core_state.o"/>
+    <ObjectFile Name="src\coremark_v1.0\core_util.o"/>
+    <ObjectFile Name="src\coremark_v1.0\tc234\core_portme.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

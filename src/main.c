@@ -16,12 +16,6 @@
 
 #include "timer.h"
 
-#ifndef MSC_CLOCK
-#define MSC_CLOCK
-
-#define HZ	1000
-#endif
-
 #include "led.h"
 #include "uart_int.h"
 
@@ -52,6 +46,11 @@ volatile uint32_t g_Ticks;
 static void my_timer_handler(void)
 {
 	++g_Ticks;
+}
+
+volatile uint32_t HAL_GetTick(void)
+{
+	return g_Ticks;
 }
 
 static void my_puts(const char *str)
@@ -141,7 +140,7 @@ size_t write(int fd, const void *buffer, size_t count)
 	return index;
 }
 
-int main(void)
+int original_main(void)
 {
 	char c;
 	int quit = 0;
@@ -171,46 +170,47 @@ int main(void)
 	/* enable global interrupts */
 	_enable();
 
-	printf("Complex Test @ Sys:%u Hz CPU:%u Hz CoreType:%04X\n",
+	printf("Coremark Test @ Sys:%u Hz CPU:%u Hz CoreType:%04X\n",
 			SYSTEM_GetSysClock(),
 			SYSTEM_GetCpuClock(),
 			__TRICORE_CORE__
 	);
-	while (!quit)
-	{
-		if (_uart_getchar(&c))
-		{
-			switch (c)
-			{
-				case '0' :
-					LEDOFF(0);
-					my_puts("LED switched to OFF");
-					break;
-				case '1' :
-					LEDON(0);
-					my_puts("LED switched to ON");
-					break;
-				case '2' :
-					printf("%s,%s\n", __DATE__, __TIME__);
-					break;
-//				case 'E' :
-//					quit = 1;
-//					my_puts("Bye bye!");
-//					break;
-				case '\n' :
-				case '\r' :
-					/* do nothing -- ignore it */
-					break;
-				default :
-					printf("Command '%c' not supported\r\n", c);
-					break;
-			}
-		}
-	}
 
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
+//	while (!quit)
+//	{
+//		if (_uart_getchar(&c))
+//		{
+//			switch (c)
+//			{
+//				case '0' :
+//					LEDOFF(0);
+//					my_puts("LED switched to OFF");
+//					break;
+//				case '1' :
+//					LEDON(0);
+//					my_puts("LED switched to ON");
+//					break;
+//				case '2' :
+//					printf("%s,%s\n", __DATE__, __TIME__);
+//					break;
+////				case 'E' :
+////					quit = 1;
+////					my_puts("Bye bye!");
+////					break;
+//				case '\n' :
+//				case '\r' :
+//					/* do nothing -- ignore it */
+//					break;
+//				default :
+//					printf("Command '%c' not supported\r\n", c);
+//					break;
+//			}
+//		}
+//	}
+//
+//	/* wait until sending has finished */
+//	while (_uart_sending())
+//		;
 
 	return EXIT_SUCCESS;
 }
