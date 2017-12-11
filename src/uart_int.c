@@ -232,3 +232,16 @@ int _uart_sending(void)
 	}
 	return ret;
 }
+
+size_t read(int fd, void *buffer, size_t count)
+{
+	//Dummy read, don't use scanf
+	return count;
+}
+
+size_t write(int fd, const void *buffer, size_t count)
+{
+	_uart_send(buffer, count);
+
+	return count;
+}

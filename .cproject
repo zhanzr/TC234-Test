@@ -19,7 +19,7 @@
 						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.857902312" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable">
 							<option id="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919" name="CPU type (-mcpu)" superClass="com.rt.hightec.buildsystem.tricore.new.mcpu" value="TC23XX" valueType="enumerated"/>
 							<targetPlatform archList="TriCore" binaryParser="org.eclipse.cdt.core.ELF" id="com.rt.hightec.buildsystem.tricore.new.excutable.targetplatform.1920218961" isAbstract="false" name="Infineon\TC234 Application Kit\AppKit_TC234" superClass="com.rt.hightec.buildsystem.tricore.new.excutable.targetplatform"/>
-							<builder buildPath="${workspace_loc:/HelloSerialInterrupt_AppKit-TC234TFT}/iROM" id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.builder.197320153" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.builder"/>
+							<builder buildPath="${workspace_loc:/HelloSerialInterrupt_AppKit-TC234TFT}/iROM" id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.builder.197320153" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.builder"/>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.219290185" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler">
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.assembler.general.includepath.502517553" name="Include Paths" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.assembler.general.includepath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;../h&quot;"/>
@@ -46,8 +46,8 @@
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths.1959146808" name="Include Paths" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;../h&quot;"/>
 								</option>
-								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization.111267155" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.code.optimization.speed" valueType="enumerated"/>
-								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.830677023" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.0" valueType="enumerated"/>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization.111267155" name="Optimization Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.code.optimization.speed" valueType="enumerated"/>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.830677023" name="Debug Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.0" valueType="enumerated"/>
 								<inputType id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType.439893687" name="Compiler Input (C)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType"/>
 							</tool>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.cpp.491974631" name="TriCore C++ Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.cpp">
@@ -201,11 +201,12 @@
 		</buildTargets>
 	</storageModule>
 	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="Default">
-			<resource resourceType="PROJECT" workspacePath="/HelloSerialInterrupt_AppKit-TC234TFT"/>
-		</configuration>
 		<configuration configurationName="iROM">
 			<resource resourceType="PROJECT" workspacePath="/HelloSerialInterrupt_AppKit-TC234TFT"/>
 		</configuration>
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/HelloSerialInterrupt_AppKit-TC234TFT"/>
+		</configuration>
 	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

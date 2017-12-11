@@ -14,11 +14,7 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#ifndef MAX_LED
-#define MAX_LED 0
-#endif
 
-#if (MAX_LED > 0)
 static __inline void LEDON(int nr)
 {
 	if (nr < MAX_LED)
@@ -42,32 +38,21 @@ static __inline void LEDTOGGLE(int nr)
 		LED_TOGGLE(nr);
 	}
 }
-#else
-/* no support for LEDs */
-static __inline void LEDON(int nr)
-{
-	(void)nr;
-}
 
-static __inline void LEDOFF(int nr)
-{
-	(void)nr;
-}
-
-static __inline void LEDTOGGLE(int nr)
-{
-	(void)nr;
-}
-
-#ifndef INIT_LEDS
-#define INIT_LEDS
-#endif /* INIT_LEDS */
-#endif /* MAX_LED > 0 */
 
 static __inline void InitLED(void)
 {
 	INIT_LEDS;
 }
+
+/* type of a timer callback function */
+typedef void (*TCF)(void);
+
+/* Initialise timer at rate <hz> */
+void TimerInit(unsigned int hz);
+
+/* Install <handler> as timer callback function */
+void TimerSetHandler(TCF handler);
 
 #ifdef __cplusplus
 }
