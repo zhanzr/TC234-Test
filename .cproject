@@ -48,6 +48,7 @@
 								</option>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization.111267155" name="Optimization Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.code.optimization.speed" valueType="enumerated"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.830677023" name="Debug Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.0" valueType="enumerated"/>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.FShortDouble.440054752" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.FShortDouble" value="false" valueType="boolean"/>
 								<inputType id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType.439893687" name="Compiler Input (C)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType"/>
 							</tool>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.cpp.491974631" name="TriCore C++ Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.cpp">

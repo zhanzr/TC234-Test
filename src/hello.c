@@ -11,6 +11,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdint.h>
+#include <math.h>
 
 #include "led.h"
 #include "uart_int.h"
@@ -300,7 +301,7 @@ int main(void)
 	//On my host PC
 	//Loops: 500000, Iterations: 1, Duration: 16 sec.
 	//C Converted Double Precision Whetstones: 3125.0 MIPS
-		loopstart = 500000;		/* see the note about LOOP below */
+		loopstart = 2000;		/* see the note about LOOP below */
 		continuous = 1;
 		II = 1;		/* start at the first arg (temp use of II here) */
 
@@ -325,8 +326,8 @@ int main(void)
 #endif /* !__TC161__ && !__TC162__ */
 #endif /* __TRICORE__ */
 
-	my_puts(my_str);
-	printf("Whetstone for TC234 Sys:%u Hz, Cpu:%u Hz, Stm:%u Hz\n",
+	printf("Whetstone for TC234 %d %d\n", sizeof(float), sizeof(double));
+	printf("Sys:%u Hz, Cpu:%u Hz, Stm:%u Hz\n",
 			SYSTEM_GetSysClock(),
 			SYSTEM_GetCpuClock(),
 			SYSTEM_GetStmClock()

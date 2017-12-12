@@ -8,6 +8,7 @@
 #define MODULE_UART_INT
 
 #include <string.h>
+#include <stdio.h>
 
 #include "bspconfig.h"
 #include "uart_int.h"
