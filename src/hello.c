@@ -49,8 +49,6 @@
 
 #define SYSTIME_CLOCK	1000	/* timer event rate [Hz] */
 
-static const char *my_str = "Hello world!";
-
 volatile uint32_t g_SysTicks;
 volatile uint8_t test_flag = 0;
 
@@ -326,7 +324,7 @@ int main(void)
 #endif /* !__TC161__ && !__TC162__ */
 #endif /* __TRICORE__ */
 
-	printf("Whetstone for TC234 %d %d\n", sizeof(float), sizeof(double));
+	printf("whetstone for TC234 %d %d\n", sizeof(float), sizeof(double));
 	printf("Sys:%u Hz, Cpu:%u Hz, Stm:%u Hz\n",
 			SYSTEM_GetSysClock(),
 			SYSTEM_GetCpuClock(),
@@ -633,7 +631,6 @@ int main(void)
 					my_puts("LED switched to ON");
 					break;
 				case '2' :
-					my_puts(my_str);
 					break;
 				case 'E' :
 					quit = 1;
