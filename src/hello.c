@@ -587,18 +587,18 @@ int main(void)
 	*/
 		printf("\n");
 		if (fini_tick-start_tick <= SYSTIME_CLOCK) {
-			printf("Insufficient duration- Increase the LOOP count\n");
+			printf("Insufficient duration- Increase the loop count\n");
 			return(1);
 		}
 
-		printf("Loops: %ld, Iterations: %d, Duration: %u/%u sec.\n",
+		printf("loops: %ld, Iterations: %d, Duration: %u/%u sec.\n",
 				LOOP, II, fini_tick-start_tick, SYSTIME_CLOCK);
 
 		KIPS = (100.0*LOOP*II)/(float)((fini_tick-start_tick)/SYSTIME_CLOCK);
 		if (KIPS >= 1000.0)
-			printf("C Converted Double Precision Whetstones: %.1f MIPS\n", KIPS/1000.0);
+			printf("C Converted Double Precision Whetstones: %.2f MIPS\n", KIPS/1000.0);
 		else
-			printf("C Converted Double Precision Whetstones: %.1f KIPS\n", KIPS);
+			printf("C Converted Double Precision Whetstones: %.2f KIPS\n", KIPS);
 
 		printf("%d %u\n",
 				_mfcr(CPU_CORE_ID),
