@@ -80,7 +80,21 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver"/>
 						</toolChain>
 					</folderInfo>
+					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.510529732" name="/" resourcePath="asm">
+						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.239742863" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable" unusedChildren="">
+							<option id="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919.82621482" name="CPU type (-mcpu)" superClass="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.219290185"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.gtm.1064064799" name="TriCore GTM Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.gtm.373372830"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.pcp.1828617310" name="TriCore PCP Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.pcp.1265890664"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.c.106796176" name="TriCore C Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.cpp.142977310" name="TriCore C++ Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.cpp.491974631"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.linker.c.747647136" name="TriCore C Linker" superClass="com.rt.hightec.buildsystem.tricore.new.linker.c.1648588151"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.linker.cpp.1476411408" name="TriCore C++ Linker" superClass="com.rt.hightec.buildsystem.tricore.new.linker.cpp.449103437"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.2139967422" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982"/>
+						</toolChain>
+					</folderInfo>
 					<sourceEntries>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>

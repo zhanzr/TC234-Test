@@ -13,6 +13,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#include <stdint.h>
+
 #include <machine/intrinsics.h>
 
 #include "tc_inc_path.h"
@@ -21,23 +23,9 @@ extern "C" {
 #include TC_INCLUDE(TCPATH/IfxStm_reg.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_bf.h)
 
-#if defined(TRIBOARD_TC233A)
-# define BOARD_NAME				"TriBoard-TC233A"
-# define BOARD_TITLE			"TC233A TriBoard"
-# define MCU_NAME				"TC233A"
-#elif defined(APPKIT_TC234TFT)
 # define BOARD_NAME				"AppKit-TC234TFT"
 # define BOARD_TITLE			"TC234TFT AppKit"
 # define MCU_NAME				"TC234A"
-#elif defined(APPKIT_TC237TFT)
-# define BOARD_NAME				"AppKit-TC237TFT"
-# define BOARD_TITLE			"TC237TFT AppKit"
-# define MCU_NAME				"TC237A"
-#else
-# define BOARD_NAME				"TriBoard-TC234A"
-# define BOARD_TITLE			"TC234A TriBoard"
-# define MCU_NAME				"TC234A"
-#endif /* TRIBOARD_TC233A */
 
 #define CPU_CLOCK				200
 #define TIM_CLOCK				(CPU_CLOCK)
@@ -54,61 +42,6 @@ extern "C" {
 #include TC_INCLUDE(TCPATH/IfxPort_reg.h)
 #include TC_INCLUDE(TCPATH/IfxPort_bf.h)
 
-#if (TRIBOARD_TC2X3 == 1)
-/* TriBoard-TC2X3 : P11.8 - P11.11 and P13.0 - P13.3 --> LED D501 ... D508 */
-
-static Ifx_P * const portLED1 = (Ifx_P *)&MODULE_P11;
-static Ifx_P * const portLED2 = (Ifx_P *)&MODULE_P13;
-
-#define MAX_LED1				4	/* number of available LEDs in 1st block */
-#define LED_PIN_NR1				8	/* pin number of first used LED in 1st block */
-#define MAX_LED2				4	/* number of available LEDs in 2nd block */
-#define LED_PIN_NR2				0	/* pin number of first used LED in 2nd block */
-
-#define MAX_LED					(MAX_LED1 + MAX_LED2)	/* number of available LEDs */
-
-#define MASK_ALL_LEDS1			((1 << MAX_LED1) - 1)
-#define MASK_ALL_LEDS2			((1 << MAX_LED2) - 1)
-
-#define LED_PIN_NO(x)			(((x) < MAX_LED1) ? LED_PIN_NR1 : LED_PIN_NR2 - MAX_LED1)
-
-/* compatibility layer: map "normal" macros to LED block 1 */
-#define LED_PIN_NR				LED_PIN_NR1
-#define MASK_ALL_LEDS			MASK_ALL_LEDS1
-#define portLED					portLED1
-
-/* OMR is WO ==> don't use load-modify-store access! */
-/* set PSx pin */
-#define LED_PIN_SET(x)			(1 << (LED_PIN_NO(x) + (x)))
-/* set PCLx pin */
-#define LED_PIN_RESET(x)		(1 << (LED_PIN_NO(x) + IFX_P_OMR_PCL0_OFF + (x)))
-
-/* LED block 1 */
-#define LED_ON1(x)				(portLED1->OMR.U = LED_PIN_RESET(x))
-#define LED_OFF1(x)				(portLED1->OMR.U = LED_PIN_SET(x))
-/* set PCLx and PSx pin to 1 ==> toggle pin state */
-#define LED_TOGGLE1(x)			(portLED1->OMR.U = LED_PIN_RESET(x) | LED_PIN_SET(x))
-
-/* LED block 2 */
-#define LED_ON2(x)				(portLED2->OMR.U = LED_PIN_RESET(x))
-#define LED_OFF2(x)				(portLED2->OMR.U = LED_PIN_SET(x))
-/* set PCLx and PSx pin to 1 ==> toggle pin state */
-#define LED_TOGGLE2(x)			(portLED2->OMR.U = LED_PIN_RESET(x) | LED_PIN_SET(x))
-
-#define LED_ON(x)				(((x) < MAX_LED1) ? LED_ON1(x) : LED_ON2(x))
-#define LED_OFF(x)				(((x) < MAX_LED1) ? LED_OFF1(x) : LED_OFF2(x))
-/* set PCLx and PSx pin to 1 ==> toggle pin state */
-#define LED_TOGGLE(x)			(((x) < MAX_LED1) ? LED_TOGGLE1(x) : LED_TOGGLE2(x))
-#define INIT_LEDS				{\
-	/* initialise all LEDs (P11.8 - P11.11 + P13.0 - P13.3) */\
-	portLED1->IOCR8.U = 0x80808080;	/* OUT_PPGPIO */\
-	portLED2->IOCR0.U = 0x80808080;	/* OUT_PPGPIO */\
-	/* all LEDs OFF */\
-	portLED1->OMR.U = (MASK_ALL_LEDS1 << LED_PIN_NR1);\
-	portLED2->OMR.U = (MASK_ALL_LEDS2 << LED_PIN_NR2);\
-}
-
-#elif (RUN_ON_APPKIT == 1)
 /* AppKit-TC2X4: P13.0 .. P13.3 --> LED D107 ... D110 */
 /* AppKit-TC2X7: P13.0 .. P13.3 --> LED D107 ... D110 */
 
@@ -135,46 +68,6 @@ static Ifx_P * const portLED = (Ifx_P *)&MODULE_P13;
 	/* all LEDs OFF */\
 	portLED->OMR.U = (MASK_ALL_LEDS << LED_PIN_NR);\
 }
-
-#else
-/* TriBoard-TC2X4-TH : P33.0 - P33.3 and P33.8 - P33.11 --> LED D501 ... D508 */
-
-static Ifx_P * const portLED = (Ifx_P *)&MODULE_P33;
-
-#define MAX_LED1				4	/* number of available LEDs in 1st block */
-#define LED_PIN_NR1				0	/* pin number of first used LED in 1st block */
-#define MAX_LED2				4	/* number of available LEDs in 2nd block */
-#define LED_PIN_NR2				8	/* pin number of first used LED in 2nd block */
-
-#define MAX_LED					(MAX_LED1 + MAX_LED2)	/* number of available LEDs */
-
-#define MASK_ALL_LEDS1			((1 << MAX_LED1) - 1)
-#define MASK_ALL_LEDS2			((1 << MAX_LED2) - 1)
-#define MASK_ALL_LEDS			(MASK_ALL_LEDS1 | MASK_ALL_LEDS2)
-
-#define LED_PIN_NO(x)			(((x) < MAX_LED1) ? LED_PIN_NR1 : LED_PIN_NR2 - MAX_LED1)
-
-/* compatibility layer: map "normal" macros to LED block 1 */
-#define LED_PIN_NR				LED_PIN_NR1
-
-/* OMR is WO ==> don't use load-modify-store access! */
-/* set PSx pin */
-#define LED_PIN_SET(x)			(1 << (LED_PIN_NO(x) + (x)))
-/* set PCLx pin */
-#define LED_PIN_RESET(x)		(1 << (LED_PIN_NO(x) + IFX_P_OMR_PCL0_OFF + (x)))
-
-#define LED_ON(x)				(portLED->OMR.U = LED_PIN_RESET(x))
-#define LED_OFF(x)				(portLED->OMR.U = LED_PIN_SET(x))
-/* set PCLx and PSx pin to 1 ==> toggle pin state */
-#define LED_TOGGLE(x)			(portLED->OMR.U = LED_PIN_RESET(x) | LED_PIN_SET(x))
-#define INIT_LEDS				{\
-	/* initialise all LEDs (P33.0 - P33.3 + P33.8 - P33.11) */\
-	portLED->IOCR0.U = 0x80808080;	/* OUT_PPGPIO */\
-	portLED->IOCR8.U = 0x80808080;	/* OUT_PPGPIO */\
-	/* all LEDs OFF */\
-	portLED->OMR.U = (MASK_ALL_LEDS1 << LED_PIN_NR1) | (MASK_ALL_LEDS2 << LED_PIN_NR2);\
-}
-#endif /* TRIBOARD_TC2X3 */
 
 
 /*********************************************************/
@@ -275,6 +168,7 @@ extern void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*ua
 
 #endif /* MODULE_UART_INT */
 
+#define UNUSED(x) (void)(x)
 
 #ifdef __cplusplus
 }

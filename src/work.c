@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdbool.h>
 #include <math.h>
 
 #include "led.h"
@@ -16,29 +17,21 @@
 
 #include "system_tc2x.h"
 #include "machine/intrinsics.h"
-
-#define SPRINTF		sprintf
-#define VSPRINTF	vsprintf
-
 #include "interrupts.h"
 
-#define BUFSIZE		512
+#include "asm_prototype.h"
 
 #define BAUDRATE	115200
 
 #define SYSTIME_CLOCK	1000	/* timer event rate [Hz] */
 
 volatile uint32_t g_SysTicks;
-volatile uint8_t test_flag = 0;
+volatile bool g_regular_task_flag;
 
 /* timer callback handler */
 static void my_timer_handler(void)
 {
 	++g_SysTicks;
-	if(0==g_SysTicks%(20*SYSTIME_CLOCK))
-	{
-		test_flag = 1;
-	}
 }
 
 const uint32_t HAL_GetTick(void)
@@ -46,32 +39,12 @@ const uint32_t HAL_GetTick(void)
 	return g_SysTicks;
 }
 
-static void my_puts(const char *str)
-{
-	char buffer[BUFSIZE];
-
-	SPRINTF(buffer, "%s\r\n", str);
-	_uart_puts(buffer);
-}
-
-static void my_printf(const char *fmt, ...)
-{
-	char buffer[BUFSIZE];
-	va_list ap;
-
-	va_start(ap, fmt);
-	VSPRINTF(buffer, fmt, ap);
-	va_end(ap);
-
-	_uart_puts(buffer);
-}
-
 #define SYSTIME_ISR_PRIO	2
 
 #define STM0_BASE			((Ifx_STM *)&MODULE_STM0)
 
 /* timer reload value (needed for subtick calculation) */
-static unsigned int reload_value = 0;
+static unsigned int reload_value;
 
 /* pointer to user specified timer callback function */
 static TCF user_handler = (TCF)0;
@@ -228,10 +201,6 @@ uint32_t IfxCpu_getRandomValue(uint32_t *seed)
 
 #define	TEST_N	10
 
-int32_t testRand[TEST_N];
-
-int16_t Ifx_AbsQ15(int16_t X);
-
 int main(void)
 {
 	SYSTEM_Init();
@@ -245,26 +214,28 @@ int main(void)
 	_init_uart(BAUDRATE);
 	InitLED();
 
-	printf("%u %u %u %u %u\n",
-			SYSTEM_GetCpuClock(),
-			SYSTEM_GetSysClock(),
-			SYSTEM_GetStmClock(),
-			SYSTEM_GetCanClock(),
+	printf("%s CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
+			__TIME__,
+			SYSTEM_GetCpuClock()/1000000,
+			SYSTEM_GetSysClock()/1000000,
+			SYSTEM_GetStmClock()/1000000,
 			SYSTEM_IsCacheEnabled());
 
-	test_flag = 1;
+	g_regular_task_flag = true;
 	while(1)
 	{
-		if(0!=test_flag)
+		if(0==g_SysTicks%(20*SYSTIME_CLOCK))
 		{
-			test_flag = 0;
+			g_regular_task_flag = true;
+		}
+
+		if(g_regular_task_flag)
+		{
+			g_regular_task_flag = false;
 
 			for(uint32_t i=0; i<TEST_N; ++i)
 			{
-				printf("%08X ", rand());
-				int32_t testSeed = i;
-				printf("%08X ", IfxCpu_getRandomValue(&testSeed));
-				printf("%d %d\n", 0-i, Ifx_AbsQ15(0-i));
+				printf("Abs[%d]=%d\t", 0-i, Ifx_AbsQ15(0-i));
 			}
 			printf("\n");
 
@@ -301,6 +272,12 @@ int main(void)
 				printf("[MULS] %i * %i = %i\n", t1, t2, res_ms);
 			}
 		}
+
+		__asm__ volatile ("nop" ::: "memory");
+		__asm volatile ("" : : : "memory");
+		/* wait until sending has finished */
+		while (_uart_sending())
+			;
 	}
 
 	return EXIT_SUCCESS;

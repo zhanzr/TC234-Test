@@ -30,7 +30,6 @@
 #define TX_CLEAR(u)
 #endif
 
-
 typedef struct
 {
 	unsigned int	head;
@@ -51,6 +50,14 @@ typedef struct
 static TxBuffer_t sendBuf;
 static RxBuffer_t recvBuf;
 
+void SimpleDelay(uint32_t d)
+{
+	uint32_t t = d*2000;
+	while(--t)
+	{
+		  __asm__ volatile ("nop" ::: "memory");
+	}
+}
 
 /* FIFO support */
 static __inline int isEmptyTXFifo(void)
@@ -123,6 +130,8 @@ static __inline void _out_uart(const char chr)
 	TX_CLEAR(UARTBASE);
 	/* send the character */
 	PUT_CHAR(UARTBASE, chr);
+
+	SimpleDelay(1);
 }
 
 /* Receive (and return) a character from the serial line */
@@ -237,11 +246,16 @@ int _uart_sending(void)
 size_t read(int fd, void *buffer, size_t count)
 {
 	//Dummy read, don't use scanf
+	UNUSED(fd);
+	UNUSED(buffer);
+
 	return count;
 }
 
 size_t write(int fd, const void *buffer, size_t count)
 {
+	UNUSED(fd);
+
 	_uart_send(buffer, count);
 
 	return count;

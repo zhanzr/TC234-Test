@@ -5,10 +5,10 @@
 * Copyright HighTec EDV-Systeme GmbH 1982-2016
 *====================================================================*/
 
+#include <stdio.h>
 #include <machine/intrinsics.h>
 #include <machine/wdtcon.h>
 #include "cint.h"
-
 #include "tc_inc_path.h"
 
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
@@ -96,6 +96,7 @@ int _install_trap_handler(int trapno, void (*traphandler)(int))
 
 static void __class_0_trap_handler(int tin)
 {
+	printf("%s %d\n", __func__, tin);
 	switch (tin)
 	{
 		case 1:
@@ -112,6 +113,7 @@ static void __class_0_trap_handler(int tin)
 
 static void __class_1_trap_handler(int tin)
 {
+	printf("%s %d\n", __func__, tin);
 	switch (tin)
 	{
 		case 1:
@@ -148,6 +150,7 @@ static void __class_1_trap_handler(int tin)
 
 static void __class_2_trap_handler(int tin)
 {
+	printf("%s %d\n", __func__, tin);
 	switch (tin)
 	{
 		case 1:
@@ -176,6 +179,7 @@ static void __class_2_trap_handler(int tin)
 
 static void __class_3_trap_handler(int tin)
 {
+	printf("%s %d\n", __func__, tin);
 	switch (tin)
 	{
 		case 1:
@@ -212,6 +216,7 @@ static void __class_3_trap_handler(int tin)
 
 static void __class_4_trap_handler(int tin)
 {
+	printf("%s %d\n", __func__, tin);
 	switch (tin)
 	{
 		case 1:
@@ -248,6 +253,7 @@ static void __class_4_trap_handler(int tin)
 
 static void __class_5_trap_handler(int tin)
 {
+	printf("%s %d\n", __func__, tin);
 	switch (tin)
 	{
 		case 1:
@@ -264,6 +270,7 @@ static void __class_5_trap_handler(int tin)
 
 static void __class_6_trap_handler(int tin)
 {
+	printf("%s %d\n", __func__, tin);
 	(void)tin;
 	__asm volatile ("debug"); /* System Call #tin  */
 }
@@ -272,6 +279,7 @@ static void __class_6_trap_handler(int tin)
 
 static void __class_7_trap_handler(int tin)
 {
+	printf("%s %d\n", __func__, tin);
 	(void)tin;
 	__asm volatile ("debug"); /* NMI -- Non-maskable Interrupt  */
 }
