@@ -1,3 +1,4 @@
 TC234 Demo.
 
-Tricore 1.6 EABI Test.
+Assemble Language Demo: Absolute Instruction Demo.
+
