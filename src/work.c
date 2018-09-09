@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <math.h>
+#include <limits.h>
 
 #include "led.h"
 #include "uart_int.h"
@@ -108,99 +109,6 @@ void TimerSetHandler(TCF handler)
 	user_handler = handler;
 }
 
-
-inline int32_t __add(int32_t a, int32_t b)
-{
-	int32_t res;
-	__asm volatile ("add %0, %1, %2": "=d" (res) : "d" (a), "d" (b));
-	return res;
-}
-
-inline int32_t __sub(int32_t a, int32_t b)
-{
-	int32_t res;
-	__asm volatile ("sub %0, %1, %2": "=d" (res) : "d" (a), "d" (b));
-	return res;
-}
-
-inline int32_t __adds(int32_t a, int32_t b)
-{
-	int32_t res;
-	__asm volatile ("adds %0, %1, %2": "=d" (res) : "d" (a), "d" (b));
-	return res;
-}
-
-inline int32_t __subs(int32_t a, int32_t b)
-{
-	int32_t res;
-	__asm volatile ("subs %0, %1, %2": "=d" (res) : "d" (a), "d" (b));
-	return res;
-}
-
-/** multiplication signed without saturation
- */
-inline uint32_t __mul(int32_t a, int32_t b)
-{
-	int32_t res;
-	__asm volatile ("mul %0, %1, %2": "=d" (res) : "d" (a), "d" (b));
-	return res;
-}
-
-/** multiplication signed with saturation
- */
-inline int32_t __muls(int32_t a, int32_t b)
-{
-	int32_t res;
-	__asm volatile ("muls %0, %1, %2": "=d" (res) : "d" (a), "d" (b));
-	return res;
-}
-
-uint32_t IfxCpu_getRandomValue(uint32_t *seed)
-{
-	/*************************************************************************
-	 * the choice of a and m is important for a long period of the LCG
-	 * with a =  279470273 and
-	 *       m = 4294967291
-	 * a maximum period of 2^32-5 is given
-	 * values for a:
-	 * 0x5EB0A82F = 1588635695
-	 * 0x48E7211F = 1223106847
-	 * 0x10a860c1 =  279470273
-	 ***************************************************************************/
-	uint32_t x = *seed;
-
-	/* a seed of 0 is not allowed, and therefore will be changed to a valid value */
-	if (x == 0)
-	{
-		x = 42;
-	}
-
-	uint32_t a = 0x10a860c1;  // 279470273
-	uint32_t m = 0xfffffffb;  // 4294967291
-	uint32_t result;
-
-	/* *INDENT-OFF* */
-#ifdef __GNUC__
-	__asm("      mul.u     %%e14,%1,%2       # d15 = Eh; d14 = El    \n"
-			"        mov       %%d12,%%d14       #   e12 = El            \n"
-			"        mov       %%d13, 0          #                       \n"
-			"        madd.u    %%e14,%%e12,%%d15, 5 # e14 = El + 5 * d15    \n"
-			" cmp_m: jge.u     %%d14,%3,sub_m    #                       \n"
-			"        jz        %%d15,done        #                       \n"
-			" sub_m: subx      %%d14,%%d14,%3    #  e12=e12-m            \n"
-			"        subc      %%d15,%%d15,%%d13 # d13=d13-0             \n"
-			"        loopu     cmp_m             #                       \n"
-			" done:  mov       %0,%%d14          #                       \n"
-			: "=d"(result) : "d"(a), "d"(x), "d"(m) : "d12","d13","d14","d15");
-#endif
-	/* *INDENT-ON* */
-	* seed = result; // to simplify seed passing
-
-	return result;
-}
-
-#define	TEST_N	10
-
 int main(void)
 {
 	SYSTEM_Init();
@@ -221,6 +129,164 @@ int main(void)
 			SYSTEM_GetStmClock()/1000000,
 			SYSTEM_IsCacheEnabled());
 
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+		;
+
+	//Test Absolute Instruction
+	printf("\nTest ABS\n");
+	pack32 a_p32;
+	pack32 b_p32;
+	pack32 res_p32;
+	a_p32.i32 = INT32_MIN/2;
+	res_p32.u32 = Ifx_Abs(a_p32.i32);
+	printf("Abs[%i]=%i\n", a_p32.i32, res_p32.i32);
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+		;
+
+	printf("\nTest ABS.B\n");
+	a_p32.i8[0] = INT8_MIN/2;
+	a_p32.i8[1] = INT8_MIN/3;
+	a_p32.i8[2] = INT8_MIN/4;
+	a_p32.i8[3] = INT8_MIN/5;
+	res_p32.u32 = Ifx_Abs_B(a_p32.i32);
+	printf("Abs_B[%i %i %i %i]=%i %i %i %i\n",
+			a_p32.i8[0], a_p32.i8[1], a_p32.i8[2], a_p32.i8[3],
+			res_p32.i8[0], res_p32.i8[1], res_p32.i8[2], res_p32.i8[3]);
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+		;
+
+	printf("\nTest ABS.H\n");
+	a_p32.i16[0] = INT16_MIN/2;
+	a_p32.i16[1] = INT16_MIN/3;
+	res_p32.u32 = Ifx_Abs_H(a_p32.i32);
+	printf("Abs_H[%i %i]=%i %i \n",
+			a_p32.i16[0], a_p32.i16[1],
+			res_p32.i16[0], res_p32.i16[1]);
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+		;
+
+	printf("\nTest ABSS\n");
+	a_p32.i32 = INT32_MIN;
+	res_p32.u32 = Ifx_Abs(a_p32.i32);
+	printf("Abs[%i]=%i\n", a_p32.i32, res_p32.i32);
+	res_p32.u32 = Ifx_AbsS(a_p32.i32);
+	printf("AbsS[%i]=%i\n", a_p32.i32, res_p32.i32);
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+		;
+
+	printf("\nTest ABSS.H\n");
+	a_p32.i16[0] = INT16_MIN;
+	a_p32.i16[1] = INT16_MIN-1;
+	res_p32.u32 = Ifx_Abs_H(a_p32.i32);
+	printf("Abs_H[%i %i]=%i %i \n",
+			a_p32.i16[0], a_p32.i16[1],
+			res_p32.i16[0], res_p32.i16[1]);
+	res_p32.u32 = Ifx_AbsS_H(a_p32.i32);
+	printf("AbsS_H[%i %i]=%i %i \n",
+			a_p32.i16[0], a_p32.i16[1],
+			res_p32.i16[0], res_p32.i16[1]);
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+		;
+
+	printf("\nTest ABSDIF\n");
+	a_p32.i32 = INT32_MIN/2;
+	b_p32.i32 = INT32_MAX/2;
+	res_p32.u32 = Ifx_Absdif(a_p32.i32, b_p32.i32);
+	printf("Absdif[%i,%i]=%i\n", a_p32.i32, b_p32.i32, res_p32.i32);
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+		;
+
+	printf("\nTest ABSDIF.B\n");
+	a_p32.i8[0] = INT8_MIN/2;
+	a_p32.i8[1] = INT8_MIN/3;
+	a_p32.i8[2] = INT8_MIN/4;
+	a_p32.i8[3] = INT8_MIN/5;
+	b_p32.i8[0] = INT8_MAX/2;
+	b_p32.i8[1] = INT8_MAX/3;
+	b_p32.i8[2] = INT8_MAX/4;
+	b_p32.i8[3] = INT8_MAX/5;
+	res_p32.u32 = Ifx_Absdif_B(a_p32.i32, b_p32.i32);
+	printf("Absdif_B[%i %i %i %i\t%i %i %i %i]=%i %i %i %i\n",
+			a_p32.i8[0], a_p32.i8[1], a_p32.i8[2], a_p32.i8[3],
+			b_p32.i8[0], b_p32.i8[1], b_p32.i8[2], b_p32.i8[3],
+			res_p32.i8[0], res_p32.i8[1], res_p32.i8[2], res_p32.i8[3]);
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+		;
+
+	printf("\nTest ABSDIF.H\n");
+	a_p32.i16[0] = INT16_MIN/2;
+	a_p32.i16[1] = INT16_MIN/3;
+	b_p32.i16[0] = INT16_MAX/2;
+	b_p32.i16[1] = INT16_MAX/3;
+	res_p32.u32 = Ifx_Absdif_H(a_p32.i32, b_p32.i32);
+	printf("Absdif_H[%i %i\t%i %i]=%i %i \n",
+			a_p32.i16[0], a_p32.i16[1],
+			b_p32.i16[0], b_p32.i16[1],
+			res_p32.i16[0], res_p32.i16[1]);
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+		;
+
+	printf("\nTest ABSDIFS\n");
+	a_p32.i32 = INT32_MIN;
+	b_p32.i32 = INT32_MAX;
+	res_p32.u32 = Ifx_Absdif(a_p32.i32, b_p32.i32);
+	printf("Absdif[%i,%i]=%i\n", a_p32.i32, b_p32.i32, res_p32.i32);
+	res_p32.u32 = Ifx_AbsdifS(a_p32.i32, b_p32.i32);
+	printf("AbsdifS[%i,%i]=%i\n", a_p32.i32, b_p32.i32, res_p32.i32);
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+		;
+
+	printf("\nTest ABSDIFS.H\n");
+	a_p32.i16[0] = INT16_MIN;
+	a_p32.i16[1] = INT16_MIN+1;
+	b_p32.i16[0] = INT16_MAX;
+	b_p32.i16[1] = INT16_MAX-1;
+	res_p32.u32 = Ifx_Absdif_H(a_p32.i32, b_p32.i32);
+	printf("Absdif_H[%i %i\t%i %i]=%i %i \n",
+			a_p32.i16[0], a_p32.i16[1],
+			b_p32.i16[0], b_p32.i16[1],
+			res_p32.i16[0], res_p32.i16[1]);
+	res_p32.u32 = Ifx_AbsdifS_H(a_p32.i32, b_p32.i32);
+	printf("AbsdifS_H[%i %i\t%i %i]=%i %i \n",
+			a_p32.i16[0], a_p32.i16[1],
+			b_p32.i16[0], b_p32.i16[1],
+			res_p32.i16[0], res_p32.i16[1]);
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+		;
+
 	g_regular_task_flag = true;
 	while(1)
 	{
@@ -233,51 +299,19 @@ int main(void)
 		{
 			g_regular_task_flag = false;
 
-			for(uint32_t i=0; i<TEST_N; ++i)
-			{
-				printf("Abs[%d]=%d\t", 0-i, Ifx_AbsQ15(0-i));
-			}
-			printf("\n");
+			printf("%s CPU:%u MHz,Sys:%u MHz, %u, CacheEn:%d\n",
+					__TIME__,
+					SYSTEM_GetCpuClock()/1000000,
+					SYSTEM_GetSysClock()/1000000,
+					HAL_GetTick(),
+					SYSTEM_IsCacheEnabled());
 
-			//Test Add
-			printf("\nTest Add\n");
-			{
-				int32_t t1 = INT32_MAX;
-				int32_t t2 = 3;
-				int32_t res_a = __add(t1, t2);
-				int32_t res_as = __adds(t1, t2);
-				printf("[ADD] %i + %i = %i\n", t1, t2, res_a);
-				printf("[ADDS] %i + %i = %i\n", t1, t2, res_as);
-			}
-
-			//Test Sub
-			printf("\nTest Substract\n");
-			{
-				int32_t t1 = INT32_MIN;
-				int32_t t2 = 3;
-				int32_t res_s = __sub(t1, t2);
-				int32_t res_ss = __subs(t1, t2);
-				printf("[SUB] %i - %i = %i\n", t1, t2, res_s);
-				printf("[SUBS] %i - %i = %i\n", t1, t2, res_ss);
-			}
-
-			//Test Multiplication
-			printf("\nTest Multiplication\n");
-			{
-				int32_t t1 = INT32_MAX/2;
-				int32_t t2 = 3;
-				int32_t res_m = __mul(t1, t2);
-				int32_t res_ms = __muls(t1, t2);
-				printf("[MUL] %i * %i = %i\n", t1, t2, res_m);
-				printf("[MULS] %i * %i = %i\n", t1, t2, res_ms);
-			}
+			__asm__ volatile ("nop" ::: "memory");
+			__asm volatile ("" : : : "memory");
+			/* wait until sending has finished */
+			while (_uart_sending())
+				;
 		}
-
-		__asm__ volatile ("nop" ::: "memory");
-		__asm volatile ("" : : : "memory");
-		/* wait until sending has finished */
-		while (_uart_sending())
-			;
 	}
 
 	return EXIT_SUCCESS;

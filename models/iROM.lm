@@ -101,7 +101,6 @@
     <InputSection Description="Bit variables" Name=".bdata"/>
     <InputSection Description="absolute addressable readonly data" Name=".zdata.rodata"/>
     <InputSection Description="absolute addressable readonly data" Name=".zrodata"/>
-    <InputSection Name=".text.dsplib"/>
   </Input>
   <Files>
     <ObjectFile Name="src\cint_tc23x.o"/>
@@ -110,7 +109,13 @@
     <ObjectFile Name="src\uart_init_int.o"/>
     <ObjectFile Name="src\uart_int.o"/>
     <ObjectFile Name="src\work.o"/>
-    <ObjectFile Name="asm\Ifx_AbsQ15.o"/>
+    <ObjectFile Name="asm\test_ABS.o"/>
+    <ObjectFile Name="asm\test_ABSDIF.o"/>
+    <ObjectFile Name="asm\test_ABSDIFS.o"/>
+    <ObjectFile Name="asm\test_ABSS.o"/>
+    <ObjectFile Name="asm\test_ADD.A.o"/>
+    <ObjectFile Name="asm\test_ADD.o"/>
+    <ObjectFile Name="asm\test_ADDS.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

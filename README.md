@@ -1,3 +1,3 @@
 TC234 Demo.
 
-Assembler Demo 1.
+Tricore 1.6 EABI Test.

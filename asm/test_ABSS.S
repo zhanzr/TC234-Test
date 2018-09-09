@@ -1,27 +1,25 @@
 //*****************************************************************************
-// File: Ifx_AbsQ15.asm
+// File: Ifx_AbsS.asm
 // Compiler: HIGHTEC
 //******************************************************************************
-// sint16 Ifx_AbsQ15(sint16 X)
-//
+// int32_t Ifx_AbsS(int32_t X)
+// uint32_t Ifx_AbsS_H(uint32_t X)
+
 // INPUTS:
-//       input       signed 16 bit value
 // OUTPUT:
-//       None.
 //
 // RETURN:
 //       The absolute value of the input value
 //
 // DESCRIPTION:
-//
-//
-// ALGORITHM:
+//	Absolute Value with Saturation
+//	Absolute Value Packed Half-word with Saturation
 //
 // TECHNIQUES:
 //       None
 //
 // ASSUMPTIONS:
-//       1)Inputs are 16 bit signed integers
+//       1)Inputs are 32 bit signed integers
 //
 // MEMORY NOTE:
 //
@@ -30,10 +28,11 @@
 //******************************************************************************
 
 //External Reference
-    .global Ifx_AbsQ15
+    .global Ifx_AbsS
+    .global Ifx_AbsS_H
 
 //Code Segment Declaration
-     .section .text.dsplib, "ax"
+//     .section .text.dsplib, "ax"
 
 #define     input       %d4        //input value
 #define     result    	%d2        //result value
@@ -41,7 +40,10 @@
 
 //Executable Code
     .align 8
-Ifx_AbsQ15:
+Ifx_AbsS:
+	abss		result, input
+    ret
 
-	abs		result, input
+Ifx_AbsS_H:
+	abss.h		result, input
     ret
