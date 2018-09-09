@@ -1,5 +1,5 @@
 //*****************************************************************************
-// File: Ifx_AbsS.asm
+// File: Ifx_AbsS.S
 // Compiler: HIGHTEC
 //******************************************************************************
 // int32_t Ifx_AbsS(int32_t X)
@@ -36,7 +36,6 @@
 
 #define     input       %d4        //input value
 #define     result    	%d2        //result value
-
 
 //Executable Code
     .align 8

@@ -1,5 +1,5 @@
 //*****************************************************************************
-// File: Ifx_Absdif.asm
+// File: Ifx_Absdif.S
 // Compiler: HIGHTEC
 //******************************************************************************
 // int32_t Ifx_Absdif(int32_t A, int32_t B)
@@ -38,7 +38,6 @@
 #define     inputA       %d4
 #define     inputB       %d5
 #define     result    	%d2
-
 
 //Executable Code
     .align 8
