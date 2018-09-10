@@ -63,7 +63,7 @@ Ifx_AddC:
     ret
 
 Ifx_AddI:
-	addi		result, inputA, -14526
+	addi		result, inputA, -10
     ret
 
 Ifx_AddI_Hi:

@@ -8,6 +8,9 @@
 #ifndef ASM_PROTOTYPE_H_
 #define ASM_PROTOTYPE_H_
 
+#include <stdint.h>
+#include <stdbool.h>
+
 typedef union union_pack32
 {
 	uint32_t u32;
@@ -49,5 +52,29 @@ int32_t Ifx_AddS_H(int32_t A, int32_t B);
 uint32_t Ifx_AddS_HU(uint32_t A, uint32_t B);
 void* Ifx_Addsc_A(void* pA, uint32_t scalar);
 void* Ifx_Addsc_AT(void* pA, uint32_t scalar);
+
+// AND
+uint32_t Ifx_And(uint32_t A, uint32_t B);
+uint32_t Ifx_AndI(uint32_t A);
+bool Ifx_And_T(uint32_t A, uint32_t B);
+uint32_t Ifx_Andn(uint32_t A, uint32_t B);
+uint32_t Ifx_AndnI(uint32_t A, uint32_t B);
+bool Ifx_Andn_T(uint32_t A, uint32_t B);
+uint32_t Ifx_And_EQ(uint32_t A, uint32_t B);
+uint32_t Ifx_AndI_EQ(uint32_t A);
+uint32_t Ifx_And_NE(uint32_t A, uint32_t B);
+uint32_t Ifx_AndI_NE(uint32_t A);
+uint32_t Ifx_And_GE(uint32_t A, uint32_t B);
+uint32_t Ifx_AndI_GE(uint32_t A);
+uint32_t Ifx_And_GE_U(uint32_t A, uint32_t B);
+uint32_t Ifx_AndI_GE_U(uint32_t A);
+uint32_t Ifx_And_LT(uint32_t A, uint32_t B);
+uint32_t Ifx_AndI_LT(uint32_t A);
+uint32_t Ifx_And_LT_U(uint32_t A, uint32_t B);
+uint32_t Ifx_AndI_LT_U(uint32_t A);
+uint32_t Ifx_AndAnd_T(uint32_t A, uint32_t B);
+uint32_t Ifx_AndAndn_T(uint32_t A, uint32_t B);
+uint32_t Ifx_AndNor_T(uint32_t A, uint32_t B);
+uint32_t Ifx_AndOr_T(uint32_t A, uint32_t B);
 
 #endif /* ASM_PROTOTYPE_H_ */

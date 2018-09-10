@@ -135,14 +135,122 @@ int main(void)
 	while (_uart_sending())
 		;
 
-	//Test Absolute Instruction
-	printf("\nTest ABS\n");
+	//Test Additon Instruction
+	printf("\nTest ADD ADDC ADDI ADDIH\n");
+
+	int32_t a = 0x11112222;
+	int32_t b = 0x33334444;
+	int32_t res = Ifx_Add(a, b);
+	printf("ADD[%08X+%08X]=%08X\n", a, b, res);
+
+	a = INT32_MAX;
+	b = 1;
+	res = Ifx_Add(a,b);
+	a = 1;
+	b = 1;
+	res = Ifx_AddC(a,b);
+	printf("ADDC[%08X+%08X]=%08X\n", a, b, res);
+
+	a = 33;
+	res = Ifx_AddI(a);
+	printf("ADD[%i+%i]=%i\n", a, -10, res);
+
+	a = 0x33;
+	res = Ifx_AddI_Hi(a);
+	printf("ADDIH[%08X+%08X]=%08X\n", a, b, res);
+
+	 a = 0x11112222;
+	 b = 0xFFFFFFFF;
+	 res = Ifx_Addx(a, b);
+	printf("ADDX[%08X+%08X]=%08X\n", a, b, res);
+
+	a = 0x33;
+	res = Ifx_Addx_I(a);
+	printf("ADDX[%i+%i]=%i\n", a, -10, res);
+
+	a = INT32_MAX;
+	b = INT32_MAX;
+	res = Ifx_Add(a, b);
+	printf("ADD[%i+%i]=%i\n", a, b, res);
+	res = Ifx_AddS(a, b);
+	printf("ADDS[%i+%i]=%i\n", a, b, res);
+
+	uint32_t c = UINT32_MAX;
+	uint32_t d = UINT32_MAX;
+	res = Ifx_Add(a, b);
+	printf("ADD[%08X+%08X]=%08X\n", a, b, res);
+	uint32_t resU = Ifx_AddS_U(c, c);
+	printf("ADDS.U[%u+%u]=%u\n", c, d, resU);
+
 	pack32 a_p32;
 	pack32 b_p32;
 	pack32 res_p32;
-	a_p32.i32 = INT32_MIN/2;
-	res_p32.u32 = Ifx_Abs(a_p32.i32);
-	printf("Abs[%i]=%i\n", a_p32.i32, res_p32.i32);
+	a_p32.i16[0]=INT16_MAX;
+	a_p32.i16[1]=INT16_MAX;
+	b_p32.i16[0]=INT16_MAX;
+	b_p32.i16[1]=INT16_MAX;
+	res_p32.i32 = Ifx_Add_H(a_p32.i32, b_p32.i32);
+	printf("ADD.H[%i,%i + %i,%i]=%i,%i\n",
+			a_p32.i16[0], a_p32.i16[1],
+			b_p32.i16[0], b_p32.i16[1],
+			res_p32.i16[0], res_p32.i16[1]);
+	res_p32.i32 = Ifx_AddS_H(a_p32.i32, b_p32.i32);
+	printf("ADDS.H[%i,%i + %i,%i]=%i,%i\n",
+			a_p32.i16[0], a_p32.i16[1],
+			b_p32.i16[0], b_p32.i16[1],
+			res_p32.i16[0], res_p32.i16[1]);
+
+	a_p32.u16[0]=UINT16_MAX;
+	a_p32.u16[1]=UINT16_MAX;
+	b_p32.u16[0]=UINT16_MAX;
+	b_p32.u16[1]=UINT16_MAX;
+	res_p32.i32 = Ifx_Add_H(a_p32.i32, b_p32.i32);
+	printf("ADD.H[%i,%i + %i,%i]=%i,%i\n",
+			a_p32.i16[0], a_p32.i16[1],
+			b_p32.i16[0], b_p32.i16[1],
+			res_p32.i16[0], res_p32.i16[1]);
+	res_p32.i32 = Ifx_AddS_HU(a_p32.i32, b_p32.i32);
+	printf("ADDS.HU[%i,%i + %i,%i]=%i,%i\n",
+			a_p32.i16[0], a_p32.i16[1],
+			b_p32.i16[0], b_p32.i16[1],
+			res_p32.i16[0], res_p32.i16[1]);
+
+	uint8_t tmpArr[16];
+	printf("%08X\n", (uint32_t)tmpArr);
+	uint8_t* pTest = Ifx_AddA(tmpArr, tmpArr);
+	printf("ADDA[%08X,%08X]=%08X\n", (uint32_t)tmpArr, (uint32_t)tmpArr, (uint32_t)pTest);
+
+	pTest = Ifx_AddA_4(tmpArr);
+	printf("ADDA[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+
+	pTest = Ifx_Addih_A(tmpArr);
+	printf("ADDA[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+
+	pTest = Ifx_Addsc_A(tmpArr, 4);
+	printf("ADDSC.A[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+
+	pTest = Ifx_Addsc_AT(tmpArr, 4);
+	printf("ADDSC.AT[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+
+	float fA = 1.123456789;
+	float fB = 0.987654321;
+	float res_f = Ifx_Add_F(fA, fB);
+	printf("ADD.F(%f,%f)=%f\n", fA, fB, res_f);
+
+	a_p32.i8[0]=INT8_MAX/3;
+	a_p32.i8[1]=INT8_MAX/4;
+	a_p32.i8[2]=INT8_MAX/5;
+	a_p32.i8[3]=INT8_MAX/6;
+	b_p32.i8[0]=INT8_MAX/3;
+	b_p32.i8[1]=INT8_MAX/4;
+	b_p32.i8[2]=INT8_MAX/5;
+	b_p32.i8[3]=INT8_MAX/6;
+	res_p32.i32 = Ifx_Add_B(a_p32.i32, b_p32.i32);
+	printf("ADD.B[%i,%i,%i,%i + %i,%i,%i,%i]=%i,%i,%i,%i\n",
+			a_p32.i8[0], a_p32.i8[1],a_p32.i8[2], a_p32.i8[3],
+			b_p32.i8[0], b_p32.i8[1],b_p32.i8[2], b_p32.i8[3],
+			res_p32.i8[0], res_p32.i8[1],res_p32.i8[2], res_p32.i8[3]);
+
 	__asm__ volatile ("nop" ::: "memory");
 	__asm volatile ("" : : : "memory");
 	/* wait until sending has finished */
