@@ -169,10 +169,6 @@ void flush_stdout(void)
 
 float __addf(float a, float b)
 {
-#pragma asm
-	add.f %d2, %d4, %d5
-#pragma endasm
-
 	float res;
     __asm__ volatile ("add.f %0, %1, %2": "=d" (res) : "d" (a), "d" (b));
     return res;
