@@ -139,15 +139,6 @@ extern void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*ua
 
 #endif /* MODULE_UART_INT */
 
-inline void flush_stdout(void)
-{
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
-}
-
 #define UNUSED(x) (void)(x)
 
 #ifdef __cplusplus

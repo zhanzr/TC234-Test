@@ -156,6 +156,33 @@ void TimerSetHandler(TCF handler)
 	user_handler = handler;
 }
 
+void flush_stdout(void)
+{
+	__asm__ volatile ("nop" ::: "memory");
+	__asm volatile ("" : : : "memory");
+	/* wait until sending has finished */
+	while (_uart_sending())
+	{
+		;
+	}
+}
+
+float __addf(float a, float b)
+{
+#pragma asm
+	add.f %d2, %d4, %d5
+#pragma endasm
+
+	float res;
+    __asm__ volatile ("add.f %0, %1, %2": "=d" (res) : "d" (a), "d" (b));
+    return res;
+}
+
+volatile float fA;
+volatile float fB;
+volatile float res_f_test;
+volatile float res_f;
+
 int main(void)
 {
 	SYSTEM_Init();
@@ -308,11 +335,17 @@ int main(void)
 			res_p32.i8[0], res_p32.i8[1],res_p32.i8[2], res_p32.i8[3]);
 	flush_stdout();
 
-	printf("\nTest ADD.F\n");
+	fA = 1.11f;
+	fB = 2.22f;
+	printf("\nTest ADD.F %08X %08X\n",
+			*(uint32_t*)&fA, *(uint32_t*)&fB);
 	flush_stdout();
-	float fA = 1.0f;
-	float fB = 2.0f;
-	float res_f = Ifx_Add_F(fA, fB);
+
+	res_f = __addf(fA, fB);
+	printf("ADD.F(%f,%f)=%f\n", fA, fB, res_f);
+	flush_stdout();
+
+	res_f = Ifx_Add_F(fA, fB);
 	printf("ADD.F(%f,%f)=%f\n", fA, fB, res_f);
 	flush_stdout();
 

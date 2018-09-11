@@ -91,5 +91,9 @@ Ifx_Add_H:
     ret
 
 Ifx_Add_F:
-	add.f		result, inputA, inputB
+//	movh	inputA, 16270
+//	addi	inputA, inputA, 5243
+//	movh	inputB, 16398
+//	addi	inputB, inputB, 5243
+	add.f result, inputA, inputB
     ret

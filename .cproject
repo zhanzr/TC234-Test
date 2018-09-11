@@ -24,6 +24,8 @@
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.assembler.general.includepath.502517553" name="Include Paths" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.assembler.general.includepath" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;../h&quot;"/>
 								</option>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.assembler.debug.option.ahlms.1246829144" name="Create assembler listing (-Wa,-ahlms=${OutputFileBaseName}.lst)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.assembler.debug.option.ahlms" value="false" valueType="boolean"/>
+								<option id="com.rt.hightec.buildsystem.tricore.new.assembler.optimization.insn.1348200042" name="Exclusively emit 32-bit opcodes insn" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.optimization.insn" value="com.rt.hightec.buildsystem.tricore.new.assembler.optimization.insn.only" valueType="enumerated"/>
 								<inputType id="com.rt.hightec.buildsystem.tricore.new.assembler.inputtype.1559120657" name="Assembler Input NO GUI" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.inputtype"/>
 							</tool>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.gtm.373372830" name="TriCore GTM Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.gtm">
@@ -46,11 +48,13 @@
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths.1959146808" name="Include Paths" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;../h&quot;"/>
 								</option>
-								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization.111267155" name="Optimization Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.code.optimization.speed" valueType="enumerated"/>
-								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.830677023" name="Debug Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.0" valueType="enumerated"/>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization.111267155" name="Optimization Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.code.optimization.none" valueType="enumerated"/>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.830677023" name="Debug Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.3" valueType="enumerated"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.language.standard.1156215739" name="C Standard (-std)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.language.standard" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.language.standard.gnu99" valueType="enumerated"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.FShortDouble.6464758" name="Treat double as float (-fshort-double)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.FShortDouble" value="false" valueType="boolean"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.mversioninfo.540244200" name="Generate version info (-mversion-info)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.mversioninfo" value="false" valueType="boolean"/>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.output.adhlms.lst.454918579" name="Create assembler listing (-Wa,-ahlms=${OutputFileBaseName}.lst)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.output.adhlms.lst" value="false" valueType="boolean"/>
+								<option id="com.rt.hightec.buildsystem.tricore.new.compiler.architecture.EABIConform.c.2009658635" name="EABI conform (-meabi)" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.architecture.EABIConform.c" value="true" valueType="boolean"/>
 								<inputType id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType.439893687" name="Compiler Input (C)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType"/>
 							</tool>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.cpp.491974631" name="TriCore C++ Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.cpp">
@@ -83,10 +87,19 @@
 					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.510529732" name="/" resourcePath="asm">
 						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.239742863" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable" unusedChildren="">
 							<option id="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919.82621482" name="CPU type (-mcpu)" superClass="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919"/>
-							<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.219290185"/>
-							<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.gtm.1064064799" name="TriCore GTM Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.gtm.373372830"/>
-							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.pcp.1828617310" name="TriCore PCP Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.pcp.1265890664"/>
-							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.c.106796176" name="TriCore C Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155"/>
+							<targetPlatform archList="TriCore" binaryParser="org.eclipse.cdt.core.ELF" id="com.rt.hightec.buildsystem.tricore.new.excutable.targetplatform" isAbstract="false" superClass="com.rt.hightec.buildsystem.tricore.new.excutable.targetplatform"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.219290185">
+								<inputType id="com.rt.hightec.buildsystem.tricore.new.assembler.inputtype.886512345" name="Assembler Input NO GUI" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.inputtype"/>
+							</tool>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.gtm.1064064799" name="TriCore GTM Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.gtm.373372830">
+								<inputType id="gtm.input.2078103404" name="Assembler Input (mcs)" superClass="gtm.input"/>
+							</tool>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.pcp.1828617310" name="TriCore PCP Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.pcp.1265890664">
+								<inputType id="com.rt.hightec.buildsystem.tricore.new.compiler.c.input.cpcp.35495789" name="Compiler Input (CPCP)" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c.input.cpcp"/>
+							</tool>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.c.106796176" name="TriCore C Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155">
+								<inputType id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType.1838123304" name="Compiler Input (C)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType"/>
+							</tool>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.cpp.142977310" name="TriCore C++ Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.cpp.491974631"/>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.linker.c.747647136" name="TriCore C Linker" superClass="com.rt.hightec.buildsystem.tricore.new.linker.c.1648588151"/>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.linker.cpp.1476411408" name="TriCore C++ Linker" superClass="com.rt.hightec.buildsystem.tricore.new.linker.cpp.449103437"/>

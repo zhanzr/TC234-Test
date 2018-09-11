@@ -101,6 +101,47 @@
     <InputSection Description="Bit variables" Name=".bdata"/>
     <InputSection Description="absolute addressable readonly data" Name=".zdata.rodata"/>
     <InputSection Description="absolute addressable readonly data" Name=".zrodata"/>
+    <InputSection Name="wm4.led.h.17.d9ec8b4820aaaefd8372e009cc67c12f"/>
+    <InputSection Name=".debug_macro"/>
+    <InputSection Name="wm4.math.h.35.76dc670ff49d2ce743a05eb4427e8ebd"/>
+    <InputSection Name="wm4.Ifx_TypesReg.h.27.516539c420f17fe6e9a73c01a48a0369"/>
+    <InputSection Name="wm4.ifxstm_reg.h.42.bac0f316afefca548609f3b63e2b2783"/>
+    <InputSection Name="wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5"/>
+    <InputSection Name="wm4._default_types.h.6.1dbd2e581fd590860c7c17f21d147e91"/>
+    <InputSection Name="wm4.string.h.86.d5c872ff52e2712c985b588a0ef39f3c"/>
+    <InputSection Name="wm4.ifxport_reg.h.84.2f1c855083b75bc111532d1afd2b79de"/>
+    <InputSection Name="wm4.limits.h.25.1e586cb345821b02cb4c72358bd0716a"/>
+    <InputSection Name="wm4.ifxcpu_bf.h.28.435a7a2b16f24199b6be0658a001c9be"/>
+    <InputSection Name="wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349"/>
+    <InputSection Name="wm4.types.h.23.0d949686bbcadd1621462d4fa1f884f9"/>
+    <InputSection Name="wm4.stdint.h.10.90b695f550ca6cc3fb08fa83baf01e05"/>
+    <InputSection Name="wm4.config.h.176.6edcf579ed56709b6b1db26e08349223"/>
+    <InputSection Name="wm4.intrinsics.h.28.762d9a30a5733d2f28822a85f919c11f"/>
+    <InputSection Name="wm4.ifxport_bf.h.28.634a1dcbc26099e3fa87037428e13aa9"/>
+    <InputSection Name="wm4.stdarg.h.31.48e922dd0aaedfb616aafd8a7b7a4949"/>
+    <InputSection Name="wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d"/>
+    <InputSection Name="wm4.stddef.h.158.a7efb00f6cbc6f43213b50e183c9830c"/>
+    <InputSection Name="wm4.stddef.h.184.f740e675efc82b9790b2d86753673cd5"/>
+    <InputSection Name="wm4.stdlib.h.53.ac6592e04c27fb6433aec3161f7846d8"/>
+    <InputSection Name="wm4.stdio.h.67.e86186cbfb246ea8547bb52373065166"/>
+    <InputSection Name="wm4.stdio.h.31.f48311dde756a2aec27351b58a280fb9"/>
+    <InputSection Name="wm4._ansi.h.23.8aa39ec63c47b0c474529e4131d42f04"/>
+    <InputSection Name="wm4.bspconfig.h.26.033b034693c4c2b363e281935e482209"/>
+    <InputSection Name="wm4.newlib.h.8.b2a2e540cc2551574077f838d8204237"/>
+    <InputSection Name="wm4.ifxstm_bf.h.28.91a2b5a01e0486b79194c4478f343693"/>
+    <InputSection Name="wm4.ifxcpu_reg.h.48.efae3e83a47a32c1e62d28f181503bc1"/>
+    <InputSection Name="wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2"/>
+    <InputSection Name="wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea"/>
+    <InputSection Name="wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a"/>
+    <InputSection Name="wm4.types.h.80.d1d5f5bf70b2a7b495c85b558a9744ac"/>
+    <InputSection Name="wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400"/>
+    <InputSection Name="wm4.stdlib.h.13.603ed7eb09a1561ab06840b7c0fcff58"/>
+    <InputSection Name="wm4.interrupts.h.9.5a62b23ea36c4906c67c8ce1135f3f17"/>
+    <InputSection Name="wm4.string.h.8.ef946ad0bc9ad5c970c365dcd1fc4b0a"/>
+    <InputSection Name="wm4.reent.h.16.5ae3c94b0f86fbd3cb48ca2ac9576746"/>
+    <InputSection Name="wm4.tc_inc_path.h.9.edf37d69033d984c657fa37b31a773ea"/>
+    <InputSection Name="wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6"/>
+    <InputSection Name="wm4.0.b1bb44d18881a2d90847a2626c0e2173"/>
   </Input>
   <Files>
     <ObjectFile Name="src\cint_tc23x.o"/>
