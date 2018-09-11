@@ -59,6 +59,10 @@ Ifx_Add:
     ret
 
 Ifx_AddC:
+	mov	%d9, 0xffffffff
+	mov	%d10, 0xffffffff
+	addc %d8, %d9, %d10
+
 	addc		result, inputA, inputB
     ret
 

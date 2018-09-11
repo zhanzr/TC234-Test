@@ -14,36 +14,15 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#define MAX_LED					4	/* number of available LEDs */
+#define LED_PIN_NR			 	0	/* pin number of first used LED */
 
-static __inline void LEDON(int nr)
-{
-	if (nr < MAX_LED)
-	{
-		LED_ON(nr);
-	}
-}
+#define MASK_ALL_LEDS			((1 << MAX_LED) - 1)
 
-static __inline void LEDOFF(int nr)
-{
-	if (nr < MAX_LED)
-	{
-		LED_OFF(nr);
-	}
-}
-
-static __inline void LEDTOGGLE(int nr)
-{
-	if (nr < MAX_LED)
-	{
-		LED_TOGGLE(nr);
-	}
-}
-
-
-static __inline void InitLED(void)
-{
-	INIT_LEDS;
-}
+ void LEDON(int nr);
+ void LEDOFF(int nr);
+ void LEDTOGGLE(int nr);
+ void InitLED(void);
 
 /* type of a timer callback function */
 typedef void (*TCF)(void);

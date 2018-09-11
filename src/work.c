@@ -29,10 +29,57 @@
 volatile uint32_t g_SysTicks;
 volatile bool g_regular_task_flag;
 
+/* AppKit-TC2X4: P13.0 .. P13.3 --> LED D107 ... D110 */
+static Ifx_P * const portLED = (Ifx_P *)&MODULE_P13;
+
+/* OMR is WO ==> don't use load-modify-store access! */
+/* set PSx pin */
+#define LED_PIN_SET(x)			(1 << (LED_PIN_NR + (x)))
+/* set PCLx pin */
+#define LED_PIN_RESET(x)		(1 << (LED_PIN_NR + IFX_P_OMR_PCL0_OFF + (x)))
+
+void LEDON(int nr)
+{
+	if (nr < MAX_LED)
+	{
+		portLED->OMR.U = LED_PIN_RESET(nr);
+	}
+}
+
+void LEDOFF(int nr)
+{
+	if (nr < MAX_LED)
+	{
+		portLED->OMR.U = LED_PIN_SET(nr);
+	}
+}
+
+void LEDTOGGLE(int nr)
+{
+	if (nr < MAX_LED)
+	{
+		/* set PCLx and PSx pin to 1 ==> toggle pin state */
+		portLED->OMR.U = LED_PIN_RESET(nr) | LED_PIN_SET(nr);
+	}
+}
+
+void InitLED(void)
+{
+	/* initialise all LEDs (P13.0 .. P13.3) */
+	portLED->IOCR0.U = 0x80808080;	/* OUT_PPGPIO */
+	/* all LEDs OFF */
+	portLED->OMR.U = (MASK_ALL_LEDS << LED_PIN_NR);
+}
+
 /* timer callback handler */
 static void my_timer_handler(void)
 {
 	++g_SysTicks;
+
+	if(0==g_SysTicks%(2*SYSTIME_CLOCK))
+	{
+		LEDTOGGLE(1);
+	}
 }
 
 const uint32_t HAL_GetTick(void)
@@ -129,59 +176,65 @@ int main(void)
 			SYSTEM_GetStmClock()/1000000,
 			SYSTEM_IsCacheEnabled());
 
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
+	flush_stdout();
 
 	//Test Additon Instruction
-	printf("\nTest ADD ADDC ADDI ADDIH\n");
-
+	printf("\nTest ADD\n");
 	int32_t a = 0x11112222;
 	int32_t b = 0x33334444;
 	int32_t res = Ifx_Add(a, b);
 	printf("ADD[%08X+%08X]=%08X\n", a, b, res);
+	flush_stdout();
 
-	a = INT32_MAX;
-	b = 1;
-	res = Ifx_Add(a,b);
-	a = 1;
-	b = 1;
+	printf("\nTest ADDC\n");
+	a = 2;
+	b = 3;
 	res = Ifx_AddC(a,b);
 	printf("ADDC[%08X+%08X]=%08X\n", a, b, res);
+	flush_stdout();
 
+	printf("\nTest ADD\n");
 	a = 33;
 	res = Ifx_AddI(a);
-	printf("ADD[%i+%i]=%i\n", a, -10, res);
+	printf("ADD[%i+ %i]=%i\n", a, -10, res);
+	flush_stdout();
 
+	printf("\nTest ADDIH\n");
 	a = 0x33;
 	res = Ifx_AddI_Hi(a);
-	printf("ADDIH[%08X+%08X]=%08X\n", a, b, res);
+	printf("ADDIH[%08X+%08X]=%08X\n", a, 4, res);
+	flush_stdout();
 
-	 a = 0x11112222;
-	 b = 0xFFFFFFFF;
-	 res = Ifx_Addx(a, b);
+	printf("\nTest ADDX\n");
+	a = 0x11112222;
+	b = 0xfff;
+	res = Ifx_Addx(a, b);
 	printf("ADDX[%08X+%08X]=%08X\n", a, b, res);
+	flush_stdout();
 
+	printf("\nTest ADDX Immediate\n");
 	a = 0x33;
 	res = Ifx_Addx_I(a);
 	printf("ADDX[%i+%i]=%i\n", a, -10, res);
+	flush_stdout();
 
+	printf("\nTest ADDS\n");
 	a = INT32_MAX;
 	b = INT32_MAX;
 	res = Ifx_Add(a, b);
 	printf("ADD[%i+%i]=%i\n", a, b, res);
 	res = Ifx_AddS(a, b);
 	printf("ADDS[%i+%i]=%i\n", a, b, res);
+	flush_stdout();
 
+	printf("\nTest ADDS.U\n");
 	uint32_t c = UINT32_MAX;
 	uint32_t d = UINT32_MAX;
-	res = Ifx_Add(a, b);
-	printf("ADD[%08X+%08X]=%08X\n", a, b, res);
-	uint32_t resU = Ifx_AddS_U(c, c);
+	uint32_t resU = Ifx_AddS_U(c, d);
 	printf("ADDS.U[%u+%u]=%u\n", c, d, resU);
+	flush_stdout();
 
+	printf("\nTest ADDS.H\n");
 	pack32 a_p32;
 	pack32 b_p32;
 	pack32 res_p32;
@@ -199,44 +252,47 @@ int main(void)
 			a_p32.i16[0], a_p32.i16[1],
 			b_p32.i16[0], b_p32.i16[1],
 			res_p32.i16[0], res_p32.i16[1]);
+	flush_stdout();
 
+	printf("\nTest ADDS.HU\n");
 	a_p32.u16[0]=UINT16_MAX;
 	a_p32.u16[1]=UINT16_MAX;
 	b_p32.u16[0]=UINT16_MAX;
 	b_p32.u16[1]=UINT16_MAX;
-	res_p32.i32 = Ifx_Add_H(a_p32.i32, b_p32.i32);
-	printf("ADD.H[%i,%i + %i,%i]=%i,%i\n",
-			a_p32.i16[0], a_p32.i16[1],
-			b_p32.i16[0], b_p32.i16[1],
-			res_p32.i16[0], res_p32.i16[1]);
-	res_p32.i32 = Ifx_AddS_HU(a_p32.i32, b_p32.i32);
-	printf("ADDS.HU[%i,%i + %i,%i]=%i,%i\n",
-			a_p32.i16[0], a_p32.i16[1],
-			b_p32.i16[0], b_p32.i16[1],
-			res_p32.i16[0], res_p32.i16[1]);
+	res_p32.u32 = Ifx_AddS_HU(a_p32.u32, b_p32.u32);
+	printf("ADDS.HU[%u,%u + %u,%u]=%u,%u\n",
+			a_p32.u16[0], a_p32.u16[1],
+			b_p32.u16[0], b_p32.u16[1],
+			res_p32.u16[0], res_p32.u16[1]);
+	flush_stdout();
 
+	printf("\nTest ADDA\n");
 	uint8_t tmpArr[16];
-	printf("%08X\n", (uint32_t)tmpArr);
 	uint8_t* pTest = Ifx_AddA(tmpArr, tmpArr);
 	printf("ADDA[%08X,%08X]=%08X\n", (uint32_t)tmpArr, (uint32_t)tmpArr, (uint32_t)pTest);
+	flush_stdout();
 
+	printf("\nTest ADDA Immediate\n");
 	pTest = Ifx_AddA_4(tmpArr);
 	printf("ADDA[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+	flush_stdout();
 
+	printf("\nTest ADDIH.A\n");
 	pTest = Ifx_Addih_A(tmpArr);
-	printf("ADDA[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+	printf("ADDIH.A[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+	flush_stdout();
 
+	printf("\nTest ADDSC.A\n");
 	pTest = Ifx_Addsc_A(tmpArr, 4);
 	printf("ADDSC.A[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+	flush_stdout();
 
-	pTest = Ifx_Addsc_AT(tmpArr, 4);
-	printf("ADDSC.AT[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+	printf("\nTest ADDSC.AT\n");
+	pTest = Ifx_Addsc_AT(tmpArr, 0x12345678);
+	printf("ADDSC.AT[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 0x12345678, (uint32_t)pTest);
+	flush_stdout();
 
-	float fA = 1.123456789;
-	float fB = 0.987654321;
-	float res_f = Ifx_Add_F(fA, fB);
-	printf("ADD.F(%f,%f)=%f\n", fA, fB, res_f);
-
+	printf("\nTest ADD.B\n");
 	a_p32.i8[0]=INT8_MAX/3;
 	a_p32.i8[1]=INT8_MAX/4;
 	a_p32.i8[2]=INT8_MAX/5;
@@ -250,150 +306,15 @@ int main(void)
 			a_p32.i8[0], a_p32.i8[1],a_p32.i8[2], a_p32.i8[3],
 			b_p32.i8[0], b_p32.i8[1],b_p32.i8[2], b_p32.i8[3],
 			res_p32.i8[0], res_p32.i8[1],res_p32.i8[2], res_p32.i8[3]);
+	flush_stdout();
 
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
-
-	printf("\nTest ABS.B\n");
-	a_p32.i8[0] = INT8_MIN/2;
-	a_p32.i8[1] = INT8_MIN/3;
-	a_p32.i8[2] = INT8_MIN/4;
-	a_p32.i8[3] = INT8_MIN/5;
-	res_p32.u32 = Ifx_Abs_B(a_p32.i32);
-	printf("Abs_B[%i %i %i %i]=%i %i %i %i\n",
-			a_p32.i8[0], a_p32.i8[1], a_p32.i8[2], a_p32.i8[3],
-			res_p32.i8[0], res_p32.i8[1], res_p32.i8[2], res_p32.i8[3]);
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
-
-	printf("\nTest ABS.H\n");
-	a_p32.i16[0] = INT16_MIN/2;
-	a_p32.i16[1] = INT16_MIN/3;
-	res_p32.u32 = Ifx_Abs_H(a_p32.i32);
-	printf("Abs_H[%i %i]=%i %i \n",
-			a_p32.i16[0], a_p32.i16[1],
-			res_p32.i16[0], res_p32.i16[1]);
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
-
-	printf("\nTest ABSS\n");
-	a_p32.i32 = INT32_MIN;
-	res_p32.u32 = Ifx_Abs(a_p32.i32);
-	printf("Abs[%i]=%i\n", a_p32.i32, res_p32.i32);
-	res_p32.u32 = Ifx_AbsS(a_p32.i32);
-	printf("AbsS[%i]=%i\n", a_p32.i32, res_p32.i32);
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
-
-	printf("\nTest ABSS.H\n");
-	a_p32.i16[0] = INT16_MIN;
-	a_p32.i16[1] = INT16_MIN-1;
-	res_p32.u32 = Ifx_Abs_H(a_p32.i32);
-	printf("Abs_H[%i %i]=%i %i \n",
-			a_p32.i16[0], a_p32.i16[1],
-			res_p32.i16[0], res_p32.i16[1]);
-	res_p32.u32 = Ifx_AbsS_H(a_p32.i32);
-	printf("AbsS_H[%i %i]=%i %i \n",
-			a_p32.i16[0], a_p32.i16[1],
-			res_p32.i16[0], res_p32.i16[1]);
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
-
-	printf("\nTest ABSDIF\n");
-	a_p32.i32 = INT32_MIN/2;
-	b_p32.i32 = INT32_MAX/2;
-	res_p32.u32 = Ifx_Absdif(a_p32.i32, b_p32.i32);
-	printf("Absdif[%i,%i]=%i\n", a_p32.i32, b_p32.i32, res_p32.i32);
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
-
-	printf("\nTest ABSDIF.B\n");
-	a_p32.i8[0] = INT8_MIN/2;
-	a_p32.i8[1] = INT8_MIN/3;
-	a_p32.i8[2] = INT8_MIN/4;
-	a_p32.i8[3] = INT8_MIN/5;
-	b_p32.i8[0] = INT8_MAX/2;
-	b_p32.i8[1] = INT8_MAX/3;
-	b_p32.i8[2] = INT8_MAX/4;
-	b_p32.i8[3] = INT8_MAX/5;
-	res_p32.u32 = Ifx_Absdif_B(a_p32.i32, b_p32.i32);
-	printf("Absdif_B[%i %i %i %i\t%i %i %i %i]=%i %i %i %i\n",
-			a_p32.i8[0], a_p32.i8[1], a_p32.i8[2], a_p32.i8[3],
-			b_p32.i8[0], b_p32.i8[1], b_p32.i8[2], b_p32.i8[3],
-			res_p32.i8[0], res_p32.i8[1], res_p32.i8[2], res_p32.i8[3]);
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
-
-	printf("\nTest ABSDIF.H\n");
-	a_p32.i16[0] = INT16_MIN/2;
-	a_p32.i16[1] = INT16_MIN/3;
-	b_p32.i16[0] = INT16_MAX/2;
-	b_p32.i16[1] = INT16_MAX/3;
-	res_p32.u32 = Ifx_Absdif_H(a_p32.i32, b_p32.i32);
-	printf("Absdif_H[%i %i\t%i %i]=%i %i \n",
-			a_p32.i16[0], a_p32.i16[1],
-			b_p32.i16[0], b_p32.i16[1],
-			res_p32.i16[0], res_p32.i16[1]);
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
-
-	printf("\nTest ABSDIFS\n");
-	a_p32.i32 = INT32_MIN;
-	b_p32.i32 = INT32_MAX;
-	res_p32.u32 = Ifx_Absdif(a_p32.i32, b_p32.i32);
-	printf("Absdif[%i,%i]=%i\n", a_p32.i32, b_p32.i32, res_p32.i32);
-	res_p32.u32 = Ifx_AbsdifS(a_p32.i32, b_p32.i32);
-	printf("AbsdifS[%i,%i]=%i\n", a_p32.i32, b_p32.i32, res_p32.i32);
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
-
-	printf("\nTest ABSDIFS.H\n");
-	a_p32.i16[0] = INT16_MIN;
-	a_p32.i16[1] = INT16_MIN+1;
-	b_p32.i16[0] = INT16_MAX;
-	b_p32.i16[1] = INT16_MAX-1;
-	res_p32.u32 = Ifx_Absdif_H(a_p32.i32, b_p32.i32);
-	printf("Absdif_H[%i %i\t%i %i]=%i %i \n",
-			a_p32.i16[0], a_p32.i16[1],
-			b_p32.i16[0], b_p32.i16[1],
-			res_p32.i16[0], res_p32.i16[1]);
-	res_p32.u32 = Ifx_AbsdifS_H(a_p32.i32, b_p32.i32);
-	printf("AbsdifS_H[%i %i\t%i %i]=%i %i \n",
-			a_p32.i16[0], a_p32.i16[1],
-			b_p32.i16[0], b_p32.i16[1],
-			res_p32.i16[0], res_p32.i16[1]);
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-		;
+	printf("\nTest ADD.F\n");
+	flush_stdout();
+	float fA = 1.0f;
+	float fB = 2.0f;
+	float res_f = Ifx_Add_F(fA, fB);
+	printf("ADD.F(%f,%f)=%f\n", fA, fB, res_f);
+	flush_stdout();
 
 	g_regular_task_flag = true;
 	while(1)
@@ -406,6 +327,8 @@ int main(void)
 		if(g_regular_task_flag)
 		{
 			g_regular_task_flag = false;
+
+			LEDTOGGLE(0);
 
 			printf("%s CPU:%u MHz,Sys:%u MHz, %u, CacheEn:%d\n",
 					__TIME__,

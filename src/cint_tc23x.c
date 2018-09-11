@@ -1,13 +1,24 @@
 /*====================================================================
-* Project:  Board Support Package (BSP)
-* Function: C interface for TriCore trap and interrupt handlers
-*
-* Copyright HighTec EDV-Systeme GmbH 1982-2016
-*====================================================================*/
+ * Project:  Board Support Package (BSP)
+ * Function: C interface for TriCore trap and interrupt handlers
+ *
+ * Copyright HighTec EDV-Systeme GmbH 1982-2016
+ *====================================================================*/
 
+#ifndef MODULE_UART_INT
+#define MODULE_UART_INT
+#endif
+
+#include <string.h>
 #include <stdio.h>
+
+#include "bspconfig.h"
+#include "uart_int.h"
+#include "led.h"
+
 #include <machine/intrinsics.h>
 #include <machine/wdtcon.h>
+
 #include "cint.h"
 #include "tc_inc_path.h"
 
@@ -46,21 +57,21 @@ void __int_handler(int arg);
 __asm (	".section .traptab, \"ax\", @progbits\n"
 		".align 8\n"
 		".global TriCore_trap_table\n"
-	"TriCore_trap_table:\n"
-	  );
+		"TriCore_trap_table:\n"
+);
 
 # define DEFINE_TRAP(i)									\
-	__asm (".global __trap_" #i);						\
-	__asm ("__trap_" #i ":");							\
-	__asm ("svlcx");									\
-	__asm ("movh.a %a15,hi:Tdisptab+(4*" #i ")");		\
-	__asm ("ld.w %d4,[%a15]lo:Tdisptab+(4*" #i ")");	\
-	__asm ("mov.a %a15, %d4");							\
-	__asm ("mov %d4,%d15");								\
-	__asm ("calli %a15");								\
-	__asm ("rslcx");									\
-	__asm ("rfe");										\
-	__asm (".align 5")
+		__asm (".global __trap_" #i);						\
+		__asm ("__trap_" #i ":");							\
+		__asm ("svlcx");									\
+		__asm ("movh.a %a15,hi:Tdisptab+(4*" #i ")");		\
+		__asm ("ld.w %d4,[%a15]lo:Tdisptab+(4*" #i ")");	\
+		__asm ("mov.a %a15, %d4");							\
+		__asm ("mov %d4,%d15");								\
+		__asm ("calli %a15");								\
+		__asm ("rslcx");									\
+		__asm ("rfe");										\
+		__asm (".align 5")
 
 
 DEFINE_TRAP(0);		/* trap class 0 (Reset) */
@@ -75,6 +86,23 @@ DEFINE_TRAP(7);		/* trap class 7 (Non-Maskable Interrupt) */
 __asm (".text");
 
 /* Install TRAPHANDLER for trap TRAPNO.  */
+
+/* Send character CHR via the serial line */
+static __inline void _out_uart(const char chr)
+{
+	TX_CLEAR(UARTBASE);
+	/* send the character */
+	PUT_CHAR(UARTBASE, chr);
+}
+
+static inline void flush_stdout_trap(void)
+{
+	for(uint32_t i=0; i<1000; ++i)
+	{
+		__asm__ volatile ("nop" ::: "memory");
+		__asm volatile ("" : : : "memory");
+	}
+}
 
 int _install_trap_handler(int trapno, void (*traphandler)(int))
 {
@@ -96,16 +124,30 @@ int _install_trap_handler(int trapno, void (*traphandler)(int))
 
 static void __class_0_trap_handler(int tin)
 {
-	printf("%s %d\n", __func__, tin);
+	LEDTOGGLE(2);
+
+	_out_uart('<');
+	flush_stdout_trap();
+	_out_uart('0');
+	flush_stdout_trap();
+	_out_uart('>');
+	flush_stdout_trap();
+	_out_uart('[');
+	flush_stdout_trap();
+	_out_uart('1'+tin);
+	flush_stdout_trap();
+	_out_uart(']');
+	flush_stdout_trap();
+
 	switch (tin)
 	{
-		case 1:
-			__asm volatile ("debug"); /* VAF -- Virtual Address Fill  */
-			break;
+	case 1:
+		__asm volatile ("debug"); /* VAF -- Virtual Address Fill  */
+		break;
 
-		case 2:
-			__asm volatile ("debug"); /* VAP -- Virtual Address Protection  */
-			break;
+	case 2:
+		__asm volatile ("debug"); /* VAP -- Virtual Address Protection  */
+		break;
 	}
 }
 
@@ -113,36 +155,50 @@ static void __class_0_trap_handler(int tin)
 
 static void __class_1_trap_handler(int tin)
 {
-	printf("%s %d\n", __func__, tin);
+	LEDTOGGLE(2);
+
+	_out_uart('<');
+	flush_stdout_trap();
+	_out_uart('1');
+	flush_stdout_trap();
+	_out_uart('>');
+	flush_stdout_trap();
+	_out_uart('[');
+	flush_stdout_trap();
+	_out_uart('1'+tin);
+	flush_stdout_trap();
+	_out_uart(']');
+	flush_stdout_trap();
+
 	switch (tin)
 	{
-		case 1:
-			__asm volatile ("debug"); /* PRIV -- Privileged Instruction  */
-			break;
+	case 1:
+		__asm volatile ("debug"); /* PRIV -- Privileged Instruction  */
+		break;
 
-		case 2:
-			__asm volatile ("debug"); /* MPR -- MemProt: Read Access  */
-			break;
+	case 2:
+		__asm volatile ("debug"); /* MPR -- MemProt: Read Access  */
+		break;
 
-		case 3:
-			__asm volatile ("debug"); /* MPW -- MemProt: Write Access  */
-			break;
+	case 3:
+		__asm volatile ("debug"); /* MPW -- MemProt: Write Access  */
+		break;
 
-		case 4:
-			__asm volatile ("debug"); /* MPX -- MemProt: Execution Access  */
-			break;
+	case 4:
+		__asm volatile ("debug"); /* MPX -- MemProt: Execution Access  */
+		break;
 
-		case 5:
-			__asm volatile ("debug"); /* MPP -- MemProt: Peripheral Access  */
-			break;
+	case 5:
+		__asm volatile ("debug"); /* MPP -- MemProt: Peripheral Access  */
+		break;
 
-		case 6:
-			__asm volatile ("debug"); /* MPN -- MemProt: Null Address  */
-			break;
+	case 6:
+		__asm volatile ("debug"); /* MPN -- MemProt: Null Address  */
+		break;
 
-		case 7:
-			__asm volatile ("debug"); /* GRPW -- Global Register Write Prot  */
-			break;
+	case 7:
+		__asm volatile ("debug"); /* GRPW -- Global Register Write Prot  */
+		break;
 	}
 }
 
@@ -150,28 +206,42 @@ static void __class_1_trap_handler(int tin)
 
 static void __class_2_trap_handler(int tin)
 {
-	printf("%s %d\n", __func__, tin);
+	LEDTOGGLE(2);
+
+	_out_uart('<');
+	flush_stdout_trap();
+	_out_uart('2');
+	flush_stdout_trap();
+	_out_uart('>');
+	flush_stdout_trap();
+	_out_uart('[');
+	flush_stdout_trap();
+	_out_uart('1'+tin);
+	flush_stdout_trap();
+	_out_uart(']');
+	flush_stdout_trap();
+
 	switch (tin)
 	{
-		case 1:
-			__asm volatile ("debug"); /* IOPC -- Illegal Opcode  */
-			break;
+	case 1:
+		__asm volatile ("debug"); /* IOPC -- Illegal Opcode  */
+		break;
 
-		case 2:
-			__asm volatile ("debug"); /* UOPC -- Unimplemented Opcode  */
-			break;
+	case 2:
+		__asm volatile ("debug"); /* UOPC -- Unimplemented Opcode  */
+		break;
 
-		case 3:
-			__asm volatile ("debug"); /* OPD -- Invalid Operand Specification  */
-			break;
+	case 3:
+		__asm volatile ("debug"); /* OPD -- Invalid Operand Specification  */
+		break;
 
-		case 4:
-			__asm volatile ("debug"); /* ALN -- Data Address Alignment  */
-			break;
+	case 4:
+		__asm volatile ("debug"); /* ALN -- Data Address Alignment  */
+		break;
 
-		case 5:
-			__asm volatile ("debug"); /* MEM -- Invalid Local Memory Address  */
-			break;
+	case 5:
+		__asm volatile ("debug"); /* MEM -- Invalid Local Memory Address  */
+		break;
 	}
 }
 
@@ -179,36 +249,50 @@ static void __class_2_trap_handler(int tin)
 
 static void __class_3_trap_handler(int tin)
 {
-	printf("%s %d\n", __func__, tin);
+	LEDTOGGLE(2);
+
+	_out_uart('<');
+	flush_stdout_trap();
+	_out_uart('3');
+	flush_stdout_trap();
+	_out_uart('>');
+	flush_stdout_trap();
+	_out_uart('[');
+	flush_stdout_trap();
+	_out_uart('1'+tin);
+	flush_stdout_trap();
+	_out_uart(']');
+	flush_stdout_trap();
+
 	switch (tin)
 	{
-		case 1:
-			__asm volatile ("debug"); /* FCD -- Free Context List Depletion  */
-			break;
+	case 1:
+		__asm volatile ("debug"); /* FCD -- Free Context List Depletion  */
+		break;
 
-		case 2:
-			__asm volatile ("debug"); /* CDO -- Call Depth Overflow  */
-			break;
+	case 2:
+		__asm volatile ("debug"); /* CDO -- Call Depth Overflow  */
+		break;
 
-		case 3:
-			__asm volatile ("debug"); /* CDU -- Call Depth Underflow  */
-			break;
+	case 3:
+		__asm volatile ("debug"); /* CDU -- Call Depth Underflow  */
+		break;
 
-		case 4:
-			__asm volatile ("debug"); /* FCU -- Free Context List Underflow  */
-			break;
+	case 4:
+		__asm volatile ("debug"); /* FCU -- Free Context List Underflow  */
+		break;
 
-		case 5:
-			__asm volatile ("debug"); /* CSU -- Call Stack Underflow  */
-			break;
+	case 5:
+		__asm volatile ("debug"); /* CSU -- Call Stack Underflow  */
+		break;
 
-		case 6:
-			__asm volatile ("debug"); /* CTYP -- Context Type Error  */
-			break;
+	case 6:
+		__asm volatile ("debug"); /* CTYP -- Context Type Error  */
+		break;
 
-		case 7:
-			__asm volatile ("debug"); /* NEST -- Nesting Error (RFE)  */
-			break;
+	case 7:
+		__asm volatile ("debug"); /* NEST -- Nesting Error (RFE)  */
+		break;
 	}
 }
 
@@ -216,36 +300,50 @@ static void __class_3_trap_handler(int tin)
 
 static void __class_4_trap_handler(int tin)
 {
-	printf("%s %d\n", __func__, tin);
+	LEDTOGGLE(3);
+
+	_out_uart('<');
+	flush_stdout_trap();
+	_out_uart('4');
+	flush_stdout_trap();
+	_out_uart('>');
+	flush_stdout_trap();
+	_out_uart('[');
+	flush_stdout_trap();
+	_out_uart('1'+tin);
+	flush_stdout_trap();
+	_out_uart(']');
+	flush_stdout_trap();
+
 	switch (tin)
 	{
-		case 1:
-			__asm volatile ("debug"); /* PSE -- Program Fetch Synchronous Error  */
-			break;
+	case 1:
+		__asm volatile ("debug"); /* PSE -- Program Fetch Synchronous Error  */
+		break;
 
-		case 2:
-			__asm volatile ("debug"); /* DSE -- Data Access Synchronous Error  */
-			break;
+	case 2:
+		__asm volatile ("debug"); /* DSE -- Data Access Synchronous Error  */
+		break;
 
-		case 3:
-			__asm volatile ("debug"); /* DAE -- Data Access Asynchronous Error  */
-			break;
+	case 3:
+		__asm volatile ("debug"); /* DAE -- Data Access Asynchronous Error  */
+		break;
 
-		case 4:
-			__asm volatile ("debug"); /* CAO -- Coprocessor Trap Asynchronous Error  */
-			break;
+	case 4:
+		__asm volatile ("debug"); /* CAO -- Coprocessor Trap Asynchronous Error  */
+		break;
 
-		case 5:
-			__asm volatile ("debug"); /* PIE -- Program Memory Integrity Error  */
-			break;
+	case 5:
+		__asm volatile ("debug"); /* PIE -- Program Memory Integrity Error  */
+		break;
 
-		case 6:
-			__asm volatile ("debug"); /* DIE -- Data Memory Integrity Error  */
-			break;
+	case 6:
+		__asm volatile ("debug"); /* DIE -- Data Memory Integrity Error  */
+		break;
 
-		case 7:
-			__asm volatile ("debug"); /* TAE -- Temporal Asynchronous Error  */
-			break;
+	case 7:
+		__asm volatile ("debug"); /* TAE -- Temporal Asynchronous Error  */
+		break;
 	}
 }
 
@@ -253,16 +351,30 @@ static void __class_4_trap_handler(int tin)
 
 static void __class_5_trap_handler(int tin)
 {
-	printf("%s %d\n", __func__, tin);
+	LEDTOGGLE(3);
+
+	_out_uart('<');
+	flush_stdout_trap();
+	_out_uart('5');
+	flush_stdout_trap();
+	_out_uart('>');
+	flush_stdout_trap();
+	_out_uart('[');
+	flush_stdout_trap();
+	_out_uart('1'+tin);
+	flush_stdout_trap();
+	_out_uart(']');
+	flush_stdout_trap();
+
 	switch (tin)
 	{
-		case 1:
-			__asm volatile ("debug"); /* OVF -- Arithmetic Overflow  */
-			break;
+	case 1:
+		__asm volatile ("debug"); /* OVF -- Arithmetic Overflow  */
+		break;
 
-		case 2:
-			__asm volatile ("debug"); /* SOVF -- Sticky Arithmetic Overflow  */
-			break;
+	case 2:
+		__asm volatile ("debug"); /* SOVF -- Sticky Arithmetic Overflow  */
+		break;
 	}
 }
 
@@ -270,7 +382,21 @@ static void __class_5_trap_handler(int tin)
 
 static void __class_6_trap_handler(int tin)
 {
-	printf("%s %d\n", __func__, tin);
+	LEDTOGGLE(3);
+
+	_out_uart('<');
+	flush_stdout_trap();
+	_out_uart('6');
+	flush_stdout_trap();
+	_out_uart('>');
+	flush_stdout_trap();
+	_out_uart('[');
+	flush_stdout_trap();
+	_out_uart('1'+tin);
+	flush_stdout_trap();
+	_out_uart(']');
+	flush_stdout_trap();
+
 	(void)tin;
 	__asm volatile ("debug"); /* System Call #tin  */
 }
@@ -279,7 +405,21 @@ static void __class_6_trap_handler(int tin)
 
 static void __class_7_trap_handler(int tin)
 {
-	printf("%s %d\n", __func__, tin);
+	LEDTOGGLE(3);
+
+	_out_uart('<');
+	flush_stdout_trap();
+	_out_uart('7');
+	flush_stdout_trap();
+	_out_uart('>');
+	flush_stdout_trap();
+	_out_uart('[');
+	flush_stdout_trap();
+	_out_uart('1'+tin);
+	flush_stdout_trap();
+	_out_uart(']');
+	flush_stdout_trap();
+
 	(void)tin;
 	__asm volatile ("debug"); /* NMI -- Non-maskable Interrupt  */
 }
@@ -298,25 +438,25 @@ static void __class_7_trap_handler(int tin)
 __asm (	".section .inttab, \"ax\", @progbits\n"
 		".align 13\n"
 		".global TriCore_int_table\n"
-	"TriCore_int_table:\n"
-	  );
+		"TriCore_int_table:\n"
+);
 
 __asm (	"debug		# int 0\n"
 		".align 5\n"
-	  );
+);
 
 #define DEFINE_INT(i)							\
-	__asm (".global __interrupt_" #i);			\
-	__asm ("__interrupt_" #i ":");				\
-	__asm ("bisr " #i);							\
-	__asm ("movh.a %a15,hi:Cdisptab+8*"#i);		\
-	__asm ("lea %a15,[%a15]lo:Cdisptab+8*"#i);	\
-	__asm ("ld.a %a14,[%a15+]");				\
-	__asm ("ld.w %d4,[%a15]");					\
-	__asm ("calli %a14");						\
-	__asm ("rslcx");							\
-	__asm ("rfe");								\
-	__asm (".align 5")
+		__asm (".global __interrupt_" #i);			\
+		__asm ("__interrupt_" #i ":");				\
+		__asm ("bisr " #i);							\
+		__asm ("movh.a %a15,hi:Cdisptab+8*"#i);		\
+		__asm ("lea %a15,[%a15]lo:Cdisptab+8*"#i);	\
+		__asm ("ld.a %a14,[%a15+]");				\
+		__asm ("ld.w %d4,[%a15]");					\
+		__asm ("calli %a14");						\
+		__asm ("rslcx");							\
+		__asm ("rfe");								\
+		__asm (".align 5")
 
 
 DEFINE_INT(1);

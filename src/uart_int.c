@@ -130,8 +130,6 @@ static __inline void _out_uart(const char chr)
 	TX_CLEAR(UARTBASE);
 	/* send the character */
 	PUT_CHAR(UARTBASE, chr);
-
-	SimpleDelay(1);
 }
 
 /* Receive (and return) a character from the serial line */
