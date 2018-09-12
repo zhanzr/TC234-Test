@@ -97,26 +97,26 @@ static unsigned int reload_value;
 /* pointer to user specified timer callback function */
 static TCF user_handler = (TCF)0;
 
-nline Ifx_STM *systime_GetStmBase(void)
+static __inline Ifx_STM *systime_GetStmBase(void)
+{
+	switch (_mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK)
+	{
+	case 0 :
+	default :
+		return STM0_BASE;
+		break;
+	}
+}
 
-itch (_mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK)
+/* timer interrupt routine */
+static void tick_irq(int reload_value)
+{
+	Ifx_STM *StmBase = systime_GetStmBase();
 
-se 0 :
-fault :
-      return STM0_BASE;
-      break;
-
-
-
-nterrupt routine */
-d tick_irq(int reload_value)
-
-x_STM *StmBase = systime_GetStmBase();
-
- set new compare value */
-mBase->CMP[0].U += (unsigned int)reload_value;
- (user_handler)
-
+	/* set new compare value */
+	StmBase->CMP[0].U += (unsigned int)reload_value;
+	if (user_handler)
+	{
 		user_handler();
 	}
 }
