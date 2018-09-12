@@ -1,4 +1,4 @@
 TC234 Demo.
 
-Assemble Language Demo: Addition Instruction Demo.
+Assemble Language Demo: AND Instruction Demo.
 
