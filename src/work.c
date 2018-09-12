@@ -8,9 +8,6 @@
 #include <math.h>
 #include <limits.h>
 
-#include "led.h"
-#include "uart_int.h"
-
 #include "tc27xc/IfxStm_reg.h"
 #include "tc27xc/IfxStm_bf.h"
 #include "tc27xc/IfxCpu_reg.h"
@@ -19,64 +16,22 @@
 #include "system_tc2x.h"
 #include "machine/intrinsics.h"
 #include "interrupts.h"
+#include "led.h"
+#include "uart_int.h"
 
 #include "asm_prototype.h"
 
-#define BAUDRATE	115200
-
 #define SYSTIME_CLOCK	1000	/* timer event rate [Hz] */
 
-volatile uint32_t g_SysTicks;
+volatile uint32_t g_sys_ticks;
 volatile bool g_regular_task_flag;
-
-/* AppKit-TC2X4: P13.0 .. P13.3 --> LED D107 ... D110 */
-static Ifx_P * const portLED = (Ifx_P *)&MODULE_P13;
-
-/* OMR is WO ==> don't use load-modify-store access! */
-/* set PSx pin */
-#define LED_PIN_SET(x)			(1 << (LED_PIN_NR + (x)))
-/* set PCLx pin */
-#define LED_PIN_RESET(x)		(1 << (LED_PIN_NR + IFX_P_OMR_PCL0_OFF + (x)))
-
-void LEDON(int nr)
-{
-	if (nr < MAX_LED)
-	{
-		portLED->OMR.U = LED_PIN_RESET(nr);
-	}
-}
-
-void LEDOFF(int nr)
-{
-	if (nr < MAX_LED)
-	{
-		portLED->OMR.U = LED_PIN_SET(nr);
-	}
-}
-
-void LEDTOGGLE(int nr)
-{
-	if (nr < MAX_LED)
-	{
-		/* set PCLx and PSx pin to 1 ==> toggle pin state */
-		portLED->OMR.U = LED_PIN_RESET(nr) | LED_PIN_SET(nr);
-	}
-}
-
-void InitLED(void)
-{
-	/* initialise all LEDs (P13.0 .. P13.3) */
-	portLED->IOCR0.U = 0x80808080;	/* OUT_PPGPIO */
-	/* all LEDs OFF */
-	portLED->OMR.U = (MASK_ALL_LEDS << LED_PIN_NR);
-}
 
 /* timer callback handler */
 static void my_timer_handler(void)
 {
-	++g_SysTicks;
+	++g_sys_ticks;
 
-	if(0==g_SysTicks%(2*SYSTIME_CLOCK))
+	if(0==g_sys_ticks%(2*SYSTIME_CLOCK))
 	{
 		LEDTOGGLE(1);
 	}
@@ -84,7 +39,7 @@ static void my_timer_handler(void)
 
 const uint32_t HAL_GetTick(void)
 {
-	return g_SysTicks;
+	return g_sys_ticks;
 }
 
 #define SYSTIME_ISR_PRIO	2
@@ -167,17 +122,12 @@ void flush_stdout(void)
 	}
 }
 
-float __addf(float a, float b)
-{
-	float res;
-    __asm__ volatile ("add.f %0, %1, %2": "=d" (res) : "d" (a), "d" (b));
-    return res;
-}
-
-volatile float fA;
-volatile float fB;
-volatile float res_f_test;
-volatile float res_f;
+bool Ifx_And_T(uint32_t A, uint32_t B);
+bool Ifx_Andn_T(uint32_t A, uint32_t B);
+uint32_t Ifx_AndAnd_T(uint32_t A, uint32_t B);
+uint32_t Ifx_AndAndn_T(uint32_t A, uint32_t B);
+uint32_t Ifx_AndNor_T(uint32_t A, uint32_t B);
+uint32_t Ifx_AndOr_T(uint32_t A, uint32_t B);
 
 int main(void)
 {
@@ -201,156 +151,141 @@ int main(void)
 
 	flush_stdout();
 
-	//Test Additon Instruction
-	printf("\nTest ADD\n");
-	int32_t a = 0x11112222;
-	int32_t b = 0x33334444;
-	int32_t res = Ifx_Add(a, b);
-	printf("ADD[%08X+%08X]=%08X\n", a, b, res);
+	//Test AND Instruction
+	printf("\nTest AND\n");
+	uint32_t a = 0x1111FFFF;
+	uint32_t b = 0x33333333;
+	uint32_t c = 0xFFFF0001;
+	uint32_t res = Ifx_And(a, b);
+	printf("AND[%08X,%08X]=%08X\n", a, b, res);
+	flush_stdout();
+	b = 0;
+	res = Ifx_And(a, b);
+	printf("AND[%08X,%08X]=%08X\n", a, b, res);
 	flush_stdout();
 
-	printf("\nTest ADDC\n");
-	a = 2;
-	b = 3;
-	res = Ifx_AddC(a,b);
-	printf("ADDC[%08X+%08X]=%08X\n", a, b, res);
+	printf("\nTest ANDI\n");
+	res = Ifx_AndI(a);
+	printf("AND[%08X,%03X]=%08X\n", a, 0x0f, res);
 	flush_stdout();
 
-	printf("\nTest ADD\n");
-	a = 33;
-	res = Ifx_AddI(a);
-	printf("ADD[%i+ %i]=%i\n", a, -10, res);
+	printf("\nTest ANDN\n");
+	a = 0x1111FFFF;
+	b = 0x33333333;
+	res = Ifx_Andn(a, b);
+	printf("ANDN[%08X,%08X]=%08X\n", a, b, res);
+	flush_stdout();
+	b = 0;
+	res = Ifx_Andn(a, b);
+	printf("ANDN[%08X,%08X]=%08X\n", a, b, res);
 	flush_stdout();
 
-	printf("\nTest ADDIH\n");
-	a = 0x33;
-	res = Ifx_AddI_Hi(a);
-	printf("ADDIH[%08X+%08X]=%08X\n", a, 4, res);
+	printf("\nTest ANDI\n");
+	res = Ifx_AndnI(a);
+	printf("ANDN[%08X,%03X]=%08X\n", a, 0x0f, res);
 	flush_stdout();
 
-	printf("\nTest ADDX\n");
-	a = 0x11112222;
-	b = 0xfff;
-	res = Ifx_Addx(a, b);
-	printf("ADDX[%08X+%08X]=%08X\n", a, b, res);
+	printf("\nTest AND.EQ\n");
+	a = 0x1111FFFF;
+	b = 0x33333333;
+	res = Ifx_And_EQ(a, b, c);
+	printf("AND.EQ[%08X, %08X,%08X]=%08X\n", c, a, b, res);
+	flush_stdout();
+	b = a;
+	res = Ifx_And_EQ(a, b, c);
+	printf("AND.EQ[%08X, %08X,%08X]=%08X\n", c, a, b, res);
 	flush_stdout();
 
-	printf("\nTest ADDX Immediate\n");
-	a = 0x33;
-	res = Ifx_Addx_I(a);
-	printf("ADDX[%i+%i]=%i\n", a, -10, res);
+	printf("\nTest AND.EQ.I\n");
+	res = Ifx_AndI_EQ(a, c);
+	printf("ANDN[%08X, %08X,%03X]=%08X\n", c, a, 0x0f, res);
 	flush_stdout();
 
-	printf("\nTest ADDS\n");
-	a = INT32_MAX;
-	b = INT32_MAX;
-	res = Ifx_Add(a, b);
-	printf("ADD[%i+%i]=%i\n", a, b, res);
-	res = Ifx_AddS(a, b);
-	printf("ADDS[%i+%i]=%i\n", a, b, res);
+
+	printf("\nTest AND.NE\n");
+	a = 0x1111FFFF;
+	b = 0x33333333;
+	res = Ifx_And_NE(a, b, c);
+	printf("AND.NE[%08X, %08X,%08X]=%08X\n", c, a, b, res);
+	flush_stdout();
+	b = a;
+	res = Ifx_And_NE(a, b, c);
+	printf("AND.NE[%08X, %08X,%08X]=%08X\n", c, a, b, res);
 	flush_stdout();
 
-	printf("\nTest ADDS.U\n");
-	uint32_t c = UINT32_MAX;
-	uint32_t d = UINT32_MAX;
-	uint32_t resU = Ifx_AddS_U(c, d);
-	printf("ADDS.U[%u+%u]=%u\n", c, d, resU);
+	printf("\nTest AND.NE.I\n");
+	res = Ifx_AndI_NE(a, c);
+	printf("ANDN[%08X, %08X,%03X]=%08X\n", c, a, 0x0f, res);
 	flush_stdout();
 
-	printf("\nTest ADDS.H\n");
-	pack32 a_p32;
-	pack32 b_p32;
-	pack32 res_p32;
-	a_p32.i16[0]=INT16_MAX;
-	a_p32.i16[1]=INT16_MAX;
-	b_p32.i16[0]=INT16_MAX;
-	b_p32.i16[1]=INT16_MAX;
-	res_p32.i32 = Ifx_Add_H(a_p32.i32, b_p32.i32);
-	printf("ADD.H[%i,%i + %i,%i]=%i,%i\n",
-			a_p32.i16[0], a_p32.i16[1],
-			b_p32.i16[0], b_p32.i16[1],
-			res_p32.i16[0], res_p32.i16[1]);
-	res_p32.i32 = Ifx_AddS_H(a_p32.i32, b_p32.i32);
-	printf("ADDS.H[%i,%i + %i,%i]=%i,%i\n",
-			a_p32.i16[0], a_p32.i16[1],
-			b_p32.i16[0], b_p32.i16[1],
-			res_p32.i16[0], res_p32.i16[1]);
+	printf("\nTest AND.GE\n");
+	a = 0x1111FFFF;
+	b = 0x33333333;
+	res = Ifx_And_GE(a, b, c);
+	printf("AND.GE[%08X, %08X,%08X]=%08X\n", c, a, b, res);
+	flush_stdout();
+	b = a;
+	res = Ifx_And_GE(a, b, c);
+	printf("AND.GE[%08X, %08X,%08X]=%08X\n", c, a, b, res);
 	flush_stdout();
 
-	printf("\nTest ADDS.HU\n");
-	a_p32.u16[0]=UINT16_MAX;
-	a_p32.u16[1]=UINT16_MAX;
-	b_p32.u16[0]=UINT16_MAX;
-	b_p32.u16[1]=UINT16_MAX;
-	res_p32.u32 = Ifx_AddS_HU(a_p32.u32, b_p32.u32);
-	printf("ADDS.HU[%u,%u + %u,%u]=%u,%u\n",
-			a_p32.u16[0], a_p32.u16[1],
-			b_p32.u16[0], b_p32.u16[1],
-			res_p32.u16[0], res_p32.u16[1]);
+	printf("\nTest AND.GE.I\n");
+	res = Ifx_AndI_GE(a, c);
+	printf("AND.GE[%08X, %08X,%03X]=%08X\n", c, a, 0x0f, res);
 	flush_stdout();
 
-	printf("\nTest ADDA\n");
-	uint8_t tmpArr[16];
-	uint8_t* pTest = Ifx_AddA(tmpArr, tmpArr);
-	printf("ADDA[%08X,%08X]=%08X\n", (uint32_t)tmpArr, (uint32_t)tmpArr, (uint32_t)pTest);
+	printf("\nTest AND.GE.U\n");
+	a = 0x1111FFFF;
+	b = 0x33333333;
+	res = Ifx_And_GE_U(a, b, c);
+	printf("AND.GE.U[%08X, %08X,%08X]=%08X\n", c, a, b, res);
+	flush_stdout();
+	b = a;
+	res = Ifx_And_GE_U(a, b, c);
+	printf("AND.GE.U[%08X, %08X,%08X]=%08X\n", c, a, b, res);
 	flush_stdout();
 
-	printf("\nTest ADDA Immediate\n");
-	pTest = Ifx_AddA_4(tmpArr);
-	printf("ADDA[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+	printf("\nTest AND.GE.U.I\n");
+	res = Ifx_AndI_GE_U(a, c);
+	printf("AND.GE.U[%08X, %08X,%03X]=%08X\n", c, a, 0x0f, res);
 	flush_stdout();
 
-	printf("\nTest ADDIH.A\n");
-	pTest = Ifx_Addih_A(tmpArr);
-	printf("ADDIH.A[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+	printf("\nTest AND.LT\n");
+	a = 0x1111FFFF;
+	b = 0x33333333;
+	res = Ifx_And_LT(a, b, c);
+	printf("AND.LT[%08X, %08X,%08X]=%08X\n", c, a, b, res);
+	flush_stdout();
+	b = a;
+	res = Ifx_And_LT(a, b, c);
+	printf("AND.LT[%08X, %08X,%08X]=%08X\n", c, a, b, res);
 	flush_stdout();
 
-	printf("\nTest ADDSC.A\n");
-	pTest = Ifx_Addsc_A(tmpArr, 4);
-	printf("ADDSC.A[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 4, (uint32_t)pTest);
+	printf("\nTest AND.LT.I\n");
+	res = Ifx_AndI_LT(a, c);
+	printf("AND.LT[%08X, %08X,%03X]=%08X\n", c, a, 0x0f, res);
 	flush_stdout();
 
-	printf("\nTest ADDSC.AT\n");
-	pTest = Ifx_Addsc_AT(tmpArr, 0x12345678);
-	printf("ADDSC.AT[%08X,%08X]=%08X\n", (uint32_t)tmpArr, 0x12345678, (uint32_t)pTest);
+	printf("\nTest AND.LT.U\n");
+	a = 0x1111FFFF;
+	b = 0x33333333;
+	res = Ifx_And_LT_U(a, b, c);
+	printf("AND.LT.U[%08X, %08X,%08X]=%08X\n", c, a, b, res);
+	flush_stdout();
+	b = a;
+	res = Ifx_And_LT_U(a, b, c);
+	printf("AND.LT.U[%08X, %08X,%08X]=%08X\n", c, a, b, res);
 	flush_stdout();
 
-	printf("\nTest ADD.B\n");
-	a_p32.i8[0]=INT8_MAX/3;
-	a_p32.i8[1]=INT8_MAX/4;
-	a_p32.i8[2]=INT8_MAX/5;
-	a_p32.i8[3]=INT8_MAX/6;
-	b_p32.i8[0]=INT8_MAX/3;
-	b_p32.i8[1]=INT8_MAX/4;
-	b_p32.i8[2]=INT8_MAX/5;
-	b_p32.i8[3]=INT8_MAX/6;
-	res_p32.i32 = Ifx_Add_B(a_p32.i32, b_p32.i32);
-	printf("ADD.B[%i,%i,%i,%i + %i,%i,%i,%i]=%i,%i,%i,%i\n",
-			a_p32.i8[0], a_p32.i8[1],a_p32.i8[2], a_p32.i8[3],
-			b_p32.i8[0], b_p32.i8[1],b_p32.i8[2], b_p32.i8[3],
-			res_p32.i8[0], res_p32.i8[1],res_p32.i8[2], res_p32.i8[3]);
+	printf("\nTest AND.LT.U.I\n");
+	res = Ifx_AndI_LT_U(a, c);
+	printf("ADD.LT.U[%08X, %08X,%03X]=%08X\n", c, a, 0x0f, res);
 	flush_stdout();
-
-	fA = 1.11f;
-	fB = 2.22f;
-	printf("\nTest ADD.F %08X %08X\n",
-			*(uint32_t*)&fA, *(uint32_t*)&fB);
-	flush_stdout();
-
-#if 0
-	res_f = __addf(fA, fB);
-	printf("ADD.F(%f,%f)=%f\n", fA, fB, res_f);
-	flush_stdout();
-
-	res_f = Ifx_Add_F(fA, fB);
-	printf("ADD.F(%f,%f)=%f\n", fA, fB, res_f);
-	flush_stdout();
-#endif
 
 	g_regular_task_flag = true;
 	while(1)
 	{
-		if(0==g_SysTicks%(20*SYSTIME_CLOCK))
+		if(0==g_sys_ticks%(20*SYSTIME_CLOCK))
 		{
 			g_regular_task_flag = true;
 		}

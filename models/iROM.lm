@@ -142,6 +142,11 @@
     <InputSection Name="wm4.tc_inc_path.h.9.edf37d69033d984c657fa37b31a773ea"/>
     <InputSection Name="wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6"/>
     <InputSection Name="wm4.0.b1bb44d18881a2d90847a2626c0e2173"/>
+    <InputSection Name="wm4.ifxcpu_bf.h.28.d558ef760fb5b506d617d899a902fd0b"/>
+    <InputSection Name="wm4.ifxcpu_reg.h.60.a87fe5519b726d5973d9b8bbefea77c7"/>
+    <InputSection Name="wm4.Ifx_TypesReg.h.27.a0265a21b4a33fc908c22e692c7dc04b"/>
+    <InputSection Name="wm4.ifxstm_reg.h.48.cf22c5554bffffad724b24ebb01643ac"/>
+    <InputSection Name="wm4.uart_int.h.10.7119d9997e9fbe4795ff202ea06387e3"/>
   </Input>
   <Files>
     <ObjectFile Name="src\cint_tc23x.o"/>
@@ -158,6 +163,7 @@
     <ObjectFile Name="asm\test_ADD.o"/>
     <ObjectFile Name="asm\test_ADDS.o"/>
     <ObjectFile Name="asm\test_AND.o"/>
+    <ObjectFile Name="src\led.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>
