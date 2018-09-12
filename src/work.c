@@ -97,26 +97,26 @@ static unsigned int reload_value;
 /* pointer to user specified timer callback function */
 static TCF user_handler = (TCF)0;
 
-static __inline Ifx_STM *systime_GetStmBase(void)
-{
-	switch (_mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK)
-	{
-	case 0 :
-	default :
-		return STM0_BASE;
-		break;
-	}
-}
+nline Ifx_STM *systime_GetStmBase(void)
 
-/* timer interrupt routine */
-static void tick_irq(int reload_value)
-{
-	Ifx_STM *StmBase = systime_GetStmBase();
+itch (_mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK)
 
-	/* set new compare value */
-	StmBase->CMP[0].U += (unsigned int)reload_value;
-	if (user_handler)
-	{
+se 0 :
+fault :
+      return STM0_BASE;
+      break;
+
+
+
+nterrupt routine */
+d tick_irq(int reload_value)
+
+x_STM *StmBase = systime_GetStmBase();
+
+ set new compare value */
+mBase->CMP[0].U += (unsigned int)reload_value;
+ (user_handler)
+
 		user_handler();
 	}
 }
@@ -337,6 +337,7 @@ int main(void)
 			*(uint32_t*)&fA, *(uint32_t*)&fB);
 	flush_stdout();
 
+#if 0
 	res_f = __addf(fA, fB);
 	printf("ADD.F(%f,%f)=%f\n", fA, fB, res_f);
 	flush_stdout();
@@ -344,6 +345,7 @@ int main(void)
 	res_f = Ifx_Add_F(fA, fB);
 	printf("ADD.F(%f,%f)=%f\n", fA, fB, res_f);
 	flush_stdout();
+#endif
 
 	g_regular_task_flag = true;
 	while(1)
