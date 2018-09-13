@@ -122,13 +122,6 @@ void flush_stdout(void)
 	}
 }
 
-bool Ifx_And_T(uint32_t A, uint32_t B);
-bool Ifx_Andn_T(uint32_t A, uint32_t B);
-uint32_t Ifx_AndAnd_T(uint32_t A, uint32_t B);
-uint32_t Ifx_AndAndn_T(uint32_t A, uint32_t B);
-uint32_t Ifx_AndNor_T(uint32_t A, uint32_t B);
-uint32_t Ifx_AndOr_T(uint32_t A, uint32_t B);
-
 int main(void)
 {
 	SYSTEM_Init();
@@ -200,7 +193,6 @@ int main(void)
 	res = Ifx_AndI_EQ(a, c);
 	printf("ANDN[%08X, %08X,%03X]=%08X\n", c, a, 0x0f, res);
 	flush_stdout();
-
 
 	printf("\nTest AND.NE\n");
 	a = 0x1111FFFF;
@@ -280,6 +272,44 @@ int main(void)
 	printf("\nTest AND.LT.U.I\n");
 	res = Ifx_AndI_LT_U(a, c);
 	printf("ADD.LT.U[%08X, %08X,%03X]=%08X\n", c, a, 0x0f, res);
+	flush_stdout();
+
+	printf("\nTest AND.T\n");
+	res = Ifx_And_T(a, b);
+	printf("AND.T[%08X(%d), %08X(%d)]=%08X\n", a,  0, b, 0, res);
+	flush_stdout();
+
+	printf("\nTest ANDN.T\n");
+	res = Ifx_Andn_T(a, b);
+	printf("ANDN.T[%08X(%d), %08X(%d)]=%08X\n", a,  0, b, 0, res);
+	flush_stdout();
+
+	printf("\nTest ANDAND.T\n");
+	a = 0x1111FFFF;
+	b = 0x33333333;
+	res = Ifx_AndAnd_T(a, b, c);
+	printf("ANDAND.T[%08X, %08X(%d),%08X(%d)]=%08X\n", c, a,1, b,1, res);
+	flush_stdout();
+
+	printf("\nTest ANDANDN.T\n");
+	a = 0x1111FFFF;
+	b = 0x33333333;
+	res = Ifx_AndAndn_T(a, b, c);
+	printf("ANDANDN.T[%08X, %08X(%d),%08X(%d)]=%08X\n", c, a,1, b,1, res);
+	flush_stdout();
+
+	printf("\nTest ANDOR.T\n");
+	a = 0x1111FFFF;
+	b = 0x33333333;
+	res = Ifx_AndOr_T(a, b, c);
+	printf("ANDOR.T[%08X, %08X(%d),%08X(%d)]=%08X\n", c, a,1, b,1, res);
+	flush_stdout();
+
+	printf("\nTest ANDNOR.T\n");
+	a = 0x1111FFFF;
+	b = 0x33333333;
+	res = Ifx_AndNor_T(a, b, c);
+	printf("ANDNOR.T[%08X, %08X(%d),%08X(%d)]=%08X\n", c, a,1, b,1, res);
 	flush_stdout();
 
 	g_regular_task_flag = true;

@@ -72,9 +72,9 @@ uint32_t Ifx_And_LT_U(uint32_t A, uint32_t B, uint32_t sum);
 uint32_t Ifx_AndI_LT_U(uint32_t A, uint32_t sum);
 bool Ifx_And_T(uint32_t A, uint32_t B);
 bool Ifx_Andn_T(uint32_t A, uint32_t B);
-uint32_t Ifx_AndAnd_T(uint32_t A, uint32_t B);
-uint32_t Ifx_AndAndn_T(uint32_t A, uint32_t B);
-uint32_t Ifx_AndNor_T(uint32_t A, uint32_t B);
-uint32_t Ifx_AndOr_T(uint32_t A, uint32_t B);
+uint32_t Ifx_AndAnd_T(uint32_t A, uint32_t B, uint32_t sum);
+uint32_t Ifx_AndAndn_T(uint32_t A, uint32_t B, uint32_t sum);
+uint32_t Ifx_AndNor_T(uint32_t A, uint32_t B, uint32_t sum);
+uint32_t Ifx_AndOr_T(uint32_t A, uint32_t B, uint32_t sum);
 
 #endif /* ASM_PROTOTYPE_H_ */

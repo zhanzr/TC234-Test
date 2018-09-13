@@ -20,10 +20,10 @@
 // uint32_t Ifx_AndI_LT_U(uint32_t A, uint32_t sum);
 // bool Ifx_And_T(uint32_t A, uint32_t B);
 // bool Ifx_Andn_T(uint32_t A, uint32_t B);
-// uint32_t Ifx_AndAnd_T(uint32_t A, uint32_t B);
-// uint32_t Ifx_AndAndn_T(uint32_t A, uint32_t B);
-// uint32_t Ifx_AndNor_T(uint32_t A, uint32_t B);
-// uint32_t Ifx_AndOr_T(uint32_t A, uint32_t B);
+// uint32_t Ifx_AndAnd_T(uint32_t A, uint32_t B, uint32_t sum);
+// uint32_t Ifx_AndAndn_T(uint32_t A, uint32_t B, uint32_t sum);
+// uint32_t Ifx_AndNor_T(uint32_t A, uint32_t B, uint32_t sum);
+// uint32_t Ifx_AndOr_T(uint32_t A, uint32_t B, uint32_t sum);
 
 // INPUTS:
 // OUTPUT:
@@ -190,20 +190,24 @@ Ifx_AndI_LT_U:
 
 //	Accumulating Bit Logical AND-AND
 Ifx_AndAnd_T:
-   and.and.t result, inputA, 1, inputB, 1
+   and.and.t inputC, inputA, 1, inputB, 1
+   mov result, inputC
    ret
 
 //	Accumulating Bit Logical AND-AND-Not
 Ifx_AndAndn_T:
-   and.andn.t result, inputA, 1, inputB, 1
-   ret
+	and.andn.t inputC, inputA, 1, inputB, 1
+   	mov result, inputC
+    ret
 
 //	Accumulating Bit Logical AND-NOR
 Ifx_AndNor_T:
-   and.nor.t result, inputA, 1, inputB, 1
+   and.nor.t inputC, inputA, 1, inputB, 1
+   mov result, inputC
    ret
 
 //	Accumulating Bit Logical AND-OR
 Ifx_AndOr_T:
-   and.or.t result, inputA, 1, inputB, 1
+   and.or.t inputC, inputA, 1, inputB, 1
+   mov result, inputC
    ret
