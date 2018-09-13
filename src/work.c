@@ -122,6 +122,11 @@ void flush_stdout(void)
 	}
 }
 
+void TestFunc(void)
+{
+	printf("%s_%d\n", __func__, __LINE__);
+}
+
 int main(void)
 {
 	SYSTEM_Init();

@@ -164,6 +164,7 @@
     <ObjectFile Name="asm\test_ADDS.o"/>
     <ObjectFile Name="asm\test_AND.o"/>
     <ObjectFile Name="src\led.o"/>
+    <ObjectFile Name="asm\test_B_C.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

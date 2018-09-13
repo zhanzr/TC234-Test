@@ -1,4 +1,30 @@
 TC234 Demo.
 
-Assemble Language Demo: AND Instruction Demo.
+Assemble Language Demo: B and C  initial Instruction Demo.
+
+BISR
+BMERGE
+BSPLIT
+CACHEA.I
+CACHEA.W
+CACHEA.WI
+CACHEI.I
+CACHEI.W
+CACHEI.WI
+CADD
+CADDN
+CALL
+CALLA
+CALLI
+CLO
+CLO.H
+CLS
+CLS.H
+CLZ
+CLZ.H
+CMOV (16-bit)
+CMOVN (16-bit)
+CMP.F
+CSUB
+CSUBN 
 

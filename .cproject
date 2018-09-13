@@ -25,7 +25,7 @@
 									<listOptionValue builtIn="false" value="&quot;../h&quot;"/>
 								</option>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.assembler.debug.option.ahlms.1246829144" name="Create assembler listing (-Wa,-ahlms=${OutputFileBaseName}.lst)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.assembler.debug.option.ahlms" value="false" valueType="boolean"/>
-								<option id="com.rt.hightec.buildsystem.tricore.new.assembler.optimization.insn.1348200042" name="Exclusively emit 32-bit opcodes insn" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.optimization.insn" value="com.rt.hightec.buildsystem.tricore.new.assembler.optimization.insn.only" valueType="enumerated"/>
+								<option id="com.rt.hightec.buildsystem.tricore.new.assembler.optimization.insn.1348200042" name="Exclusively emit 32-bit opcodes insn" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.optimization.insn" value="com.rt.hightec.buildsystem.tricore.new.assembler.optimization.insn.preferred" valueType="enumerated"/>
 								<inputType id="com.rt.hightec.buildsystem.tricore.new.assembler.inputtype.1559120657" name="Assembler Input NO GUI" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.inputtype"/>
 							</tool>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.gtm.373372830" name="TriCore GTM Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.gtm">
