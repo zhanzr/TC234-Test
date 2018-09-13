@@ -11,6 +11,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+//Remaining Uncovered Instruction
+//ADD.F
+//BISR
+
 typedef union union_pack32
 {
 	uint32_t u32;
