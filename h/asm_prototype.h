@@ -81,4 +81,39 @@ uint32_t Ifx_AndAndn_T(uint32_t A, uint32_t B, uint32_t sum);
 uint32_t Ifx_AndNor_T(uint32_t A, uint32_t B, uint32_t sum);
 uint32_t Ifx_AndOr_T(uint32_t A, uint32_t B, uint32_t sum);
 
+//B-C Instruction Set
+uint32_t Ifx_Bisr(uint32_t A);
+uint32_t Ifx_Bmerge(uint32_t A, uint32_t B);
+uint64_t Ifx_Bsplit(uint32_t A);
+uint32_t Ifx_Cachea_I(void);
+uint32_t Ifx_Cachea_W(void);
+uint32_t Ifx_Cachea_WI(void);
+uint32_t Ifx_Cachei_I(void);
+uint32_t Ifx_Cachei_W(void);
+uint32_t Ifx_Cachei_WI(void);
+uint32_t Ifx_CADD(uint32_t A, uint32_t B, uint32_t cond);
+uint32_t Ifx_CADD_I(uint32_t A, uint32_t cond);
+uint32_t Ifx_CADD_I16(uint32_t A, uint32_t cond);
+uint32_t Ifx_CADDN(uint32_t A, uint32_t B, uint32_t cond);
+uint32_t Ifx_CADDN_I(uint32_t A, uint32_t cond);
+uint32_t Ifx_CADDN_I16(uint32_t A, uint32_t cond);
+uint32_t Ifx_Call(uint32_t A, uint32_t B, uint32_t cond);
+uint32_t Ifx_Call_A(uint32_t A, uint32_t B, uint32_t cond);
+uint32_t Ifx_Call_I(uint32_t(*p)(uint32_t A, uint32_t B, uint32_t cond),uint32_t A, uint32_t B, uint32_t cond);
+uint32_t Ifx_Clo(uint32_t A);
+uint32_t Ifx_Clo_H(uint32_t A);
+uint32_t Ifx_Cls(uint32_t A);
+uint32_t Ifx_Cls_H(uint32_t A);
+uint32_t Ifx_Clz(uint32_t A);
+uint32_t Ifx_Clz_H(uint32_t A);
+uint32_t Ifx_Cmov(uint32_t A, uint32_t B, uint32_t cond);
+uint32_t Ifx_Cmov_I(uint32_t A, uint32_t cond);
+uint32_t Ifx_Cmovn(uint32_t A, uint32_t B, uint32_t cond);
+uint32_t Ifx_Cmovn_I(uint32_t A, uint32_t cond);
+uint32_t Ifx_Cmp_F(float A, float B);
+uint32_t Ifx_Csub(uint32_t A, uint32_t B, uint32_t cond);
+uint32_t Ifx_Csubn(uint32_t A, uint32_t B, uint32_t cond);
+
+uint32_t Ifx_Rslcx(void);
+
 #endif /* ASM_PROTOTYPE_H_ */
