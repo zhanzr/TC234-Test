@@ -1,84 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LinkerModel:LinkerDescriptionFile xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:LinkerModel="http://LinkerModel" xmlns:memorydescription="http://MemoryDescription" Description="internal flash configuration" Name="iROM">
+<LinkerModel:LinkerDescriptionFile xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:LinkerModel="http://LinkerModel" xmlns:memorydescription="http://MemoryDescription" Description="internal flash configuration" Name="iROM">
   <Output>
     <Code>
-      <DeepOutputSection Description="Startup code for TriCore" Name=".startup_code" RuntimeAddressVMA="#//@LocalAliases/@Alias.0">
-        <InputEntry Description="Startup code for TriCore" Name=".startup_code" InputSection="#//@Input/@InputSection.0"/>
+      <DeepOutputSection Description="Startup code for TriCore" Name=".startup_code" RuntimeAddressVMA="//@LocalAliases/@Alias.0">
+        <InputEntry Description="Startup code for TriCore" Name=".startup_code" InputSection="//@Input/@InputSection.0"/>
       </DeepOutputSection>
-      <DeepOutputSection Description="Code section" Name=".text" RuntimeAddressVMA="#//@LocalAliases/@Alias.0">
-        <InputEntry Description="Code section" Name=".text" InputSection="#//@Input/@InputSection.3"/>
+      <DeepOutputSection Description="Code section" Name=".text" RuntimeAddressVMA="//@LocalAliases/@Alias.0">
+        <InputEntry Description="Code section" Name=".text" InputSection="//@Input/@InputSection.3"/>
       </DeepOutputSection>
-      <DeepOutputSection Description="Code executed before calling main" Name=".init" RuntimeAddressVMA="#//@LocalAliases/@Alias.0">
-        <InputEntry Description="Code executed before calling main" Name=".init" InputSection="#//@Input/@InputSection.5" KEEP="true"/>
+      <DeepOutputSection Description="Code executed before calling main" Name=".init" RuntimeAddressVMA="//@LocalAliases/@Alias.0">
+        <InputEntry Description="Code executed before calling main" Name=".init" InputSection="//@Input/@InputSection.5" KEEP="true"/>
       </DeepOutputSection>
-      <DeepOutputSection Description="Code executed before exiting program" Name=".fini" RuntimeAddressVMA="#//@LocalAliases/@Alias.0">
-        <InputEntry Description="Code executed before exiting program" Name=".fini" InputSection="#//@Input/@InputSection.6" KEEP="true"/>
+      <DeepOutputSection Description="Code executed before exiting program" Name=".fini" RuntimeAddressVMA="//@LocalAliases/@Alias.0">
+        <InputEntry Description="Code executed before exiting program" Name=".fini" InputSection="//@Input/@InputSection.6" KEEP="true"/>
       </DeepOutputSection>
-      <DeepOutputSection Description="Section for trap table" Name=".traptab" RuntimeAddressVMA="#//@LocalAliases/@Alias.0">
-        <InputEntry Description="Section for trap table" Name=".traptab" InputSection="#//@Input/@InputSection.7"/>
+      <DeepOutputSection Description="Section for trap table" Name=".traptab" RuntimeAddressVMA="//@LocalAliases/@Alias.0">
+        <InputEntry Description="Section for trap table" Name=".traptab" InputSection="//@Input/@InputSection.7"/>
       </DeepOutputSection>
-      <DeepOutputSection Description="Section for interrupt table" Name=".inttab" RuntimeAddressVMA="#//@LocalAliases/@Alias.0">
-        <InputEntry Description="Section for interrupt table" Name=".inttab" InputSection="#//@Input/@InputSection.8"/>
+      <DeepOutputSection Description="Section for interrupt table" Name=".inttab" RuntimeAddressVMA="//@LocalAliases/@Alias.0">
+        <InputEntry Description="Section for interrupt table" Name=".inttab" InputSection="//@Input/@InputSection.8"/>
       </DeepOutputSection>
-      <DeepOutputSection Description="Exception handling frame for C++ exceptions" Name=".eh_frame" RuntimeAddressVMA="#//@LocalAliases/@Alias.0">
-        <InputEntry Description="Exception handling frame for C++ exceptions" Name=".eh_frame" InputSection="#//@Input/@InputSection.15"/>
+      <DeepOutputSection Description="Exception handling frame for C++ exceptions" Name=".eh_frame" RuntimeAddressVMA="//@LocalAliases/@Alias.0">
+        <InputEntry Description="Exception handling frame for C++ exceptions" Name=".eh_frame" InputSection="//@Input/@InputSection.15"/>
       </DeepOutputSection>
     </Code>
     <Data>
       <Absolute>
-        <DeepOutputSection Description="Initialised data addressed as absolute" Name=".zdata" RuntimeAddressVMA="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" LoadMachineAddressLMA="#//@LocalAliases/@Alias.0">
-          <InputEntry Description="Initialised data addressed as absolute" Name=".zdata" InputSection="#//@Input/@InputSection.11"/>
-          <InputEntry Description="absolute addressable read only data" Name=".zdata.rodata" InputSection="#//@Input/@InputSection.17"/>
-          <InputEntry Description="absolute addressable read only data" Name=".zrodata" InputSection="#//@Input/@InputSection.18"/>
+        <DeepOutputSection Description="Initialised data addressed as absolute" Name=".zdata" LoadMachineAddressLMA="//@LocalAliases/@Alias.0">
+          <RuntimeAddressVMA xsi:type="memorydescription:Region" href="TC23xx.mdm#//@Memory.2/@Region.0"/>
+          <InputEntry Description="Initialised data addressed as absolute" Name=".zdata" InputSection="//@Input/@InputSection.11"/>
+          <InputEntry Description="absolute addressable read only data" Name=".zdata.rodata" InputSection="//@Input/@InputSection.17"/>
+          <InputEntry Description="absolute addressable read only data" Name=".zrodata" InputSection="//@Input/@InputSection.18"/>
         </DeepOutputSection>
-        <DeepOutputSection Description="Not initialised data addressed as absolute" Name=".zbss" RuntimeAddressVMA="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" NOLOAD="true">
-          <InputEntry Description="Not Initialised data addressed as absolute" Name=".zbss" InputSection="#//@Input/@InputSection.12"/>
+        <DeepOutputSection Description="Not initialised data addressed as absolute" Name=".zbss" NOLOAD="true">
+          <RuntimeAddressVMA xsi:type="memorydescription:Region" href="TC23xx.mdm#//@Memory.2/@Region.0"/>
+          <InputEntry Description="Not Initialised data addressed as absolute" Name=".zbss" InputSection="//@Input/@InputSection.12"/>
         </DeepOutputSection>
-        <DeepOutputSection Description="Not initialised bit data" Name=".bbss" RuntimeAddressVMA="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" NOLOAD="true">
-          <InputEntry Description="Not initialised bit data" Name=".bbss" InputSection="#//@Input/@InputSection.14"/>
+        <DeepOutputSection Description="Not initialised bit data" Name=".bbss" NOLOAD="true">
+          <RuntimeAddressVMA xsi:type="memorydescription:Region" href="TC23xx.mdm#//@Memory.2/@Region.0"/>
+          <InputEntry Description="Not initialised bit data" Name=".bbss" InputSection="//@Input/@InputSection.14"/>
         </DeepOutputSection>
-        <DeepOutputSection Description="Bit variables" Name=".bdata" RuntimeAddressVMA="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" LoadMachineAddressLMA="#//@LocalAliases/@Alias.0">
-          <InputEntry Description="Bit variables" Name=".bdata" InputSection="#//@Input/@InputSection.16"/>
+        <DeepOutputSection Description="Bit variables" Name=".bdata" LoadMachineAddressLMA="//@LocalAliases/@Alias.0">
+          <RuntimeAddressVMA xsi:type="memorydescription:Region" href="TC23xx.mdm#//@Memory.2/@Region.0"/>
+          <InputEntry Description="Bit variables" Name=".bdata" InputSection="//@Input/@InputSection.16"/>
         </DeepOutputSection>
       </Absolute>
       <Small>
-        <DeepOutputSection Description="Storage of write-protected data addressed as small" Name=".sdata2" RuntimeAddressVMA="#//@LocalAliases/@Alias.0">
-          <InputEntry Description="Storage of write-protected data addressed as small" Name=".sdata.rodata" InputSection="#//@Input/@InputSection.9"/>
+        <DeepOutputSection Description="Storage of write-protected data addressed as small" Name=".sdata2" RuntimeAddressVMA="//@LocalAliases/@Alias.0">
+          <InputEntry Description="Storage of write-protected data addressed as small" Name=".sdata.rodata" InputSection="//@Input/@InputSection.9"/>
         </DeepOutputSection>
-        <DeepOutputSection Description="Section stores initialised data which is addressable by small data area pointer (%a0)" Name=".sdata" RuntimeAddressVMA="#//@LocalAliases/@Alias.1" LoadMachineAddressLMA="#//@LocalAliases/@Alias.0">
-          <InputEntry Description="Section stores initialised data which is addressable by small data area pointer (%a0)" Name=".sdata" InputSection="#//@Input/@InputSection.10"/>
+        <DeepOutputSection Description="Section stores initialised data which is addressable by small data area pointer (%a0)" Name=".sdata" RuntimeAddressVMA="//@LocalAliases/@Alias.1" LoadMachineAddressLMA="//@LocalAliases/@Alias.0">
+          <InputEntry Description="Section stores initialised data which is addressable by small data area pointer (%a0)" Name=".sdata" InputSection="//@Input/@InputSection.10"/>
         </DeepOutputSection>
-        <DeepOutputSection Description="Not initialised data in section ’.sbss’, addressable by small data area pointer (%a0)" Name=".sbss" RuntimeAddressVMA="#//@LocalAliases/@Alias.1" NOLOAD="true">
-          <InputEntry Description="Not initialised data in section ’.sbss’, addressable by small data area pointer (%a0)" Name=".sbss" InputSection="#//@Input/@InputSection.13"/>
+        <DeepOutputSection Description="Not initialised data in section ’.sbss’, addressable by small data area pointer (%a0)" Name=".sbss" RuntimeAddressVMA="//@LocalAliases/@Alias.1" NOLOAD="true">
+          <InputEntry Description="Not initialised data in section ’.sbss’, addressable by small data area pointer (%a0)" Name=".sbss" InputSection="//@Input/@InputSection.13"/>
         </DeepOutputSection>
       </Small>
       <Normal>
-        <DeepOutputSection Description="Storage of write-protected data" Name=".rodata" RuntimeAddressVMA="#//@LocalAliases/@Alias.0">
-          <InputEntry Description="Storage of write-protected data" Name=".rodata" InputSection="#//@Input/@InputSection.1"/>
+        <DeepOutputSection Description="Storage of write-protected data" Name=".rodata" RuntimeAddressVMA="//@LocalAliases/@Alias.0">
+          <InputEntry Description="Storage of write-protected data" Name=".rodata" InputSection="//@Input/@InputSection.1"/>
         </DeepOutputSection>
-        <DeepOutputSection Description="Initialised data" Name=".data" RuntimeAddressVMA="#//@LocalAliases/@Alias.1" LoadMachineAddressLMA="#//@LocalAliases/@Alias.0">
-          <InputEntry Description="Initialised data" Name=".data" InputSection="#//@Input/@InputSection.2"/>
+        <DeepOutputSection Description="Initialised data" Name=".data" RuntimeAddressVMA="//@LocalAliases/@Alias.1" LoadMachineAddressLMA="//@LocalAliases/@Alias.0">
+          <InputEntry Description="Initialised data" Name=".data" InputSection="//@Input/@InputSection.2"/>
         </DeepOutputSection>
-        <DeepOutputSection Description="Not Initialised data" Name=".bss" RuntimeAddressVMA="#//@LocalAliases/@Alias.1" NOLOAD="true">
-          <InputEntry Description="Not Initialised data" Name=".bss" InputSection="#//@Input/@InputSection.4"/>
+        <DeepOutputSection Description="Not Initialised data" Name=".bss" RuntimeAddressVMA="//@LocalAliases/@Alias.1" NOLOAD="true">
+          <InputEntry Description="Not Initialised data" Name=".bss" InputSection="//@Input/@InputSection.4"/>
         </DeepOutputSection>
       </Normal>
     </Data>
     <PCP>
-      <DeepOutputSection Description="PCP code section" Name=".pcptext" RuntimeAddressVMA="#//@LocalAliases/@Alias.0"/>
-      <DeepOutputSection Description="PCP data section" Name=".pcpdata" RuntimeAddressVMA="#//@LocalAliases/@Alias.0"/>
+      <DeepOutputSection Description="PCP code section" Name=".pcptext" RuntimeAddressVMA="//@LocalAliases/@Alias.0"/>
+      <DeepOutputSection Description="PCP data section" Name=".pcpdata" RuntimeAddressVMA="//@LocalAliases/@Alias.0"/>
     </PCP>
     <MemoryReservation>
-      <Reservation Description="Section for ustack" Name=".ustack" Size="16" Alignment="8" Region="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" Unit="KB" Grows="downwards"/>
-      <Reservation Description="Section for istack" Name=".istack" Size="4" Alignment="8" Region="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" Unit="KB" Grows="downwards"/>
-      <Reservation Description="Section for heap" Name=".heap" Size="4" Alignment="8" Region="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" Unit="KB"/>
-      <Reservation Description="Section for CSA" Name=".csa" Size="16" Alignment="64" Region="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" Unit="KB"/>
+      <Reservation Description="Section for ustack" Name=".ustack" Size="32" Alignment="8" Unit="KB" Grows="downwards">
+        <Region xsi:type="memorydescription:Region" href="TC23xx.mdm#//@Memory.2/@Region.0"/>
+      </Reservation>
+      <Reservation Description="Section for istack" Name=".istack" Size="4" Alignment="8" Unit="KB" Grows="downwards">
+        <Region xsi:type="memorydescription:Region" href="TC23xx.mdm#//@Memory.2/@Region.0"/>
+      </Reservation>
+      <Reservation Description="Section for heap" Name=".heap" Size="16" Alignment="8" Unit="KB">
+        <Region xsi:type="memorydescription:Region" href="TC23xx.mdm#//@Memory.2/@Region.0"/>
+      </Reservation>
+      <Reservation Description="Section for CSA" Name=".csa" Size="16" Alignment="64" Unit="KB">
+        <Region xsi:type="memorydescription:Region" href="TC23xx.mdm#//@Memory.2/@Region.0"/>
+      </Reservation>
     </MemoryReservation>
     <SpecialSections>
-      <ClearTable Description="Section for clear table" Name=".clear_sec" Region="#//@LocalAliases/@Alias.0"/>
-      <CopyTable Description="Section for copy table" Name=".copy_sec" Region="#//@LocalAliases/@Alias.0"/>
-      <Destructor Description="Section for destructors" Name=".dtors" Region="#//@LocalAliases/@Alias.0"/>
-      <Constructor Description="Section for constructors" Name=".ctors" Region="#//@LocalAliases/@Alias.0"/>
+      <ClearTable Description="Section for clear table" Name=".clear_sec" Region="//@LocalAliases/@Alias.0"/>
+      <CopyTable Description="Section for copy table" Name=".copy_sec" Region="//@LocalAliases/@Alias.0"/>
+      <Destructor Description="Section for destructors" Name=".dtors" Region="//@LocalAliases/@Alias.0"/>
+      <Constructor Description="Section for constructors" Name=".ctors" Region="//@LocalAliases/@Alias.0"/>
     </SpecialSections>
   </Output>
   <Input>
@@ -128,9 +140,7 @@
     <InputSection Name="wm4._ansi.h.23.8aa39ec63c47b0c474529e4131d42f04"/>
     <InputSection Name="wm4.bspconfig.h.26.033b034693c4c2b363e281935e482209"/>
     <InputSection Name="wm4.newlib.h.8.b2a2e540cc2551574077f838d8204237"/>
-    <InputSection Name="wm4.ifxstm_bf.h.28.91a2b5a01e0486b79194c4478f343693"/>
     <InputSection Name="wm4.ifxcpu_reg.h.48.efae3e83a47a32c1e62d28f181503bc1"/>
-    <InputSection Name="wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2"/>
     <InputSection Name="wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea"/>
     <InputSection Name="wm4.stdio.h.2.4aa87247282eca6c8f36f9de33d8df1a"/>
     <InputSection Name="wm4.types.h.80.d1d5f5bf70b2a7b495c85b558a9744ac"/>
@@ -141,12 +151,45 @@
     <InputSection Name="wm4.reent.h.16.5ae3c94b0f86fbd3cb48ca2ac9576746"/>
     <InputSection Name="wm4.tc_inc_path.h.9.edf37d69033d984c657fa37b31a773ea"/>
     <InputSection Name="wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6"/>
-    <InputSection Name="wm4.0.b1bb44d18881a2d90847a2626c0e2173"/>
-    <InputSection Name="wm4.ifxcpu_bf.h.28.d558ef760fb5b506d617d899a902fd0b"/>
-    <InputSection Name="wm4.ifxcpu_reg.h.60.a87fe5519b726d5973d9b8bbefea77c7"/>
     <InputSection Name="wm4.Ifx_TypesReg.h.27.a0265a21b4a33fc908c22e692c7dc04b"/>
     <InputSection Name="wm4.ifxstm_reg.h.48.cf22c5554bffffad724b24ebb01643ac"/>
     <InputSection Name="wm4.uart_int.h.10.7119d9997e9fbe4795ff202ea06387e3"/>
+    <InputSection Name="wm4.0.1a4f9ca241bee3177088d4b675d8477e"/>
+    <InputSection Name="wm4.bspconfig.h.59.b0fa0c50cc66e026d36ff6bf8107a8c4"/>
+    <InputSection Name="wm4.string.h.17.f8d12df81104836a3f2a5d589ae830d8"/>
+    <InputSection Name="wm4.stdio.h.27.f2ac352bab34f31f9f478442827b2ba6"/>
+    <InputSection Name="wm4.ifxsrc_reg.h.42.f44c43a46d4ca81589017945efd8519d"/>
+    <InputSection Name="wm4.bspconfig.h.132.89f640448266357bb917280bacfca622"/>
+    <InputSection Name="wm4.stddef.h.234.7b49b621169e2007451b8fadbcc644ca"/>
+    <InputSection Name="wm4.ifxasclin_bf.h.28.82c7a4119e8f5617f7b90a7d670d2dac"/>
+    <InputSection Name="wm4.ifxasclin_reg.h.45.b9fc0f41cb72deda5d5117dbcbcf1abb"/>
+    <InputSection Name="wm4.jansson_config.h.19.6bbfe6fde7e17458e08d0e6f364f6a49"/>
+    <InputSection Name="wm4.cint.h.9.2a620d1ba9e5c2af6127ea3fcd7ce8dd"/>
+    <InputSection Name="wm4.jansson.h.23.44fe5c909604dae5b7a7a99a59d02b75"/>
+    <InputSection Name="wm4.jansson_private_config.h.19.b7a351c0e3982fa8a43ed43fd3566829"/>
+    <InputSection Name="wm4.jansson_private.h.16.7818636d0cd564eec2422277827bc815"/>
+    <InputSection Name="wm4.errno.h.14.84e5a50cdf375f3e6c7abc27b8e42963"/>
+    <InputSection Name="wm4.time.h.124.10ced469f846269cafc58b59c853e1bb"/>
+    <InputSection Name="wm4.assert.h.11.7fe9eb241be6b0fee772a1e693b81ae3"/>
+    <InputSection Name="wm4.hashtable.h.9.3153ffbd66b390fabc31c1264b69628f"/>
+    <InputSection Name="wm4.stddef.h.39.d0197034aa5fd947cae140b9289e6734"/>
+    <InputSection Name="wm4.stdlib.h.50.622023ed9abe014547a3bd67d796ebc1"/>
+    <InputSection Name="wm4.lookup3.h.71.065938276bfc97cbf4c0e0e83923739f"/>
+    <InputSection Name="wm4.stddef.h.184.4e5d46709ab217f381b449671f32b922"/>
+    <InputSection Name="wm4.time.h.21.96f9e2785f13e7d0b51ccee957e059dd"/>
+    <InputSection Name="wm4.errno.h.2.ba016d646105af6cad23be83630b6a3f"/>
+    <InputSection Name="wm4.stddef.h.158.61317cdbfb4026324507d123a50b0fd6"/>
+    <InputSection Name="wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8"/>
+    <InputSection Name="wm4.ifxstm_bf.h.28.91a2b5a01e0486b79194c4478f343693"/>
+    <InputSection Name="wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2"/>
+    <InputSection Name="wm4.system.h.20.826ff10d3de94b206e8c7fe33021368e"/>
+    <InputSection Name="wm4.ifxscu_bf.h.28.9a07903c69e87b761063be2cfe1bc5c5"/>
+    <InputSection Name="wm4.ifxstm_bf.h.28.72ff81a9d174f4a2ba66a2163ff690d8"/>
+    <InputSection Name="wm4.ifxcpu_bf.h.28.d558ef760fb5b506d617d899a902fd0b"/>
+    <InputSection Name="wm4.ifxcpu_reg.h.60.a87fe5519b726d5973d9b8bbefea77c7"/>
+    <InputSection Name="wm4.ifxqspi_reg.h.51.6bbae5556c07695ffbec783b82bacef8"/>
+    <InputSection Name="wm4.ifxscu_reg.h.42.635ad195b6ad8d830f8c237313dbd237"/>
+    <InputSection Name="wm4.system.h.100.15b0323781b0589e6f5339906b16412a"/>
   </Input>
   <Files>
     <ObjectFile Name="src\cint_tc23x.o"/>
@@ -165,9 +208,25 @@
     <ObjectFile Name="asm\test_AND.o"/>
     <ObjectFile Name="src\led.o"/>
     <ObjectFile Name="asm\test_B_C.o"/>
+    <ObjectFile Name="src\jansson\dump.o"/>
+    <ObjectFile Name="src\jansson\error.o"/>
+    <ObjectFile Name="src\jansson\hashtable.o"/>
+    <ObjectFile Name="src\jansson\load.o"/>
+    <ObjectFile Name="src\jansson\memory.o"/>
+    <ObjectFile Name="src\jansson\pack_unpack.o"/>
+    <ObjectFile Name="src\jansson\strbuffer.o"/>
+    <ObjectFile Name="src\jansson\strconv.o"/>
+    <ObjectFile Name="src\jansson\utf.o"/>
+    <ObjectFile Name="src\jansson\value.o"/>
+    <ObjectFile Name="src\jansson_private\hashtable_seed.o"/>
+    <ObjectFile Name="src\jansson_private\jansson_config.o"/>
   </Files>
   <LocalAliases>
-    <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>
-    <Alias Description="Alias for RAM" Name="DATA" Region="TC23xx.mdm#//@Memory.2/@Region.0"/>
+    <Alias Description="Alias for Code" Name="CODE">
+      <Region href="TC23xx.mdm#//@Memory.0/@Region.0"/>
+    </Alias>
+    <Alias Description="Alias for RAM" Name="DATA">
+      <Region href="TC23xx.mdm#//@Memory.2/@Region.0"/>
+    </Alias>
   </LocalAliases>
 </LinkerModel:LinkerDescriptionFile>

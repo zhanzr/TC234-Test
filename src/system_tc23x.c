@@ -513,3 +513,14 @@ void SYSTEM_DbgBreak(void)
 		;
 #endif
 }
+
+Ifx_STM *systime_GetStmBase(void)
+{
+	switch (_mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK)
+	{
+	case 0 :
+	default :
+		return STM0_BASE;
+		break;
+	}
+}

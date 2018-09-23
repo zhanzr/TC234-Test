@@ -14,14 +14,13 @@
 #include "tc27xc/IfxCpu_bf.h"
 
 #include "system_tc2x.h"
-#include "machine/intrinsics.h"
 #include "interrupts.h"
 #include "led.h"
 #include "uart_int.h"
 
 #include "asm_prototype.h"
 
-#define SYSTIME_CLOCK	1000	/* timer event rate [Hz] */
+#include "jansson.h"
 
 volatile uint32_t g_sys_ticks;
 volatile bool g_regular_task_flag;
@@ -42,26 +41,11 @@ const uint32_t HAL_GetTick(void)
 	return g_sys_ticks;
 }
 
-#define SYSTIME_ISR_PRIO	2
-
-#define STM0_BASE			((Ifx_STM *)&MODULE_STM0)
-
 /* timer reload value (needed for subtick calculation) */
 static unsigned int reload_value;
 
 /* pointer to user specified timer callback function */
 static TCF user_handler = (TCF)0;
-
-static __inline Ifx_STM *systime_GetStmBase(void)
-{
-	switch (_mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK)
-	{
-	case 0 :
-	default :
-		return STM0_BASE;
-		break;
-	}
-}
 
 /* timer interrupt routine */
 static void tick_irq(int reload_value)
@@ -122,257 +106,83 @@ static inline void flush_stdout(void)
 	}
 }
 
-void TestFunc(void)
+void add_2array_to_json( json_t* obj, const char* name, const int*
+		marr, size_t dim1, size_t dim2 )
 {
-	printf("%s_%d\n", __func__, __LINE__);
+	size_t i, j;
+	json_t* jarr1 = json_array();
+
+	for( i=0; i<dim1; ++i ) {
+		json_t* jarr2 = json_array();
+
+		for( j=0; j<dim2; ++j ) {
+			int val = marr[ i*dim2 + j ];
+			json_t* jval = json_integer( val );
+			json_array_append_new( jarr2, jval );
+		}
+		json_array_append_new( jarr1, jarr2 );
+	}
+	json_object_set_new( obj, name, jarr1 );
+	return;
+}
+
+void test_jansson(void)
+{
+	json_t* jdata;
+	char* s;
+//	int arr1[2][3] = { {1,2,3}, {4,5,6} };
+	int arr1[2][3];
+	int arr2[4][4] = { {1,2,3,4}, {5,6,7,8}, {9,10,11,12}, {13,14,15,16} };
+
+	for(uint32_t i=0; i<2; ++i)
+	{
+		for(uint32_t j=0; j<3; ++j)
+		{
+			arr1[i][j] = rand();
+		}
+	}
+
+	jdata = json_object();
+
+	add_2array_to_json( jdata, "arr1", &arr1[0][0], 2, 3 );
+	add_2array_to_json( jdata, "arr2", &arr2[0][0], 4, 4 );
+
+	s = json_dumps( jdata, 0 );
+
+	printf(s);
+	flush_stdout();
+
+	free( s );
+	json_decref( jdata );
 }
 
 int main(void)
 {
 	SYSTEM_Init();
+
 	SYSTEM_EnaDisCache(1);
 
-	/* initialise timer at SYSTIME_CLOCK rate */
 	TimerInit(SYSTIME_CLOCK);
-	/* add own handler for timer interrupts */
 	TimerSetHandler(my_timer_handler);
 
 	_init_uart(BAUDRATE);
+
 	InitLED();
 
-	printf("%s CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
-			__TIME__,
+	printf("Test Jansson CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
 			SYSTEM_GetCpuClock()/1000000,
 			SYSTEM_GetSysClock()/1000000,
 			SYSTEM_GetStmClock()/1000000,
 			SYSTEM_IsCacheEnabled());
-
 	flush_stdout();
 
-	//Test B-C Instruction
-	uint32_t a;
-	uint32_t b;
-	uint32_t c;
-	uint32_t d;
-	uint32_t res;
-	uint64_t res64;
-
-//	printf("\nTest BISR RSLCX\n");
-//	Ifx_Bisr(4);
-//	Ifx_Rslcx();
-//	printf("BISR RSLCX should be combined to avoid CSA leak\n");
-//	flush_stdout();
-
-	printf("\nTest BMERGE\n");
-	a = 0x000000FF;
-	b = 0x0000FF00;
-	res = Ifx_Bmerge(a, b);
-	printf("BMERGE[%08X, %08X]=%08X\n", a, b, res);
+	printf("\n\n\n\n\n\n\n\n\n\n");
 	flush_stdout();
 
-	printf("\nTest BSPLIT\n");
-	a = 0xA5A5C9C9;
-	res64 = Ifx_Bsplit(a);
-	printf("BSPLIT[%08X]=%016llX\n", a, res64);
+	test_jansson();
 	flush_stdout();
 
-	printf("\nTest CACHEA.I CACHEA.W CACHEA.WI CACHEI.I CACHEI.W CACHEI.WI\n");
-	Ifx_Cachea_I();
-	Ifx_Cachea_W();
-	Ifx_Cachea_WI();
-	Ifx_Cachei_I();
-	Ifx_Cachei_W();
-	Ifx_Cachei_WI();
-	printf("Cache operation end\n");
-	flush_stdout();
-
-	printf("\nTest CADD\n");
-	a = 0x11111111;
-	b = 0x22222222;
-	c = 0;
-	res =  Ifx_CADD(a, b, c);
-	printf("CADD[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_CADD(a, b, c);
-	printf("CADD[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	flush_stdout();
-
-	printf("\nTest CADDI\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_CADD_I(a, c);
-	printf("CADDI[%08X, %08X, %08X]=%08X\n", a, 126, c, res);
-	c = 1;
-	res =  Ifx_CADD_I(a, c);
-	printf("CADDI[%08X, %08X, %08X]=%08X\n", a, 126, c, res);
-	flush_stdout();
-
-	printf("\nTest CADDI 16bit\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_CADD_I(a, c);
-	printf("CADDI_16[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	c = 1;
-	res =  Ifx_CADD_I16(a, c);
-	printf("CADDI_16[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	flush_stdout();
-
-	printf("\nTest CADDN\n");
-	a = 0x11111111;
-	b = 0x22222222;
-	c = 0;
-	res =  Ifx_CADDN(a, b, c);
-	printf("CADDN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_CADDN(a, b, c);
-	printf("CADDN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	flush_stdout();
-
-	printf("\nTest CADDN_I\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_CADDN_I(a, c);
-	printf("CADDN_I[%08X, %08X, %08X]=%08X\n", a, 126, c, res);
-	c = 1;
-	res =  Ifx_CADDN_I(a, c);
-	printf("CADDN_I[%08X, %08X, %08X]=%08X\n", a, 126, c, res);
-	flush_stdout();
-
-	printf("\nTest CADDNI 16bit\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_CADDN_I16(a, c);
-	printf("CADDNI_16[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	c = 1;
-	res =  Ifx_CADDN_I16(a, c);
-	printf("CADDNI_16[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	flush_stdout();
-
-	printf("\nTest CALL\n");
-	a = 0x11111111;
-	b = 0x22222222;
-	c = 0;
-	res =  Ifx_Call(a, b, c);
-	printf("CADD[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	flush_stdout();
-
-	printf("\nTest CALL_A\n");
-	c = 1;
-	res =  Ifx_Call_A(a, b, c);
-	printf("CADD[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	flush_stdout();
-
-	printf("\nTest CALL_I\n");
-	c = 0;
-	res =  Ifx_Call_I(Ifx_CADD, a, b, c);
-	printf("CADD[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	flush_stdout();
-
-	printf("\nTest CLO(Count Leading Ones)\n");
-	a = 0xC0010000;
-	res =  Ifx_Clo(a);
-	printf("CLO[%08X]=%08X\n", a, res);
-	flush_stdout();
-
-	printf("\nTest CLO.H(Count Leading Ones in Packed Half-words)\n");
-	a = 0xC0019003;
-	res =  Ifx_Clo_H(a);
-	printf("CLO.H[%08X]=%08X\n", a, res);
-	flush_stdout();
-
-	printf("\nTest CLS(Count Leading Signs)\n");
-	a = 0xC0010000;
-	res =  Ifx_Cls(a);
-	printf("CLS[%08X]=%08X\n", a, res);
-	flush_stdout();
-
-	printf("\nTest CLS.H(Count Leading Signs in Packed Half-words)\n");
-	a = 0xC0013003;
-	res =  Ifx_Cls_H(a);
-	printf("CLS.H[%08X]=%08X\n", a, res);
-	flush_stdout();
-
-	printf("\nTest CLZ(Count Leading Zeros)\n");
-	a = 0x00010000;
-	res =  Ifx_Clz(a);
-	printf("CLO[%08X]=%08X\n", a, res);
-	flush_stdout();
-
-	printf("\nTest CLO.H(Count Leading Zeros in Packed Half-words)\n");
-	a = 0x00030008;
-	res =  Ifx_Clz_H(a);
-	printf("CLO.H[%08X]=%08X\n", a, res);
-	flush_stdout();
-
-	printf("\nTest CMOV\n");
-	a = 0x11111111;
-	b = 0x22222222;
-	c = 0;
-	res =  Ifx_Cmov(a, b, c);
-	printf("CMOV[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_Cmov(a, b, c);
-	printf("CMOV[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	flush_stdout();
-
-	printf("\nTest CMOV_I\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_Cmov_I(a, c);
-	printf("CMOV_I[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	c = 1;
-	res =  Ifx_Cmov_I(a, c);
-	printf("CMOV_I[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	flush_stdout();
-
-	printf("\nTest CMOVN\n");
-	a = 0x11111111;
-	b = 0x22222222;
-	c = 0;
-	res =  Ifx_Cmovn(a, b, c);
-	printf("CMOVN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_Cmovn(a, b, c);
-	printf("CMOVN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	flush_stdout();
-
-	printf("\nTest CMOVN_I\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_Cmovn_I(a, c);
-	printf("CMOVN_I[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	c = 1;
-	res =  Ifx_Cmovn_I(a, c);
-	printf("CMOVN_I[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	flush_stdout();
-
-//	printf("\nTest CMP.F\n");
-//	float fA = 1.1;
-//	float fB = 2.2;
-//	res =  Ifx_Cmp_F(fA, fB);
-//	printf("CMP.F[%f, %f]=%08X\n", fA, fB, res);
-//	flush_stdout();
-
-	printf("\nTest CSUB\n");
-	a = 0x22222222;
-	b = 0x11111110;
-	c = 0;
-	res =  Ifx_Csub(a, b, c);
-	printf("CSUB[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_Csub(a, b, c);
-	printf("CSUB[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	flush_stdout();
-
-	printf("\nTest CSUBN\n");
-	a = 0x22222222;
-	b = 0x11111110;
-	c = 0;
-	res =  Ifx_Csubn(a, b, c);
-	printf("CSUBN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_Csubn(a, b, c);
-	printf("CSUBN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
+	printf("\n\n\n\n\n\n\n\n\n\n");
 	flush_stdout();
 
 	g_regular_task_flag = true;

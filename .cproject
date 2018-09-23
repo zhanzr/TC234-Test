@@ -44,9 +44,12 @@
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.symbols.defined.223010303" name="Defined symbols (-D)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.symbols.defined" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="APPKIT_TC234TFT"/>
 									<listOptionValue builtIn="false" value="USE_IRQ"/>
+									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
 								</option>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths.1959146808" name="Include Paths" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;../h&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/jansson}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/jansson_private}&quot;"/>
 								</option>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization.111267155" name="Optimization Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.code.optimization.none" valueType="enumerated"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.830677023" name="Debug Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.3" valueType="enumerated"/>
@@ -69,7 +72,7 @@
 								</option>
 							</tool>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.linker.c.1648588151" name="TriCore C Linker" superClass="com.rt.hightec.buildsystem.tricore.new.linker.c">
-								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.linker.general.description.file.83016807" name="Browse Linker Description File (-T)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.linker.general.description.file" value="&quot;..\ld\iROM.ld&quot;" valueType="string"/>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.linker.general.description.file.83016807" name="Browse Linker Description File (-T)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.linker.general.description.file" value="..\ld\iROM.ld" valueType="string"/>
 								<option id="abstract.tool.linker.warnings.no.warn.flags.258069669" name="Do not warn about incompatible section flags (-Wl,--no-warn-flags)" superClass="abstract.tool.linker.warnings.no.warn.flags" value="true" valueType="boolean"/>
 								<inputType id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.linker.input.361274405" name="Abstract Linker Input NO GUI" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
@@ -82,6 +85,19 @@
 								<option id="abstract.tool.linker.warnings.no.warn.flags.585296270" name="Do not warn about incompatible section flags (-Wl,--no-warn-flags)" superClass="abstract.tool.linker.warnings.no.warn.flags" value="true" valueType="boolean"/>
 							</tool>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver"/>
+						</toolChain>
+					</folderInfo>
+					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1240947283" name="/" resourcePath="src/jansson">
+						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.841231074" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable" unusedChildren="">
+							<option id="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919.621170457" name="CPU type (-mcpu)" superClass="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.606405885" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.219290185"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.gtm.2066479022" name="TriCore GTM Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.gtm.373372830"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.pcp.1842194927" name="TriCore PCP Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.pcp.1265890664"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.c.1002102486" name="TriCore C Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.cpp.1985685996" name="TriCore C++ Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.cpp.491974631"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.linker.c.1119588638" name="TriCore C Linker" superClass="com.rt.hightec.buildsystem.tricore.new.linker.c.1648588151"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.linker.cpp.2013118920" name="TriCore C++ Linker" superClass="com.rt.hightec.buildsystem.tricore.new.linker.cpp.449103437"/>
+							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.119805754" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982"/>
 						</toolChain>
 					</folderInfo>
 					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.510529732" name="/" resourcePath="asm">
@@ -108,7 +124,7 @@
 					</folderInfo>
 					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1125921551" name="generate_template.py" rcbsApplicability="disable" resourcePath="asm/generate_template.py" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry excluding="generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
+						<entry excluding="test_B_C.S|generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>

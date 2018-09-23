@@ -1,24 +1,5 @@
 TC234 Demo.
 
-Assemble Language Demo: D initial Instruction Demo.
-
-DEBUG
-DEXTR
-DISABLE
-DIV
-DIV.F
-DIV.U
-DSYNC
-DVADJ
-DVINIT
-DVINIT.B
-DVINIT.BU
-DVINIT.H
-DVINIT.HU
-DVINIT.U
-DVSTEP
-DVSTEP.U
-ENABLE 
-
+Jansson Demo.
 
 

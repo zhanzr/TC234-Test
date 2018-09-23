@@ -11,7 +11,4 @@
   <Memory Description="Data Memory Interface (DMI)" Name="Data Interface">
     <Region Description="Local Data RAM (DSPR)" Name="DMI_DSPR" Begin="0xD0000000" Attributes="w!xp" Length="184" LengthUnit="KB"/>
   </Memory>
-  <Memory Description="Local Memory Unit (LMU)" Name="Local Memory Unit">
-    <Region Description="Local Data RAM (DSPR)" Name="LMU_SRAM" Begin="0x90000000" Attributes="w!xp" Length="32" LengthUnit="KB"/>
-  </Memory>
 </LinkerModel:LDFMemoryDescripton>

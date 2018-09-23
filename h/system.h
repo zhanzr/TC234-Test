@@ -23,6 +23,13 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#include "machine/intrinsics.h"
+
+#include "tc27xc/IfxCpu_reg.h"
+#include "tc27xc/IfxCpu_bf.h"
+
+#include "tc27xc/IfxStm_reg.h"
+
 /*! \brief System initialisation
  *
  *  Do basic system initialisation like
@@ -89,6 +96,13 @@ int SYSTEM_Sleep(void);
 /*! \brief Debug break system
  */
 void SYSTEM_DbgBreak(void);
+
+#define SYSTIME_CLOCK	1000
+#define SYSTIME_ISR_PRIO	2
+
+#define STM0_BASE			((Ifx_STM *)&MODULE_STM0)
+
+Ifx_STM *systime_GetStmBase(void);
 
 #ifdef __cplusplus
 }
