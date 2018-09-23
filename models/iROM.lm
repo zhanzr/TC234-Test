@@ -182,7 +182,6 @@
     <InputSection Name="wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8"/>
     <InputSection Name="wm4.ifxstm_bf.h.28.91a2b5a01e0486b79194c4478f343693"/>
     <InputSection Name="wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2"/>
-    <InputSection Name="wm4.system.h.20.826ff10d3de94b206e8c7fe33021368e"/>
     <InputSection Name="wm4.ifxscu_bf.h.28.9a07903c69e87b761063be2cfe1bc5c5"/>
     <InputSection Name="wm4.ifxstm_bf.h.28.72ff81a9d174f4a2ba66a2163ff690d8"/>
     <InputSection Name="wm4.ifxcpu_bf.h.28.d558ef760fb5b506d617d899a902fd0b"/>
@@ -190,6 +189,12 @@
     <InputSection Name="wm4.ifxqspi_reg.h.51.6bbae5556c07695ffbec783b82bacef8"/>
     <InputSection Name="wm4.ifxscu_reg.h.42.635ad195b6ad8d830f8c237313dbd237"/>
     <InputSection Name="wm4.system.h.100.15b0323781b0589e6f5339906b16412a"/>
+    <InputSection Name="wm4.cJSON.h.24.ffe7a31bf5c24512a1ea84894e49984f"/>
+    <InputSection Name="wm4.system.h.20.be039ac5fb8eb32ec60cbfc4c34d6256"/>
+    <InputSection Name="wm4.ctype.h.29.655cb005a4d596b4713c7a42170c401a"/>
+    <InputSection Name="wm4.cJSON.h.39.bad37882f37efd21e451dba2e9d6cf11"/>
+    <InputSection Name="wm4.stddef.h.234.020c6a0cdca367fb1d664c74ff427e24"/>
+    <InputSection Name="wm4.ctype.h.2.807cf8b53e92f83ce947ab40213cf812"/>
   </Input>
   <Files>
     <ObjectFile Name="src\cint_tc23x.o"/>
@@ -220,6 +225,8 @@
     <ObjectFile Name="src\jansson\value.o"/>
     <ObjectFile Name="src\jansson_private\hashtable_seed.o"/>
     <ObjectFile Name="src\jansson_private\jansson_config.o"/>
+    <ObjectFile Name="src\cjson_177\cJSON.o"/>
+    <ObjectFile Name="src\cjson_177\cJSON_Utils.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE">
