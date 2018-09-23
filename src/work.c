@@ -231,6 +231,7 @@ static int print_preallocated(cJSON *root)
         free(buf);
         return -1;
     }
+	flush_stdout();
 
     free(out);
     free(buf_fail);
@@ -392,6 +393,7 @@ static void create_objects(void)
 void test_cJSON(void)
 {
 	printf("Version: %s\n", cJSON_Version());
+	flush_stdout();
 
 	/* Now some samplecode for building objects concisely: */
 	create_objects();
