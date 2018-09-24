@@ -107,287 +107,380 @@ static inline void flush_stdout(void)
 	}
 }
 
-void add_2array_to_json( json_t* obj, const char* name, const int*
-		marr, size_t dim1, size_t dim2 )
+
+/* Used by some code below as an example datatype. */
+typedef struct str_poi_record
 {
-	size_t i, j;
-	json_t* jarr1 = json_array();
+	const char *precision;
+	double lat;
+	double lon;
+	const char *address;
+	const char *city;
+	const char *state;
+	const char *zip;
+	const char *country;
+}poi_record;
 
-	for( i=0; i<dim1; ++i ) {
-		json_t* jarr2 = json_array();
+/* Our "days of the week" array: */
+const char *str_weekdays[7] =
+{
+		"Sunday",
+		"Monday",
+		"Tuesday",
+		"Wednesday",
+		"Thursday",
+		"Friday",
+		"Saturday"
+};
 
-		for( j=0; j<dim2; ++j ) {
-			int val = marr[ i*dim2 + j ];
-			json_t* jval = json_integer( val );
-			json_array_append_new( jarr2, jval );
+/* Our matrix: */
+const int numbers[3][3] =
+{
+		{0, -1, 0},
+		{1, 0, 0},
+		{0 ,0, 1}
+};
+
+/* Our "gallery" item: */
+const int ids[4] = { 116, 943, 234, 38793 };
+/* Our array of "records": */
+const poi_record fields[2] =
+{
+		{
+				"zip",
+				37.7668,
+				-1.223959e+2,
+				"",
+				"SAN FRANCISCO",
+				"CA",
+				"94107",
+				"US"
+		},
+		{
+				"zip",
+				37.371991,
+				-1.22026e+2,
+				"",
+				"SUNNYVALE",
+				"CA",
+				"94085",
+				"US"
 		}
-		json_array_append_new( jarr1, jarr2 );
-	}
-	json_object_set_new( obj, name, jarr1 );
-	return;
-}
+};
 
 void test_jansson(void)
 {
-	json_t* jdata;
-	char* s;
-//	int arr1[2][3] = { {1,2,3}, {4,5,6} };
-	int arr1[2][3];
-	int arr2[4][4] = { {1,2,3,4}, {5,6,7,8}, {9,10,11,12}, {13,14,15,16} };
+	printf("Jansson Version:%s\n", JANSSON_VERSION);
 
-	for(uint32_t i=0; i<2; ++i)
+	json_t* root;
+	char* str_dump;
+
+	//Object Video Creating Test
 	{
-		for(uint32_t j=0; j<3; ++j)
-		{
-			arr1[i][j] = rand();
-		}
+		json_t* fmt;
+		root = json_object();
+		json_object_set_new(root, "name", json_string("Jack (\"Bee\") Nimble"));
+		json_object_set_new(root, "format", fmt=json_object());
+		json_object_set_new(fmt,  "type", json_string("rect"));
+		json_object_set_new(fmt, "width", json_integer(1920));
+		json_object_set_new(fmt, "height", json_integer(1080));
+		json_object_set_new(fmt, "interlace", json_boolean(false));
+		json_object_set_new(fmt, "frame rate", json_integer(24));
+
+		str_dump = json_dumps( root, 0 );
+		printf( str_dump );
+		printf("\n");
+		flush_stdout();
+		free( str_dump );
+		json_decref( root );
 	}
 
-	jdata = json_object();
+	//1-Dim Array of String Test
+	{
+		root = json_array();
 
-	add_2array_to_json( jdata, "arr1", &arr1[0][0], 2, 3 );
-	add_2array_to_json( jdata, "arr2", &arr2[0][0], 4, 4 );
+		for(size_t i=0; i<7; ++i )
+		{
+			json_array_append_new( root, json_string(str_weekdays[i]) );
+		}
 
-	s = json_dumps( jdata, 0 );
+		str_dump = json_dumps( root, 0 );
+		printf( str_dump );
+		printf("\n");
+		flush_stdout();
+		free( str_dump );
+		json_decref( root );
+	}
 
-	printf(s);
-	flush_stdout();
+	//2-Dim Array of Integer Test
+	{
+		root = json_array();
 
-	free( s );
-	json_decref( jdata );
+		for(size_t i=0; i<3; ++i )
+		{
+			json_t* jarr2 = json_array();
+			for(size_t j=0; j<3; ++j )
+			{
+				json_array_append_new( jarr2, json_integer((json_int_t)numbers[i][j]));
+			}
+			json_array_append_new( root, jarr2);
+		}
+
+		str_dump = json_dumps( root, 0 );
+		printf( str_dump );
+		printf("\n");
+		flush_stdout();
+		free( str_dump );
+		json_decref( root );
+	}
+
+	//Object Gallery Creating Test
+	{
+		json_t* img;
+		json_t* thm;
+
+		root = json_object();
+		json_object_set_new(root, "Image", img=json_object());
+		json_object_set_new(img, "Width", json_integer(800));
+		json_object_set_new(img, "Height", json_integer(600));
+		json_object_set_new(img,  "Title", json_string("View from 15th Floor"));
+		json_object_set_new(img, "Thumbnail", thm=json_object());
+		json_object_set_new(thm, "Url", json_string("http:/*www.example.com/image/481989943"));
+		json_object_set_new(thm, "Height", json_integer(125));
+		json_object_set_new(thm, "Width", json_string("100"));
+
+		json_t* jarr = json_array();
+		for(size_t i=0; i<sizeof(ids)/sizeof(ids[0]); ++i)
+		{
+			json_array_append_new( jarr, json_integer((json_int_t)ids[i]));
+		}
+		json_object_set_new(img, "IDs", jarr);
+
+		str_dump = json_dumps( root, 0 );
+		printf( str_dump );
+		printf("\n");
+		flush_stdout();
+		free( str_dump );
+		json_decref( root );
+	}
+
+	//Array of "records" Test
+	{
+		root = json_array();
+
+		for (size_t i = 0; i < 2; i++)
+		{
+			json_t* item = json_object();
+
+			json_object_set_new(item, "precision", json_string(fields[i].precision));
+			json_object_set_new(item, "Latitude", json_real(fields[i].lat));
+			json_object_set_new(item, "Longitude", json_real(fields[i].lon));
+			json_object_set_new(item, "Address", json_string(fields[i].address));
+			json_object_set_new(item, "City", json_string(fields[i].city));
+			json_object_set_new(item, "State", json_string(fields[i].state));
+			json_object_set_new(item, "Zip", json_string(fields[i].zip));
+			json_object_set_new(item, "Country", json_string(fields[i].country));
+
+			json_array_append_new( root, item);
+		}
+
+		str_dump = json_dumps( root, 0 );
+		printf( str_dump );
+		printf("\n");
+		flush_stdout();
+		free( str_dump );
+		json_decref( root );
+	}
+
+	//null Test
+	{
+		root = json_object();
+		volatile double zero = 0.0;
+
+		json_object_set_new(root, "number", json_null());
+
+		str_dump = json_dumps( root, 0 );
+		printf( str_dump );
+		printf("\n");
+		flush_stdout();
+		free( str_dump );
+		json_decref( root );
+	}
 }
-
-
-/* Used by some code below as an example datatype. */
-struct record
-{
-    const char *precision;
-    double lat;
-    double lon;
-    const char *address;
-    const char *city;
-    const char *state;
-    const char *zip;
-    const char *country;
-};
 
 
 /* Create a bunch of objects as demonstration. */
 static int print_preallocated(cJSON *root)
 {
-    /* declarations */
-    char *out = NULL;
-    char *buf = NULL;
-    char *buf_fail = NULL;
-    size_t len = 0;
-    size_t len_fail = 0;
+	/* declarations */
+	char *out = NULL;
+	char *buf = NULL;
+	char *buf_fail = NULL;
+	size_t len = 0;
+	size_t len_fail = 0;
 
-    /* formatted print */
-    out = cJSON_Print(root);
+	/* formatted print */
+	out = cJSON_Print(root);
 
-    /* create buffer to succeed */
-    /* the extra 5 bytes are because of inaccuracies when reserving memory */
-    len = strlen(out) + 5;
-    buf = (char*)malloc(len);
-    if (buf == NULL)
-    {
-        printf("Failed to allocate memory.\n");
-        exit(1);
-    }
+	/* create buffer to succeed */
+	/* the extra 5 bytes are because of inaccuracies when reserving memory */
+	len = strlen(out) + 5;
+	buf = (char*)malloc(len);
+	if (buf == NULL)
+	{
+		printf("Failed to allocate memory.\n");
+		exit(1);
+	}
 
-    /* create buffer to fail */
-    len_fail = strlen(out);
-    buf_fail = (char*)malloc(len_fail);
-    if (buf_fail == NULL)
-    {
-        printf("Failed to allocate memory.\n");
-        exit(1);
-    }
+	/* create buffer to fail */
+	len_fail = strlen(out);
+	buf_fail = (char*)malloc(len_fail);
+	if (buf_fail == NULL)
+	{
+		printf("Failed to allocate memory.\n");
+		exit(1);
+	}
 
-    /* Print to buffer */
-    if (!cJSON_PrintPreallocated(root, buf, (int)len, 1)) {
-        printf("cJSON_PrintPreallocated failed!\n");
-        if (strcmp(out, buf) != 0) {
-            printf("cJSON_PrintPreallocated not the same as cJSON_Print!\n");
-            printf("cJSON_Print result:\n%s\n", out);
-            printf("cJSON_PrintPreallocated result:\n%s\n", buf);
-        }
-        free(out);
-        free(buf_fail);
-        free(buf);
-        return -1;
-    }
+	/* Print to buffer */
+	if (!cJSON_PrintPreallocated(root, buf, (int)len, 1)) {
+		printf("cJSON_PrintPreallocated failed!\n");
+		if (strcmp(out, buf) != 0) {
+			printf("cJSON_PrintPreallocated not the same as cJSON_Print!\n");
+			printf("cJSON_Print result:\n%s\n", out);
+			printf("cJSON_PrintPreallocated result:\n%s\n", buf);
+		}
+		free(out);
+		free(buf_fail);
+		free(buf);
+		return -1;
+	}
 
-    /* success */
-    printf("%s\n", buf);
+	/* success */
+	printf("%s\n", buf);
 
-    /* force it to fail */
-    if (cJSON_PrintPreallocated(root, buf_fail, (int)len_fail, 1)) {
-        printf("cJSON_PrintPreallocated failed to show error with insufficient memory!\n");
-        printf("cJSON_Print result:\n%s\n", out);
-        printf("cJSON_PrintPreallocated result:\n%s\n", buf_fail);
-        free(out);
-        free(buf_fail);
-        free(buf);
-        return -1;
-    }
+	/* force it to fail */
+	if (cJSON_PrintPreallocated(root, buf_fail, (int)len_fail, 1)) {
+		printf("cJSON_PrintPreallocated failed to show error with insufficient memory!\n");
+		printf("cJSON_Print result:\n%s\n", out);
+		printf("cJSON_PrintPreallocated result:\n%s\n", buf_fail);
+		free(out);
+		free(buf_fail);
+		free(buf);
+		return -1;
+	}
 	flush_stdout();
 
-    free(out);
-    free(buf_fail);
-    free(buf);
-    return 0;
+	free(out);
+	free(buf_fail);
+	free(buf);
+	return 0;
 }
 
 /* Create a bunch of objects as demonstration. */
 static void create_objects(void)
 {
-    /* declare a few. */
-    cJSON *root = NULL;
-    cJSON *fmt = NULL;
-    cJSON *img = NULL;
-    cJSON *thm = NULL;
-    cJSON *fld = NULL;
-    int i = 0;
+	/* declare a few. */
+	cJSON *root = NULL;
+	cJSON *fmt = NULL;
+	cJSON *img = NULL;
+	cJSON *thm = NULL;
+	cJSON *fld = NULL;
+	int i = 0;
 
-    /* Our "days of the week" array: */
-    const char *strings[7] =
-    {
-        "Sunday",
-        "Monday",
-        "Tuesday",
-        "Wednesday",
-        "Thursday",
-        "Friday",
-        "Saturday"
-    };
-    /* Our matrix: */
-    int numbers[3][3] =
-    {
-        {0, -1, 0},
-        {1, 0, 0},
-        {0 ,0, 1}
-    };
-    /* Our "gallery" item: */
-    int ids[4] = { 116, 943, 234, 38793 };
-    /* Our array of "records": */
-    struct record fields[2] =
-    {
-        {
-            "zip",
-            37.7668,
-            -1.223959e+2,
-            "",
-            "SAN FRANCISCO",
-            "CA",
-            "94107",
-            "US"
-        },
-        {
-            "zip",
-            37.371991,
-            -1.22026e+2,
-            "",
-            "SUNNYVALE",
-            "CA",
-            "94085",
-            "US"
-        }
-    };
-    volatile double zero = 0.0;
+	volatile double zero = 0.0;
 
-    /* Here we construct some JSON standards, from the JSON site. */
+	/* Here we construct some JSON standards, from the JSON site. */
 
-    /* Our "Video" datatype: */
-    root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "name", cJSON_CreateString("Jack (\"Bee\") Nimble"));
-    cJSON_AddItemToObject(root, "format", fmt = cJSON_CreateObject());
-    cJSON_AddStringToObject(fmt, "type", "rect");
-    cJSON_AddNumberToObject(fmt, "width", 1920);
-    cJSON_AddNumberToObject(fmt, "height", 1080);
-    cJSON_AddFalseToObject (fmt, "interlace");
-    cJSON_AddNumberToObject(fmt, "frame rate", 24);
+	/* Our "Video" datatype: */
+	root = cJSON_CreateObject();
+	cJSON_AddItemToObject(root, "name", cJSON_CreateString("Jack (\"Bee\") Nimble"));
+	cJSON_AddItemToObject(root, "format", fmt = cJSON_CreateObject());
+	cJSON_AddStringToObject(fmt, "type", "rect");
+	cJSON_AddNumberToObject(fmt, "width", 1920);
+	cJSON_AddNumberToObject(fmt, "height", 1080);
+	cJSON_AddFalseToObject (fmt, "interlace");
+	cJSON_AddNumberToObject(fmt, "frame rate", 24);
 
-    /* Print to text */
-    if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
-        exit(EXIT_FAILURE);
-    }
-    cJSON_Delete(root);
+	/* Print to text */
+	if (print_preallocated(root) != 0) {
+		cJSON_Delete(root);
+		exit(EXIT_FAILURE);
+	}
+	cJSON_Delete(root);
 
-    /* Our "days of the week" array: */
-    root = cJSON_CreateStringArray(strings, 7);
+	/* Our "days of the week" array: */
+	root = cJSON_CreateStringArray(str_weekdays, 7);
 
-    if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
-        exit(EXIT_FAILURE);
-    }
-    cJSON_Delete(root);
+	if (print_preallocated(root) != 0) {
+		cJSON_Delete(root);
+		exit(EXIT_FAILURE);
+	}
+	cJSON_Delete(root);
 
-    /* Our matrix: */
-    root = cJSON_CreateArray();
-    for (i = 0; i < 3; i++)
-    {
-        cJSON_AddItemToArray(root, cJSON_CreateIntArray(numbers[i], 3));
-    }
+	/* Our matrix: */
+	root = cJSON_CreateArray();
+	for (i = 0; i < 3; i++)
+	{
+		cJSON_AddItemToArray(root, cJSON_CreateIntArray(numbers[i], 3));
+	}
 
-    /* cJSON_ReplaceItemInArray(root, 1, cJSON_CreateString("Replacement")); */
+	/* cJSON_ReplaceItemInArray(root, 1, cJSON_CreateString("Replacement")); */
 
-    if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
-        exit(EXIT_FAILURE);
-    }
-    cJSON_Delete(root);
+	if (print_preallocated(root) != 0) {
+		cJSON_Delete(root);
+		exit(EXIT_FAILURE);
+	}
+	cJSON_Delete(root);
 
-    /* Our "gallery" item: */
-    root = cJSON_CreateObject();
-    cJSON_AddItemToObject(root, "Image", img = cJSON_CreateObject());
-    cJSON_AddNumberToObject(img, "Width", 800);
-    cJSON_AddNumberToObject(img, "Height", 600);
-    cJSON_AddStringToObject(img, "Title", "View from 15th Floor");
-    cJSON_AddItemToObject(img, "Thumbnail", thm = cJSON_CreateObject());
-    cJSON_AddStringToObject(thm, "Url", "http:/*www.example.com/image/481989943");
-    cJSON_AddNumberToObject(thm, "Height", 125);
-    cJSON_AddStringToObject(thm, "Width", "100");
-    cJSON_AddItemToObject(img, "IDs", cJSON_CreateIntArray(ids, 4));
+	/* Our "gallery" item: */
+	root = cJSON_CreateObject();
+	cJSON_AddItemToObject(root, "Image", img = cJSON_CreateObject());
+	cJSON_AddNumberToObject(img, "Width", 800);
+	cJSON_AddNumberToObject(img, "Height", 600);
+	cJSON_AddStringToObject(img, "Title", "View from 15th Floor");
+	cJSON_AddItemToObject(img, "Thumbnail", thm = cJSON_CreateObject());
+	cJSON_AddStringToObject(thm, "Url", "http:/*www.example.com/image/481989943");
+	cJSON_AddNumberToObject(thm, "Height", 125);
+	cJSON_AddStringToObject(thm, "Width", "100");
+	cJSON_AddItemToObject(img, "IDs", cJSON_CreateIntArray(ids, 4));
 
-    if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
-        exit(EXIT_FAILURE);
-    }
-    cJSON_Delete(root);
+	if (print_preallocated(root) != 0) {
+		cJSON_Delete(root);
+		exit(EXIT_FAILURE);
+	}
+	cJSON_Delete(root);
 
-    /* Our array of "records": */
-    root = cJSON_CreateArray();
-    for (i = 0; i < 2; i++)
-    {
-        cJSON_AddItemToArray(root, fld = cJSON_CreateObject());
-        cJSON_AddStringToObject(fld, "precision", fields[i].precision);
-        cJSON_AddNumberToObject(fld, "Latitude", fields[i].lat);
-        cJSON_AddNumberToObject(fld, "Longitude", fields[i].lon);
-        cJSON_AddStringToObject(fld, "Address", fields[i].address);
-        cJSON_AddStringToObject(fld, "City", fields[i].city);
-        cJSON_AddStringToObject(fld, "State", fields[i].state);
-        cJSON_AddStringToObject(fld, "Zip", fields[i].zip);
-        cJSON_AddStringToObject(fld, "Country", fields[i].country);
-    }
+	/* Our array of "records": */
+	root = cJSON_CreateArray();
+	for (i = 0; i < 2; i++)
+	{
+		cJSON_AddItemToArray(root, fld = cJSON_CreateObject());
+		cJSON_AddStringToObject(fld, "precision", fields[i].precision);
+		cJSON_AddNumberToObject(fld, "Latitude", fields[i].lat);
+		cJSON_AddNumberToObject(fld, "Longitude", fields[i].lon);
+		cJSON_AddStringToObject(fld, "Address", fields[i].address);
+		cJSON_AddStringToObject(fld, "City", fields[i].city);
+		cJSON_AddStringToObject(fld, "State", fields[i].state);
+		cJSON_AddStringToObject(fld, "Zip", fields[i].zip);
+		cJSON_AddStringToObject(fld, "Country", fields[i].country);
+	}
 
-    /* cJSON_ReplaceItemInObject(cJSON_GetArrayItem(root, 1), "City", cJSON_CreateIntArray(ids, 4)); */
+	/* cJSON_ReplaceItemInObject(cJSON_GetArrayItem(root, 1), "City", cJSON_CreateIntArray(ids, 4)); */
 
-    if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
-        exit(EXIT_FAILURE);
-    }
-    cJSON_Delete(root);
+	if (print_preallocated(root) != 0) {
+		cJSON_Delete(root);
+		exit(EXIT_FAILURE);
+	}
+	cJSON_Delete(root);
 
-    root = cJSON_CreateObject();
-    cJSON_AddNumberToObject(root, "number", 1.0 / zero);
+	root = cJSON_CreateObject();
+	cJSON_AddNumberToObject(root, "number", 1.0 / zero);
 
-    if (print_preallocated(root) != 0) {
-        cJSON_Delete(root);
-        exit(EXIT_FAILURE);
-    }
-    cJSON_Delete(root);
+	if (print_preallocated(root) != 0) {
+		cJSON_Delete(root);
+		exit(EXIT_FAILURE);
+	}
+	cJSON_Delete(root);
 }
 
 void test_cJSON(void)
@@ -422,8 +515,8 @@ int main(void)
 	printf("\n\n\n\n\n\n\n\n\n\n");
 	flush_stdout();
 
-//	test_jansson();
-//	flush_stdout();
+	test_jansson();
+	flush_stdout();
 
 	test_cJSON();
 	flush_stdout();
