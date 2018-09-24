@@ -35,6 +35,7 @@ static void my_timer_handler(void)
 	{
 		LEDTOGGLE(1);
 	}
+
 }
 
 const uint32_t HAL_GetTick(void)
@@ -150,229 +151,167 @@ int main(void)
 	flush_stdout();
 
 	//Test B-C Instruction
-	uint32_t a;
-	uint32_t b;
-	uint32_t c;
-	uint32_t d;
-	uint32_t res;
-	uint64_t res64;
+	volatile uint32_t a;
+	volatile uint32_t b;
+	volatile uint32_t c;
+	volatile uint32_t d;
+	volatile int32_t ai;
+	volatile uint32_t res;
+	volatile uint64_t a64;
+	volatile uint64_t res64;
+	volatile float fA;
+	volatile float fB;
+	volatile float f_res;
+	volatile pack64 p_res_64;
 
-//	printf("\nTest BISR RSLCX\n");
-//	Ifx_Bisr(4);
-//	Ifx_Rslcx();
-//	printf("BISR RSLCX should be combined to avoid CSA leak\n");
-//	flush_stdout();
+#define	TEST_NOP_NUM	1000000
 
-	printf("\nTest BMERGE\n");
-	a = 0x000000FF;
-	b = 0x0000FF00;
-	res = Ifx_Bmerge(a, b);
-	printf("BMERGE[%08X, %08X]=%08X\n", a, b, res);
+	printf("\nTest DEBUG\n");
+	a = g_sys_ticks;
+	for(size_t i=0; i<TEST_NOP_NUM; ++i)
+	{
+		Ifx_Debug();
+	}
+	b = g_sys_ticks;
+	for(size_t i=0; i<TEST_NOP_NUM; ++i)
+	{
+		Ifx_Nop();
+	}
+	c = g_sys_ticks;
+	printf("DEBUG[%u, %u, %u]\n", a, b, c);
 	flush_stdout();
 
-	printf("\nTest BSPLIT\n");
-	a = 0xA5A5C9C9;
-	res64 = Ifx_Bsplit(a);
-	printf("BSPLIT[%08X]=%016llX\n", a, res64);
+	printf("\nTest DEXTR\n");
+	a = 0x11223344;
+	b = 0x55667788;
+	c = 8;
+	res = Ifx_Dextr(a, b, c);
+	printf("DEXTR[%08X,%08X, %u] = %08X\n", a, b, c, res);
 	flush_stdout();
 
-	printf("\nTest CACHEA.I CACHEA.W CACHEA.WI CACHEI.I CACHEI.W CACHEI.WI\n");
-	Ifx_Cachea_I();
-	Ifx_Cachea_W();
-	Ifx_Cachea_WI();
-	Ifx_Cachei_I();
-	Ifx_Cachei_W();
-	Ifx_Cachei_WI();
-	printf("Cache operation end\n");
+	printf("\nTest DEXTR_I\n");
+	a = 0x11223344;
+	b = 0x55667788;
+	res = Ifx_Dextr_I(a, b);
+	printf("DEXTR_I[%08X,%08X, %u] = %08X\n", a, b, 16, res);
 	flush_stdout();
 
-	printf("\nTest CADD\n");
-	a = 0x11111111;
-	b = 0x22222222;
-	c = 0;
-	res =  Ifx_CADD(a, b, c);
-	printf("CADD[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_CADD(a, b, c);
-	printf("CADD[%08X, %08X, %08X]=%08X\n", a, b, c, res);
+	printf("\nTest ENABLE DISABLE 1\n");
+	a = g_sys_ticks;
+	for(volatile size_t i=0; i<TEST_NOP_NUM; ++i)
+	{
+		Ifx_Nop();
+	}
+	b = g_sys_ticks;
+	flush_stdout();
+	printf("[%u, %u]\n", a, b);
 	flush_stdout();
 
-	printf("\nTest CADDI\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_CADD_I(a, c);
-	printf("CADDI[%08X, %08X, %08X]=%08X\n", a, 126, c, res);
-	c = 1;
-	res =  Ifx_CADD_I(a, c);
-	printf("CADDI[%08X, %08X, %08X]=%08X\n", a, 126, c, res);
+	printf("\nTest ENABLE DISABLE 2\n");
+	Ifx_Disable();
+	a = g_sys_ticks;
+	for(volatile size_t i=0; i<TEST_NOP_NUM; ++i)
+	{
+		Ifx_Nop();
+	}
+	b = g_sys_ticks;
+	Ifx_Enable();
+	Ifx_Dsync();
+	printf("[%u, %u]\n", a, b);
 	flush_stdout();
 
-	printf("\nTest CADDI 16bit\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_CADD_I(a, c);
-	printf("CADDI_16[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	c = 1;
-	res =  Ifx_CADD_I16(a, c);
-	printf("CADDI_16[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
+	printf("\nTest DSYNC\n");
+	Ifx_Dsync();
+
+	printf("\nTest DIV\n");
+	ai=-3334;
+	b = 3;
+	p_res_64.u64 = Ifx_Div(ai, b);
+	printf("DIV[%d,%d] = %d,%d\n", ai, b, p_res_64.i32[0], p_res_64.i32[1]);
 	flush_stdout();
 
-	printf("\nTest CADDN\n");
-	a = 0x11111111;
-	b = 0x22222222;
-	c = 0;
-	res =  Ifx_CADDN(a, b, c);
-	printf("CADDN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_CADDN(a, b, c);
-	printf("CADDN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
+	printf("\nTest DIV_U\n");
+	a = UINT32_MAX/2;
+	b = 3;
+	p_res_64.u64 = Ifx_Div_U(a, b);
+	printf("DIV_U[%u,%u] = %u,%u\n", a, b, p_res_64.u32[0], p_res_64.u32[1]);
 	flush_stdout();
 
-	printf("\nTest CADDN_I\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_CADDN_I(a, c);
-	printf("CADDN_I[%08X, %08X, %08X]=%08X\n", a, 126, c, res);
-	c = 1;
-	res =  Ifx_CADDN_I(a, c);
-	printf("CADDN_I[%08X, %08X, %08X]=%08X\n", a, 126, c, res);
+	printf("\nTest DIV_F\n");
+	fA = M_PI;
+	fB = 2;
+	f_res = Ifx_Div_F(fA, fB);
+	printf("DIV_F[%f, %f] = %f\n", fA, fB, f_res);
 	flush_stdout();
 
-	printf("\nTest CADDNI 16bit\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_CADDN_I16(a, c);
-	printf("CADDNI_16[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	c = 1;
-	res =  Ifx_CADDN_I16(a, c);
-	printf("CADDNI_16[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
+	printf("\nTest DVINIT\n");
+	ai=-3333;
+	b = 3;
+	res64 = Ifx_DivInit(ai, b);
+	printf("DVINIT[%08X,%08X] = %016llX\n", ai, b, res64);
 	flush_stdout();
 
-	printf("\nTest CALL\n");
-	a = 0x11111111;
-	b = 0x22222222;
-	c = 0;
-	res =  Ifx_Call(a, b, c);
-	printf("CADD[%08X, %08X, %08X]=%08X\n", a, b, c, res);
+	printf("\nTest DVSTEP\n");
+	a64 = res64;
+	b = 3;
+	res64 = Ifx_Dvstep(a64, b);
+	printf("DVSTEP[%016llX,%08X] = %016llX\n", a64, b, res64);
 	flush_stdout();
 
-	printf("\nTest CALL_A\n");
-	c = 1;
-	res =  Ifx_Call_A(a, b, c);
-	printf("CADD[%08X, %08X, %08X]=%08X\n", a, b, c, res);
+	printf("\nTest DVADJ\n");
+	a64 = res64;
+	b = 3;
+	res64 = Ifx_Dvadj(a64, b);
+	printf("DVADJ[%016llX,%08X] = %016llX\n", a64, b, res64);
 	flush_stdout();
 
-	printf("\nTest CALL_I\n");
-	c = 0;
-	res =  Ifx_Call_I(Ifx_CADD, a, b, c);
-	printf("CADD[%08X, %08X, %08X]=%08X\n", a, b, c, res);
+	printf("\nTest DVINIT_U\n");
+	a = 0x99663312;
+	b = 3;
+	res64 = Ifx_DivInit_U(a, b);
+	printf("DVINIT_U[%08X,%08X] = %016llX\n", a, b, res64);
 	flush_stdout();
 
-	printf("\nTest CLO(Count Leading Ones)\n");
-	a = 0xC0010000;
-	res =  Ifx_Clo(a);
-	printf("CLO[%08X]=%08X\n", a, res);
+	printf("\nTest DVSTEP_U\n");
+	a64 = res64;
+	b = 3;
+	res64 = Ifx_Dvstep_U(a64, b);
+	printf("DVSTEP_U[%016llX,%08X] = %016llX\n", a64, b, res64);
 	flush_stdout();
 
-	printf("\nTest CLO.H(Count Leading Ones in Packed Half-words)\n");
-	a = 0xC0019003;
-	res =  Ifx_Clo_H(a);
-	printf("CLO.H[%08X]=%08X\n", a, res);
+	printf("\nTest DVADJ\n");
+	a64 = res64;
+	b = 3;
+	res64 = Ifx_Dvadj(a64, b);
+	printf("DVADJ[%016llX,%08X] = %016llX\n", a64, b, res64);
 	flush_stdout();
 
-	printf("\nTest CLS(Count Leading Signs)\n");
-	a = 0xC0010000;
-	res =  Ifx_Cls(a);
-	printf("CLS[%08X]=%08X\n", a, res);
+	printf("\nTest DVINIT_B\n");
+	ai=0xFF8080FF;
+	b = 3;
+	res64 = Ifx_DivInit_B(a, b);
+	printf("DVINIT_B[%08X,%08X] = %016llX\n", a, b, res64);
 	flush_stdout();
 
-	printf("\nTest CLS.H(Count Leading Signs in Packed Half-words)\n");
-	a = 0xC0013003;
-	res =  Ifx_Cls_H(a);
-	printf("CLS.H[%08X]=%08X\n", a, res);
+	printf("\nTest DVINIT_BU\n");
+	a = 0x99663312;
+	b = 3;
+	res64 = Ifx_DivInit_BU(a, b);
+	printf("DVINIT_BU[%08X,%08X] = %016llX\n", a, b, res64);
 	flush_stdout();
 
-	printf("\nTest CLZ(Count Leading Zeros)\n");
-	a = 0x00010000;
-	res =  Ifx_Clz(a);
-	printf("CLO[%08X]=%08X\n", a, res);
+	printf("\nTest DVINIT_H\n");
+	ai=0xFFFF8000;
+	b = 3;
+	res64 = Ifx_DivInit_H(a, b);
+	printf("DVINIT_H[%08X,%08X] = %016llX\n", a, b, res64);
 	flush_stdout();
 
-	printf("\nTest CLO.H(Count Leading Zeros in Packed Half-words)\n");
-	a = 0x00030008;
-	res =  Ifx_Clz_H(a);
-	printf("CLO.H[%08X]=%08X\n", a, res);
-	flush_stdout();
-
-	printf("\nTest CMOV\n");
-	a = 0x11111111;
-	b = 0x22222222;
-	c = 0;
-	res =  Ifx_Cmov(a, b, c);
-	printf("CMOV[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_Cmov(a, b, c);
-	printf("CMOV[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	flush_stdout();
-
-	printf("\nTest CMOV_I\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_Cmov_I(a, c);
-	printf("CMOV_I[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	c = 1;
-	res =  Ifx_Cmov_I(a, c);
-	printf("CMOV_I[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	flush_stdout();
-
-	printf("\nTest CMOVN\n");
-	a = 0x11111111;
-	b = 0x22222222;
-	c = 0;
-	res =  Ifx_Cmovn(a, b, c);
-	printf("CMOVN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_Cmovn(a, b, c);
-	printf("CMOVN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	flush_stdout();
-
-	printf("\nTest CMOVN_I\n");
-	a = 0x11111111;
-	c = 0;
-	res =  Ifx_Cmovn_I(a, c);
-	printf("CMOVN_I[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	c = 1;
-	res =  Ifx_Cmovn_I(a, c);
-	printf("CMOVN_I[%08X, %08X, %08X]=%08X\n", a, 6, c, res);
-	flush_stdout();
-
-//	printf("\nTest CMP.F\n");
-//	float fA = 1.1;
-//	float fB = 2.2;
-//	res =  Ifx_Cmp_F(fA, fB);
-//	printf("CMP.F[%f, %f]=%08X\n", fA, fB, res);
-//	flush_stdout();
-
-	printf("\nTest CSUB\n");
-	a = 0x22222222;
-	b = 0x11111110;
-	c = 0;
-	res =  Ifx_Csub(a, b, c);
-	printf("CSUB[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_Csub(a, b, c);
-	printf("CSUB[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	flush_stdout();
-
-	printf("\nTest CSUBN\n");
-	a = 0x22222222;
-	b = 0x11111110;
-	c = 0;
-	res =  Ifx_Csubn(a, b, c);
-	printf("CSUBN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
-	c = 1;
-	res =  Ifx_Csubn(a, b, c);
-	printf("CSUBN[%08X, %08X, %08X]=%08X\n", a, b, c, res);
+	printf("\nTest DVINIT_HU\n");
+	a = 0x99663312;
+	b = 3;
+	res64 = Ifx_DivInit_HU(a, b);
+	printf("DVINIT_HU[%08X,%08X] = %016llX\n", a, b, res64);
 	flush_stdout();
 
 	g_regular_task_flag = true;

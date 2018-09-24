@@ -11,9 +11,13 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-//Remaining Uncovered Instruction
-//ADD.F
-//BISR
+typedef union union_pack16
+{
+	uint16_t u16;
+	int16_t i16;
+	uint8_t u8[2];
+	int8_t i8[2];
+}pack16;
 
 typedef union union_pack32
 {
@@ -24,6 +28,18 @@ typedef union union_pack32
 	uint8_t u8[4];
 	int8_t i8[4];
 }pack32;
+
+typedef union union_pack64
+{
+	uint64_t u64;
+	int64_t i64;
+	uint32_t u32[2];
+	int32_t i32[2];
+	uint16_t u16[4];
+	int16_t i16[4];
+	uint8_t u8[8];
+	int8_t i8[8];
+}pack64;
 
 //Absolute
 uint32_t Ifx_Abs_B(uint32_t X);
@@ -113,6 +129,29 @@ uint32_t Ifx_Cmovn_I(uint32_t A, uint32_t cond);
 uint32_t Ifx_Cmp_F(float A, float B);
 uint32_t Ifx_Csub(uint32_t A, uint32_t B, uint32_t cond);
 uint32_t Ifx_Csubn(uint32_t A, uint32_t B, uint32_t cond);
+
+//D Initial Instuction Set
+void Ifx_Debug(void);
+uint32_t Ifx_Dextr(uint32_t A, uint32_t B, uint32_t pos);
+uint32_t Ifx_Dextr_I(uint32_t A, uint32_t B);
+uint32_t Ifx_Disable(void);
+void Ifx_Dsync(void);
+uint64_t Ifx_Dvadj(uint64_t inputA64, uint32_t inputC);
+uint64_t Ifx_Div(uint32_t inputA, uint32_t inputB);
+uint64_t Ifx_Div_U(uint32_t inputA, uint32_t inputB);
+float Ifx_Div_F(float inputA, float inputB);
+uint64_t Ifx_DivInit(uint32_t inputA, uint32_t inputB);
+uint64_t Ifx_DivInit_U(uint32_t inputA, uint32_t inputB);
+uint64_t Ifx_DivInit_B(uint32_t inputA, uint32_t inputB);
+uint64_t Ifx_DivInit_BU(uint32_t inputA, uint32_t inputB);
+uint64_t Ifx_DivInit_H(uint32_t inputA, uint32_t inputB);
+uint64_t Ifx_DivInit_HU(uint32_t inputA, uint32_t inputB);
+uint64_t Ifx_Dvstep(uint64_t inputA64, uint32_t inputC);
+uint64_t Ifx_Dvstep_U(uint64_t inputA64, uint32_t inputC);
+
+void Ifx_Enable(void);
+
+void Ifx_Nop(void);
 
 uint32_t Ifx_Rslcx(void);
 
