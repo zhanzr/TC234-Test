@@ -149,6 +149,30 @@ uint64_t Ifx_DivInit_HU(uint32_t inputA, uint32_t inputB);
 uint64_t Ifx_Dvstep(uint64_t inputA64, uint32_t inputC);
 uint64_t Ifx_Dvstep_U(uint64_t inputA64, uint32_t inputC);
 
+//E and F Initial Instuction Set
+uint32_t Ifx_Eq(uint32_t A, uint32_t B);
+uint32_t Ifx_Eq_fast(uint32_t A, uint32_t B);
+
+uint32_t Ifx_Eq_B(uint32_t A, uint32_t B);
+uint32_t Ifx_Eq_H(uint32_t A, uint32_t B);
+uint32_t Ifx_Eq_W(uint32_t A, uint32_t B);
+uint32_t Ifx_EqAny_B(uint32_t A, uint32_t B);
+uint32_t Ifx_EqAny_H(uint32_t A, uint32_t B);
+uint32_t Ifx_Eq_A(void* pointerA, void* pointerB);
+uint32_t Ifx_Eq_Z_A(void* pointerA);
+
+int32_t Ifx_Ftoi(float inputA);
+int32_t Ifx_Ftoi_Z(float inputA);
+uint32_t Ifx_Ftou(float inputA);
+uint32_t Ifx_Ftou_Z(float inputA);
+
+uint32_t Ifx_Extr(uint32_t inputA, uint32_t inputB);
+uint32_t Ifx_Extr_U(uint32_t inputA, uint32_t inputB);
+
+uint32_t Ifx_Fcall(uint32_t A, uint32_t B);
+uint32_t Ifx_Fcall_A(uint32_t A, uint32_t B);
+uint32_t Ifx_Fcall_I(uint32_t(*p)(uint32_t A, uint32_t B),uint32_t A, uint32_t B);
+
 void Ifx_Enable(void);
 
 void Ifx_Nop(void);

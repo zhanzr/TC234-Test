@@ -150,13 +150,17 @@ int main(void)
 
 	flush_stdout();
 
-	//Test B-C Instruction
 	volatile uint32_t a;
 	volatile uint32_t b;
 	volatile uint32_t c;
 	volatile uint32_t d;
+	volatile pack32 packA;
+	volatile pack32 packB;
+	volatile pack32 packC;
+	volatile pack32 packD;
 	volatile int32_t ai;
 	volatile uint32_t res;
+	volatile int32_t res_i;
 	volatile uint64_t a64;
 	volatile uint64_t res64;
 	volatile float fA;
@@ -164,154 +168,168 @@ int main(void)
 	volatile float f_res;
 	volatile pack64 p_res_64;
 
-#define	TEST_NOP_NUM	1000000
-
-	printf("\nTest DEBUG\n");
-	a = g_sys_ticks;
-	for(size_t i=0; i<TEST_NOP_NUM; ++i)
-	{
-		Ifx_Debug();
-	}
-	b = g_sys_ticks;
-	for(size_t i=0; i<TEST_NOP_NUM; ++i)
-	{
-		Ifx_Nop();
-	}
-	c = g_sys_ticks;
-	printf("DEBUG[%u, %u, %u]\n", a, b, c);
-	flush_stdout();
-
-	printf("\nTest DEXTR\n");
+	printf("\nTest EQ\n");
 	a = 0x11223344;
 	b = 0x55667788;
-	c = 8;
-	res = Ifx_Dextr(a, b, c);
-	printf("DEXTR[%08X,%08X, %u] = %08X\n", a, b, c, res);
+	res = Ifx_Eq(a, b);
+	printf("EQ[%08X,%08X] = %08X\n", a, b, res);
+	a = 0x11223344;
+	b = a;
+	res = Ifx_Eq(a, b);
+	printf("EQ[%08X,%08X] = %08X\n", a, b, res);
 	flush_stdout();
 
-	printf("\nTest DEXTR_I\n");
+	printf("\nTest EQ.B\n");
+	packA.u32 = 0x11223344;
+	packB.u32 = 0x11663388;
+	res = Ifx_Eq_B(packA.u32, packB.u32);
+	printf("EQ.B[%08X,%08X] = %08X\n", packA.u32, packB.u32, res);
+	flush_stdout();
+
+	printf("\nTest EQ.H\n");
+	packA.u32 = 0x11223344;
+	packB.u32 = 0x11223388;
+	res = Ifx_Eq_H(packA.u32, packB.u32);
+	printf("EQ.H[%08X,%08X] = %08X\n", packA.u32, packB.u32, res);
+	flush_stdout();
+
+	printf("\nTest EQ.W\n");
+	packA.u32 = 0x11223344;
+	packB.u32 = 0x11223388;
+	res = Ifx_Eq_W(packA.u32, packB.u32);
+	printf("EQ.W[%08X,%08X] = %08X\n", packA.u32, packB.u32, res);
+	packA.u32 = 0x11223344;
+	packB.u32 = packA.u32;
+	res = Ifx_Eq_W(packA.u32, packB.u32);
+	printf("EQ.W[%08X,%08X] = %08X\n", packA.u32, packB.u32, res);
+	flush_stdout();
+
+	printf("\nTest EQANY.B\n");
+	packA.u32 = 0x11223344;
+	packB.u32 = 0x11663388;
+	res = Ifx_EqAny_B(packA.u32, packB.u32);
+	printf("EQANY.B[%08X,%08X] = %08X\n", packA.u32, packB.u32, res);
+	packA.u32 = 0x11223344;
+	packB.u32 = 0x44;
+	res = Ifx_EqAny_B(packA.u32, packB.u32);
+	printf("EQANY.B[%08X,%08X] = %08X\n", packA.u32, packB.u32, res);
+	flush_stdout();
+
+	printf("\nTest EQANY.H\n");
+	packA.u32 = 0x11223344;
+	packB.u32 = 0x11663388;
+	res = Ifx_EqAny_H(packA.u32, packB.u32);
+	printf("EQANY.H[%08X,%08X] = %08X\n", packA.u32, packB.u32, res);
+	packA.u32 = 0x11223344;
+	packB.u32 = 0x3344;
+	res = Ifx_EqAny_H(packA.u32, packB.u32);
+	printf("EQANY.H[%08X,%08X] = %08X\n", packA.u32, packB.u32, res);
+	flush_stdout();
+
+	printf("\nTest EQ.A\n");
+	res = Ifx_Eq_A(&a, &b);
+	printf("EQ.A[%08X,%08X] = %08X\n", &a, &b, res);
+	res = Ifx_Eq_A(&a, &a);
+	printf("EQ.A[%08X,%08X] = %08X\n", &a, &a, res);
+	flush_stdout();
+
+	printf("\nTest EQZ.A\n");
+	res = Ifx_Eq_Z_A(&a);
+	printf("EQZ.A[%08X] = %08X\n", &a, res);
+	void* pNull = 0;
+	res = Ifx_Eq_Z_A(pNull);
+	printf("EQZ.A[%08X] = %08X\n", pNull, res);
+	flush_stdout();
+
+	printf("\nTest FTOI\n");
+	fA = -1234.5678;
+	res_i = Ifx_Ftoi(fA);
+	printf("FTOI[%f] = %d\n", fA, res_i);
+	fA = -0.9999999;
+	res_i = Ifx_Ftoi(fA);
+	printf("FTOI[%f] = %d\n", fA, res_i);
+	flush_stdout();
+
+	printf("\nTest FTOI_Z\n");
+	fA = -1234.5678;
+	res_i = Ifx_Ftoi_Z(fA);
+	printf("FTOIZ[%f] = %d\n", fA, res_i);
+	fA = -0.9999999;
+	res_i = Ifx_Ftoi_Z(fA);
+	printf("FTOIZ[%f] = %d\n", fA, res_i);
+	flush_stdout();
+
+	printf("\nTest FTOU\n");
+	fA = 1234.5678;
+	res_i = Ifx_Ftou(fA);
+	printf("FTOU[%f] = %d\n", fA, res_i);
+	fA = 1.99999999;
+	res_i = Ifx_Ftou(fA);
+	printf("FTOU[%f] = %d\n", fA, res_i);
+	flush_stdout();
+
+	printf("\nTest FTOU_Z\n");
+	fA = 1234.5678;
+	res_i = Ifx_Ftou_Z(fA);
+	printf("FTOU_Z[%f] = %d\n", fA, res_i);
+	fA = 1.99999999;
+	res_i = Ifx_Ftou_Z(fA);
+	printf("FTOU_Z[%f] = %d\n", fA, res_i);
+	flush_stdout();
+
+	printf("\nTest EXTR\n");
+	a = 0xF1223344;
+	b = 8;
+	res = Ifx_Extr(a, b);
+	printf("EXTR[%08X,%08X, %u] = %08X\n", a, b, 4, res);
+	a = 0xF1223344;
+	b = 24;
+	res = Ifx_Extr(a, b);
+	printf("EXTR[%08X,%08X, %u] = %08X\n", a, b, 4, res);
+	flush_stdout();
+
+	printf("\nTest EXTR_U\n");
+	a = 0xF1223344;
+	b = 8;
+	res = Ifx_Extr_U(a, b);
+	printf("EXTR_U[%08X,%08X, %u] = %08X\n", a, b, 4, res);
+	a = 0xF1223344;
+	b = 24;
+	res = Ifx_Extr_U(a, b);
+	printf("EXTR_U[%08X,%08X, %u] = %08X\n", a, b, 4, res);
+	flush_stdout();
+
+	printf("\nTest Fcall EQ\n");
 	a = 0x11223344;
 	b = 0x55667788;
-	res = Ifx_Dextr_I(a, b);
-	printf("DEXTR_I[%08X,%08X, %u] = %08X\n", a, b, 16, res);
+	res = Ifx_Fcall(a, b);
+	printf("Fcall EQ[%08X,%08X] = %08X\n", a, b, res);
+	a = 0x11223344;
+	b = a;
+	res = Ifx_Fcall(a, b);
+	printf("Fcall EQ[%08X,%08X] = %08X\n", a, b, res);
 	flush_stdout();
 
-	printf("\nTest ENABLE DISABLE 1\n");
-	a = g_sys_ticks;
-	for(volatile size_t i=0; i<TEST_NOP_NUM; ++i)
-	{
-		Ifx_Nop();
-	}
-	b = g_sys_ticks;
-	flush_stdout();
-	printf("[%u, %u]\n", a, b);
-	flush_stdout();
-
-	printf("\nTest ENABLE DISABLE 2\n");
-	Ifx_Disable();
-	a = g_sys_ticks;
-	for(volatile size_t i=0; i<TEST_NOP_NUM; ++i)
-	{
-		Ifx_Nop();
-	}
-	b = g_sys_ticks;
-	Ifx_Enable();
-	Ifx_Dsync();
-	printf("[%u, %u]\n", a, b);
+	printf("\nTest FcallA EQ\n");
+	a = 0x11223344;
+	b = 0x55667788;
+	res = Ifx_Fcall_A(a, b);
+	printf("FcallA EQ[%08X,%08X] = %08X\n", a, b, res);
+	a = 0x11223344;
+	b = a;
+	res = Ifx_Fcall_A(a, b);
+	printf("FcallA EQ[%08X,%08X] = %08X\n", a, b, res);
 	flush_stdout();
 
-	printf("\nTest DSYNC\n");
-	Ifx_Dsync();
-
-	printf("\nTest DIV\n");
-	ai=-3334;
-	b = 3;
-	p_res_64.u64 = Ifx_Div(ai, b);
-	printf("DIV[%d,%d] = %d,%d\n", ai, b, p_res_64.i32[0], p_res_64.i32[1]);
-	flush_stdout();
-
-	printf("\nTest DIV_U\n");
-	a = UINT32_MAX/2;
-	b = 3;
-	p_res_64.u64 = Ifx_Div_U(a, b);
-	printf("DIV_U[%u,%u] = %u,%u\n", a, b, p_res_64.u32[0], p_res_64.u32[1]);
-	flush_stdout();
-
-	printf("\nTest DIV_F\n");
-	fA = M_PI;
-	fB = 2;
-	f_res = Ifx_Div_F(fA, fB);
-	printf("DIV_F[%f, %f] = %f\n", fA, fB, f_res);
-	flush_stdout();
-
-	printf("\nTest DVINIT\n");
-	ai=-3333;
-	b = 3;
-	res64 = Ifx_DivInit(ai, b);
-	printf("DVINIT[%08X,%08X] = %016llX\n", ai, b, res64);
-	flush_stdout();
-
-	printf("\nTest DVSTEP\n");
-	a64 = res64;
-	b = 3;
-	res64 = Ifx_Dvstep(a64, b);
-	printf("DVSTEP[%016llX,%08X] = %016llX\n", a64, b, res64);
-	flush_stdout();
-
-	printf("\nTest DVADJ\n");
-	a64 = res64;
-	b = 3;
-	res64 = Ifx_Dvadj(a64, b);
-	printf("DVADJ[%016llX,%08X] = %016llX\n", a64, b, res64);
-	flush_stdout();
-
-	printf("\nTest DVINIT_U\n");
-	a = 0x99663312;
-	b = 3;
-	res64 = Ifx_DivInit_U(a, b);
-	printf("DVINIT_U[%08X,%08X] = %016llX\n", a, b, res64);
-	flush_stdout();
-
-	printf("\nTest DVSTEP_U\n");
-	a64 = res64;
-	b = 3;
-	res64 = Ifx_Dvstep_U(a64, b);
-	printf("DVSTEP_U[%016llX,%08X] = %016llX\n", a64, b, res64);
-	flush_stdout();
-
-	printf("\nTest DVADJ\n");
-	a64 = res64;
-	b = 3;
-	res64 = Ifx_Dvadj(a64, b);
-	printf("DVADJ[%016llX,%08X] = %016llX\n", a64, b, res64);
-	flush_stdout();
-
-	printf("\nTest DVINIT_B\n");
-	ai=0xFF8080FF;
-	b = 3;
-	res64 = Ifx_DivInit_B(a, b);
-	printf("DVINIT_B[%08X,%08X] = %016llX\n", a, b, res64);
-	flush_stdout();
-
-	printf("\nTest DVINIT_BU\n");
-	a = 0x99663312;
-	b = 3;
-	res64 = Ifx_DivInit_BU(a, b);
-	printf("DVINIT_BU[%08X,%08X] = %016llX\n", a, b, res64);
-	flush_stdout();
-
-	printf("\nTest DVINIT_H\n");
-	ai=0xFFFF8000;
-	b = 3;
-	res64 = Ifx_DivInit_H(a, b);
-	printf("DVINIT_H[%08X,%08X] = %016llX\n", a, b, res64);
-	flush_stdout();
-
-	printf("\nTest DVINIT_HU\n");
-	a = 0x99663312;
-	b = 3;
-	res64 = Ifx_DivInit_HU(a, b);
-	printf("DVINIT_HU[%08X,%08X] = %016llX\n", a, b, res64);
+	printf("\nTest FcallI EQ\n");
+	a = 0x11223344;
+	b = 0x55667788;
+	res = Ifx_Fcall_I(Ifx_Eq_fast, a, b);
+	printf("FcallI EQ[%p %08X,%08X] = %08X\n", Ifx_Eq_fast, a, b, res);
+	a = 0x11223344;
+	b = a;
+	res = Ifx_Fcall_I(Ifx_Eq_fast, a, b);
+	printf("FcallI EQ[%08X %08X,%08X] = %08X\n", Ifx_Eq_fast, a, b, res);
 	flush_stdout();
 
 	g_regular_task_flag = true;
