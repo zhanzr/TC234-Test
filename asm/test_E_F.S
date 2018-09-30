@@ -19,7 +19,8 @@
 
 //	uint32_t Ifx_Extr(uint32_t inputA, uint32_t inputB);
 //	uint32_t Ifx_Extr_U(uint32_t inputA, uint32_t inputB);
-
+//	uint32_t Ifx_Ftoq31(float inputA, uint32_t inputB);
+//	uint32_t Ifx_Ftoq31z(float inputA, uint32_t inputB);
 // uint32_t Ifx_Fcall(uint32_t A, uint32_t B);
 // uint32_t Ifx_Fcall_A(uint32_t A, uint32_t B);
 // uint32_t Ifx_Fcall_I(uint32_t(*p)(uint32_t A, uint32_t B),uint32_t A, uint32_t B);

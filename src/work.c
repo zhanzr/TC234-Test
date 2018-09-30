@@ -299,6 +299,28 @@ int main(void)
 	printf("EXTR_U[%08X,%08X, %u] = %08X\n", a, b, 4, res);
 	flush_stdout();
 
+	printf("\nTest FTOQ31\n");
+	fA = 1.2345678;
+	b = 4;
+	res = Ifx_Ftoq31(fA, b);
+	printf("FTOQ31[%f, %u] = %08X\n", fA, b, res);
+	fA = 0.5678;
+	b = 3;
+	res = Ifx_Ftoq31(fA, b);
+	printf("FTOQ31[%f, %u] = %08X\n", fA, b, res);
+	flush_stdout();
+
+	printf("\nTest FTOQ31Z\n");
+	fA = 1.2345678;
+	b = 2;
+	res = Ifx_Ftoq31z(fA, b);
+	printf("FTOQ31Z[%f, %u] = %08X\n", fA, b, res);
+	fA = 0.5678;
+	b = 1;
+	res = Ifx_Ftoq31z(fA, b);
+	printf("FTOQ31Z[%f, %u] = %08X\n", fA, b, res);
+	flush_stdout();
+
 	printf("\nTest Fcall EQ\n");
 	a = 0x11223344;
 	b = 0x55667788;
