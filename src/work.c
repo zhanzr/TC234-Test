@@ -183,118 +183,214 @@ int main(void)
 	printf("JA[%u] = %u\n", a, res);
 	flush_stdout();
 
-	printf("\nTest INS.T\n");
+	printf("\nTest JI\n");
+	res = Ifx_JI(Ifx_J);
+	printf("JI[%08X %u] = %u\n", Ifx_J, 30, res);
+	flush_stdout();
+
+	printf("\nTest JEQ\n");
+	a = 1000;
+	b = 1001;
+	res = Ifx_Jeq(a, b);
+	printf("JEQ[%08X, %08X] = %u\n", a, b, res);
+	b = a;
+	res = Ifx_Jeq(a, b);
+	printf("JEQ[%08X, %08X] = %u\n", a, b, res);
+	flush_stdout();
+
+	printf("\nTest JNE\n");
+	a = 1000;
+	b = 1001;
+	res = Ifx_Jne(a, b);
+	printf("JNE[%08X, %08X] = %u\n", a, b, res);
+	b = a;
+	res = Ifx_Jne(a, b);
+	printf("JNE[%08X, %08X] = %u\n", a, b, res);
+	flush_stdout();
+
+	printf("\nTest JNED\n");
+	a = 1000;
+	b = 1001;
+	res = Ifx_Jned(a, b);
+	printf("JNED[%08X, %08X] = %u\n", a, b, res);
+	b = a;
+	res = Ifx_Jned(a, b);
+	printf("JNED[%08X, %08X] = %u\n", a, b, res);
+	flush_stdout();
+
+	printf("\nTest JNEI\n");
+	a = 1000;
+	b = 1001;
+	res = Ifx_Jnei(a, b);
+	printf("JNEI[%08X, %08X] = %u\n", a, b, res);
+	b = a;
+	res = Ifx_Jnei(a, b);
+	printf("JNEI[%08X, %08X] = %u\n", a, b, res);
+	flush_stdout();
+
+	printf("\nTest JGE\n");
+	a = 1000;
+	b = (uint32_t)-1;
+	res = Ifx_Jge(a, b);
+	printf("JGE[%08X, %08X] = %u\n", a, b, res);
+	b = a;
+	res = Ifx_Jge(a, b);
+	printf("JGE[%08X, %08X] = %u\n", a, b, res);
+	flush_stdout();
+
+	printf("\nTest JGE.U\n");
+	a = 1000;
+	b = (uint32_t)-1;
+	res = Ifx_Jge_U(a, b);
+	printf("JGE.U[%08X, %08X] = %u\n", a, b, res);
+	b = a;
+	res = Ifx_Jge_U(a, b);
+	printf("JGE.U[%08X, %08X] = %u\n", a, b, res);
+	flush_stdout();
+
+	printf("\nTest JLT\n");
+	a = (uint32_t)-1;
+	b = 1001;
+	res = Ifx_Jlt(a, b);
+	printf("JLT[%08X, %08X] = %u\n", a, b, res);
+	b = a;
+	res = Ifx_Jlt(a, b);
+	printf("JLT[%08X, %08X] = %u\n", a, b, res);
+	flush_stdout();
+
+	printf("\nTest JLT.U\n");
+	a = (uint32_t)-1;
+	b = 1001;
+	res = Ifx_Jlt_U(a, b);
+	printf("JLT.U[%08X, %08X] = %u\n", a, b, res);
+	b = a;
+	res = Ifx_Jlt_U(a, b);
+	printf("JLT.U[%08X, %08X] = %u\n", a, b, res);
+	flush_stdout();
+
+	printf("\nTest JEQ.A\n");
+	res = Ifx_Jeq_A(Ifx_J, Ifx_J);
+	printf("JEQ.A[%08X, %08X] = %08X\n", (uint32_t)Ifx_J, (uint32_t)Ifx_J, res);
+	res = Ifx_Jeq_A(Ifx_J, Ifx_Jeq);
+	printf("JEQ.A[%08X, %08X] = %08X\n", (uint32_t)Ifx_J, (uint32_t)Ifx_Jeq, res);
+	flush_stdout();
+
+	printf("\nTest JNE.A\n");
+	res = Ifx_Jne_A(Ifx_J, Ifx_J);
+	printf("JNE.A[%08X, %08X] = %08X\n", (uint32_t)Ifx_J, (uint32_t)Ifx_J, res);
+	res = Ifx_Jne_A(Ifx_J, Ifx_Jeq);
+	printf("JNE.A[%08X, %08X] = %08X\n", (uint32_t)Ifx_J, (uint32_t)Ifx_Jeq, res);
+	flush_stdout();
+
+	printf("\nTest JNZ.A\n");
+	res = Ifx_Jnz_A(Ifx_J, Ifx_J);
+	printf("JNZ.A[%08X, %08X] = %08X\n", (uint32_t)Ifx_J, (uint32_t)Ifx_J, res);
+	res = Ifx_Jnz_A(Ifx_J, (void*)0);
+	printf("JNZ.A[%08X, %08X] = %08X\n", (uint32_t)Ifx_J, (uint32_t)(void*)0, res);
+	flush_stdout();
+
+	printf("\nTest JZ.A\n");
+	res = Ifx_Jz_A(Ifx_J, Ifx_J);
+	printf("JZ.A[%08X, %08X] = %08X\n", (uint32_t)Ifx_J, (uint32_t)Ifx_J, res);
+	res = Ifx_Jz_A(Ifx_J, (void*)0);
+	printf("JZ.A[%08X, %08X] = %08X\n", (uint32_t)Ifx_J, (uint32_t)(void*)0, res);
+	flush_stdout();
+
+	printf("\nTest JNZ.T\n");
 	a = 0xFFFFFFFF;
-	b = 0x11223344;
-	res = Ifx_InsT(a, b);
-	printf("INS.T[%08X, %u, %08X, %u] = %08X\n", a, 5, b, 7, res);
+	res = Ifx_Jnz_T(a);
+	printf("JNZ.T[%08X] = %u\n", a, res);
 	a = 0;
-	res = Ifx_InsT(a, b);
-	printf("INS.T[%08X, %u, %08X, %u] = %08X\n", a, 5, b, 7, res);
+	res = Ifx_Jnz_T(a);
+	printf("JNZ.T[%08X] = %u\n", a, res);
 	flush_stdout();
 
-	printf("\nTest INSN.T\n");
+	printf("\nTest JZ.T\n");
 	a = 0xFFFFFFFF;
-	b = 0x11223344;
-	res = Ifx_Ins_nT(a, b);
-	printf("INSN.T[%08X, %u, %08X, %u] = %08X\n", a, 5, b, 7, res);
+	res = Ifx_Jz_T(a);
+	printf("JZ.T[%08X] = %u\n", a, res);
 	a = 0;
-	res = Ifx_Ins_nT(a, b);
-	printf("INSN.T[%08X, %u, %08X, %u] = %08X\n", a, 5, b, 7, res);
+	res = Ifx_Jz_T(a);
+	printf("JZ.T[%08X] = %u\n", a, res);
 	flush_stdout();
 
-	printf("\nTest INSERT\n");
+	printf("\nTest JGEZ\n");
+	a = 0xFFFFFFFF;
+	res = Ifx_Jgez(a);
+	printf("JGEZ[%08X] = %u\n", a, res);
 	a = 0;
-	b = 0xFF;
-	res = Ifx_Insert(a, b, 8);
-	printf("INSERT[%08X, %08X, %u] = %08X\n", a, b, 8, res);
-	res = Ifx_Insert(a, b, 16);
-	printf("INSERT[%08X, %08X, %u] = %08X\n", a, b, 16, res);
+	res = Ifx_Jgez(a);
+	printf("JGEZ[%08X] = %u\n", a, res);
 	flush_stdout();
 
-	printf("\nTest ISYNC\n");
-	Ifx_Isync();
+	printf("\nTest JGTZ\n");
+	a = 0xFFFFFFFF;
+	res = Ifx_Jgtz(a);
+	printf("JGTZ[%08X] = %u\n", a, res);
+	a = 0;
+	res = Ifx_Jgtz(a);
+	printf("JGTZ[%08X] = %u\n", a, res);
 	flush_stdout();
 
-	printf("\nTest IXMAX\n");
-	p_res_64.u16[0] = 0;
-	p_res_64.u16[1] = 0;
-	p_res_64.u16[2] = 0;
-	p_res_64.u16[3] = 0;
-	p_a_64.u16[0] = 0;
-	p_a_64.u16[1] = 0;
-	p_a_64.u16[2] = 0;
-	p_a_64.u16[3] = 0;
-	p_b_32.i16[0] = 1000;
-	p_b_32.i16[1] = -1;
-	printf("IXMAX[%016llX,%i, %i] = %i, %i, %i, %i\n",
-			p_a_64.u64, p_b_32.i16[0], p_b_32.i16[1],
-			p_res_64.i16[0], p_res_64.i16[1], p_res_64.i16[2], p_res_64.i16[3]);
-	p_res_64.u64 = Ifx_Ixmax(p_a_64.u64, p_b_32.u32);
-	printf("IXMAX[%016llX,%i, %i] = %i, %i, %i, %i\n",
-			p_a_64.u64, p_b_32.i16[0], p_b_32.i16[1],
-			p_res_64.i16[0], p_res_64.i16[1], p_res_64.i16[2], p_res_64.i16[3]);
+	printf("\nTest JLTZ\n");
+	a = 0xFFFFFFFF;
+	res = Ifx_Jltz(a);
+	printf("JLTZ[%08X] = %u\n", a, res);
+	a = 0;
+	res = Ifx_Jltz(a);
+	printf("JLTZ[%08X] = %u\n", a, res);
 	flush_stdout();
 
-	printf("\nTest IXMIN\n");
-	p_res_64.u16[0] = 0;
-	p_res_64.u16[1] = 0;
-	p_res_64.u16[2] = 0;
-	p_res_64.u16[3] = 0;
-	p_a_64.u16[0] = 0;
-	p_a_64.u16[1] = 0;
-	p_a_64.u16[2] = 0;
-	p_a_64.u16[3] = 0;
-	p_b_32.i16[0] = 1000;
-	p_b_32.i16[1] = -1;
-	printf("IXMIN[%016llX,%i, %i] = %i, %i, %i, %i\n",
-			p_a_64.u64, p_b_32.i16[0], p_b_32.i16[1],
-			p_res_64.i16[0], p_res_64.i16[1], p_res_64.i16[2], p_res_64.i16[3]);
-	p_res_64.u64 = Ifx_Ixmin(p_a_64.u64, p_b_32.u32);
-	printf("IXMIN[%016llX,%i, %i] = %i, %i, %i, %i\n",
-			p_a_64.u64, p_b_32.i16[0], p_b_32.i16[1],
-			p_res_64.i16[0], p_res_64.i16[1], p_res_64.i16[2], p_res_64.i16[3]);
+	printf("\nTest JNZ\n");
+	a = 0xFFFFFFFF;
+	res = Ifx_Jnz(a);
+	printf("JNZ[%08X] = %u\n", a, res);
+	a = 0;
+	res = Ifx_Jnz(a);
+	printf("JNZ[%08X] = %u\n", a, res);
 	flush_stdout();
 
-	printf("\nTest IXMAX_U\n");
-	p_res_64.u16[0] = 0;
-	p_res_64.u16[1] = 0;
-	p_res_64.u16[2] = 0;
-	p_res_64.u16[3] = 0;
-	p_a_64.u16[0] = 0;
-	p_a_64.u16[1] = 0;
-	p_a_64.u16[2] = 0;
-	p_a_64.u16[3] = 0;
-	p_b_32.i16[0] = 1000;
-	p_b_32.u16[1] = (uint16_t)-1;
-	printf("IXMAX_U[%016llX,%u, %u] = %u, %u, %u, %u\n",
-			p_a_64.u64, p_b_32.u16[0], p_b_32.u16[1],
-			p_res_64.u16[0], p_res_64.u16[1], p_res_64.u16[2], p_res_64.u16[3]);
-	p_res_64.u64 = Ifx_Ixmax_U(p_a_64.u64, p_b_32.u32);
-	printf("IXMAX_U[%016llX,%u, %u] = %u, %u, %u, %u\n",
-			p_a_64.u64, p_b_32.u16[0], p_b_32.u16[1],
-			p_res_64.u16[0], p_res_64.u16[1], p_res_64.u16[2], p_res_64.u16[3]);
+	printf("\nTest JZ\n");
+	a = 0xFFFFFFFF;
+	res = Ifx_Jz(a);
+	printf("JZ[%08X] = %u\n", a, res);
+	a = 0;
+	res = Ifx_Jz(a);
+	printf("JZ[%08X] = %u\n", a, res);
 	flush_stdout();
 
-	printf("\nTest IXMIN_U\n");
-	p_res_64.u16[0] = 0;
-	p_res_64.u16[1] = 0;
-	p_res_64.u16[2] = 0;
-	p_res_64.u16[3] = 0;
-	p_a_64.u16[0] = 0;
-	p_a_64.u16[1] = 0;
-	p_a_64.u16[2] = 0;
-	p_a_64.u16[3] = 0;
-	p_b_32.u16[0] = 1000;
-	p_b_32.u16[1] = (uint16_t)-1;
-	printf("IXMIN_U[%016llX,%u, %u] = %u, %u, %u, %u\n",
-			p_a_64.u64, p_b_32.u16[0], p_b_32.u16[1],
-			p_res_64.u16[0], p_res_64.u16[1], p_res_64.u16[2], p_res_64.u16[3]);
-	p_res_64.u64 = Ifx_Ixmin_U(p_a_64.u64, p_b_32.u32);
-	printf("IXMIN_U[%016llX,%u, %u] = %u, %u, %u, %u\n",
-			p_a_64.u64, p_b_32.u16[0], p_b_32.u16[1],
-			p_res_64.u16[0], p_res_64.u16[1], p_res_64.u16[2], p_res_64.u16[3]);
+	printf("\nTest JLEZ\n");
+	a = 0xFFFFFFFF;
+	res = Ifx_Jlez(a);
+	printf("JLEZ[%08X] = %u\n", a, res);
+	a = 0;
+	res = Ifx_Jlez(a);
+	printf("JLEZ[%08X] = %u\n", a, res);
 	flush_stdout();
+
+//	printf("\nTest JLA\n");
+//	a = 1000;
+//	b = 1001;
+//	res = Ifx_JLA(a, b);
+//	printf("JLA[%08X, %08X] = %u\n", a, b, res);
+//	b = a;
+//	res = Ifx_JLA(a, b);
+//	printf("JLA[%08X, %08X] = %u\n", a, b, res);
+//	flush_stdout();
+//
+//	printf("\nTest JL\n");
+//	a = 0xFFFFFFFF;
+//	res = Ifx_JL(a);
+//	printf("JL[%08X] = %u\n", a, res);
+//	a = 0;
+//	res = Ifx_JL(a);
+//	printf("JL[%08X] = %u\n", a, res);
+//	flush_stdout();
+//
+//	printf("\nTest JLI\n");
+//	res = Ifx_JLI(Ifx_J);
+//	printf("JLI[%08X] = %u\n", (uint32_t)Ifx_J, res);
+//	flush_stdout();
 
 	g_regular_task_flag = true;
 	while(1)

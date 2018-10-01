@@ -175,6 +175,34 @@ uint32_t Ifx_Fcall_A(uint32_t A, uint32_t B);
 uint32_t Ifx_Fcall_I(uint32_t(*p)(uint32_t A, uint32_t B),uint32_t A, uint32_t B);
 float Ifx_Itof(int32_t inputA);
 
+uint32_t Ifx_J(uint32_t inputA);
+uint32_t Ifx_JA(uint32_t inputA);
+uint32_t Ifx_JI(uint32_t (*pFunc)(uint32_t inputA));
+uint32_t Ifx_Jeq(uint32_t A, uint32_t B);
+void* Ifx_Jeq_A(void* A, void* B);
+uint32_t Ifx_Jne(uint32_t A, uint32_t B);
+uint32_t Ifx_Jnz_T(uint32_t A);
+uint32_t Ifx_Jz_T(uint32_t A);
+void* Ifx_Jne_A(void* A, void* B);
+void* Ifx_Jnz_A(void* A, void* B);
+void* Ifx_Jz_A(void* A, void* B);
+
+uint32_t Ifx_Jned(uint32_t A, uint32_t B);
+uint32_t Ifx_Jnei(uint32_t A, uint32_t B);
+uint32_t Ifx_Jge(uint32_t A, uint32_t B);
+uint32_t Ifx_Jge_U(uint32_t A, uint32_t B);
+uint32_t Ifx_Jgez(uint32_t A);
+uint32_t Ifx_Jgtz(uint32_t A);
+uint32_t Ifx_Jltz(uint32_t A);
+uint32_t Ifx_Jnz(uint32_t A);
+uint32_t Ifx_Jz(uint32_t A);
+uint32_t Ifx_JL(uint32_t A);
+uint32_t Ifx_JLA(uint32_t A, uint32_t B);
+uint32_t Ifx_Jlez(uint32_t A);
+uint32_t Ifx_JLI(uint32_t (*pFunc)(uint32_t inputA));
+uint32_t Ifx_Jlt(uint32_t A, uint32_t B);
+uint32_t Ifx_Jlt_U(uint32_t A, uint32_t B);
+
 void Ifx_Enable(void);
 
 void Ifx_Nop(void);
