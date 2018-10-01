@@ -106,12 +106,12 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.2139967422" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.841735582" name="test_E_F.S" rcbsApplicability="disable" resourcePath="asm/test_E_F.S" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.1600213413">
-						<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.1600213413" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.694596367"/>
-					</fileInfo>
 					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1125921551" name="generate_template.py" rcbsApplicability="disable" resourcePath="asm/generate_template.py" toolsToInvoke=""/>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1692008677" name="test_G_I.S" rcbsApplicability="disable" resourcePath="asm/test_G_I.S" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.140705645">
+						<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.140705645" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.694596367"/>
+					</fileInfo>
 					<sourceEntries>
-						<entry excluding="test_E_F.S|test_D.S|test_B_C.S|generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
+						<entry excluding="test_G_I.S|test_E_F.S|test_D.S|test_B_C.S|generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>

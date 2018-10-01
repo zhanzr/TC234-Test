@@ -171,41 +171,16 @@ int main(void)
 	volatile pack64 p_a_64;
 	volatile pack32 p_b_32;
 
-	printf("\nTest GE\n");
-	ai = 1000;
-	bi = -1;
-	res = Ifx_Ge(ai, bi);
-	printf("GE[%08X,%08X] = %08X\n", ai, bi, res);
-	bi = ai;
-	res = Ifx_Ge(ai, bi);
-	printf("GE[%08X,%08X] = %08X\n", ai, bi, res);
+	printf("\nTest J\n");
+	a = 1000;
+	res = Ifx_J(a);
+	printf("J[%u] = %u\n", a, res);
 	flush_stdout();
 
-	printf("\nTest GE_U\n");
-	ai = 1000;
-	bi = -1;
-	res = Ifx_Ge_U(ai, bi);
-	printf("GE_U[%08X,%08X] = %08X\n", ai, bi, res);
-	bi = 999;
-	res = Ifx_Ge_U(ai, bi);
-	printf("GE_U[%08X,%08X] = %08X\n", ai, bi, res);
-	flush_stdout();
-
-	printf("\nTest GE_A\n");
-	res = Ifx_Ge_A(&ai, &bi);
-	printf("GE_A[%08X,%08X] = %08X\n", (uint32_t)&ai, (uint32_t)&bi, res);
-	res = Ifx_Ge_A(Ifx_Ge, Ifx_Ge_U);
-	printf("GE_A[%08X,%08X] = %08X\n", (uint32_t)Ifx_Ge, (uint32_t)Ifx_Ge_U, res);
-	flush_stdout();
-
-	printf("\nTest IMASK\n");
-	a = 0xA5;
-	b = 8;
-	res64 = Ifx_Imask(a, b);
-	printf("IMASK[%08X,%u, %u] = %016llX\n", a, b, 8, res64);
-	b = 16;
-	res64 = Ifx_Imask(a, b);
-	printf("IMASK[%08X,%u, %u] = %016llX\n", a, b, 8, res64);
+	printf("\nTest JA\n");
+	a = 1000;
+	res = Ifx_JA(a);
+	printf("JA[%u] = %u\n", a, res);
 	flush_stdout();
 
 	printf("\nTest INS.T\n");
