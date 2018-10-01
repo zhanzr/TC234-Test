@@ -14,7 +14,6 @@
 //	uint64_t Ifx_Ixmax_U(uint64_t inputA64, uint32_t inputC);
 //	uint64_t Ifx_Ixmin(uint64_t inputA64, int32_t inputC);
 //	uint64_t Ifx_Ixmin_U(uint64_t inputA64, uint32_t inputC);
-//	float Ifx_Itof(int32_t inputA);
 //******************************************************************************
     .global Ifx_Ge
     .global Ifx_Ge_U
@@ -28,7 +27,6 @@
     .global Ifx_Ixmax_U
     .global Ifx_Ixmin
     .global Ifx_Ixmin_U
-	.global Ifx_Itof
 
 #define	inputA       %d4
 #define	inputB       %d5
@@ -155,9 +153,3 @@ Ifx_Ixmin:
 Ifx_Ixmin_U:
 	ixmin.u result64, inputA64, inputC
     ret
-
-//Integer to Float
-Ifx_Itof:
-	itof result, inputA
-	ret
-

@@ -151,11 +151,9 @@
     <InputSection Name="wm4.bspconfig.h.132.89f640448266357bb917280bacfca622"/>
     <InputSection Name="wm4.stdio.h.27.f2ac352bab34f31f9f478442827b2ba6"/>
     <InputSection Name="wm4.stddef.h.234.7b49b621169e2007451b8fadbcc644ca"/>
-    <InputSection Name="wm4.0.1a4f9ca241bee3177088d4b675d8477e"/>
     <InputSection Name="wm4.ifxasclin_bf.h.28.82c7a4119e8f5617f7b90a7d670d2dac"/>
     <InputSection Name="wm4.string.h.17.f8d12df81104836a3f2a5d589ae830d8"/>
     <InputSection Name="wm4.ifxscu_bf.h.28.9a07903c69e87b761063be2cfe1bc5c5"/>
-    <InputSection Name="wm4.system.h.20.be039ac5fb8eb32ec60cbfc4c34d6256"/>
     <InputSection Name="wm4.ifxsrc_reg.h.42.f44c43a46d4ca81589017945efd8519d"/>
     <InputSection Name="wm4.ifxqspi_reg.h.51.6bbae5556c07695ffbec783b82bacef8"/>
     <InputSection Name="wm4.cint.h.9.2a620d1ba9e5c2af6127ea3fcd7ce8dd"/>
@@ -183,6 +181,7 @@
     <ObjectFile Name="asm\test_D.o"/>
     <ObjectFile Name="asm\test_E_F.o"/>
     <ObjectFile Name="asm\test_G_I.o"/>
+    <ObjectFile Name="asm\test_J.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

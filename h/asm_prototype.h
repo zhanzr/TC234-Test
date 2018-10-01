@@ -173,6 +173,7 @@ uint32_t Ifx_Ftoq31z(float inputA, uint32_t inputB);
 uint32_t Ifx_Fcall(uint32_t A, uint32_t B);
 uint32_t Ifx_Fcall_A(uint32_t A, uint32_t B);
 uint32_t Ifx_Fcall_I(uint32_t(*p)(uint32_t A, uint32_t B),uint32_t A, uint32_t B);
+float Ifx_Itof(int32_t inputA);
 
 void Ifx_Enable(void);
 

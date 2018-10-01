@@ -237,6 +237,13 @@ int main(void)
 	printf("INSERT[%08X, %08X, %u] = %08X\n", a, b, 16, res);
 	flush_stdout();
 
+	printf("\nTest ITOF\n");
+	ai = INT32_MAX/10;
+	printf("ITOF[%08X] = %f\n", ai, f_res);
+	f_res = Ifx_Itof(ai);
+	printf("ITOF[%08X] = %f\n", ai, f_res);
+	flush_stdout();
+
 	printf("\nTest ISYNC\n");
 	Ifx_Isync();
 	flush_stdout();
