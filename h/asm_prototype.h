@@ -203,6 +203,31 @@ uint32_t Ifx_JLI(uint32_t (*pFunc)(uint32_t inputA));
 uint32_t Ifx_Jlt(uint32_t A, uint32_t B);
 uint32_t Ifx_Jlt_U(uint32_t A, uint32_t B);
 
+uint32_t* Ifx_LD_A(uint32_t* pA);
+int8_t Ifx_LD_B(int8_t* pA);
+uint8_t Ifx_LD_BU(uint8_t* pA);
+uint64_t Ifx_LD_D(uint64_t* pA);
+uint64_t* Ifx_LD_DA(uint64_t* pA);
+int16_t Ifx_LD_H(int16_t* pA);
+uint16_t Ifx_LD_HU(uint16_t* pA);
+uint32_t Ifx_LD_Q(uint32_t* pA);
+int32_t Ifx_LD_W(uint32_t* pA);
+void Ifx_LDLCX(void);
+void Ifx_LDUCX(void);
+uint64_t Ifx_LDMST(uint64_t A);
+uint32_t* Ifx_LEA(void);
+uint32_t Ifx_LOOP(uint32_t A, uint32_t B);
+uint32_t Ifx_LOOPU(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_LT(uint32_t A, uint32_t B);
+uint32_t Ifx_LT_A(uint32_t* pA, uint32_t* pB);
+pack32 Ifx_LT_B(pack32 packA, pack32 packB);
+pack32 Ifx_LT_BU(pack32 packA, pack32 packB);
+pack32 Ifx_LT_H(pack32 packA, pack32 packB);
+pack32 Ifx_LT_HU(pack32 packA, pack32 packB);
+uint32_t Ifx_LT_U(uint32_t A, uint32_t B);
+int32_t Ifx_LT_W(int32_t A, int32_t B);
+uint32_t Ifx_LT_WU(uint32_t A, uint32_t B);
+
 void Ifx_Enable(void);
 
 void Ifx_Nop(void);
