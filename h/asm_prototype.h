@@ -228,6 +228,50 @@ uint32_t Ifx_LT_U(uint32_t A, uint32_t B);
 int32_t Ifx_LT_W(int32_t A, int32_t B);
 uint32_t Ifx_LT_WU(uint32_t A, uint32_t B);
 
+int32_t Ifx_MADD(int32_t A, int32_t B, int32_t C);
+int32_t Ifx_MADDS(int32_t A, int32_t B, int32_t C);
+uint64_t Ifx_MADD_U(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MADDS_U(uint64_t A, uint32_t C, uint32_t D);
+
+float Ifx_MADD_F(float A, float B, float C);
+
+uint64_t Ifx_MADD_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MADDS_H(uint64_t A, uint32_t C, uint32_t D);
+
+uint32_t Ifx_MADD_Q(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MADDS_Q(uint32_t A, uint32_t B, uint32_t C);
+
+//Packed Multiply-Add Q Format Multi-precision
+//Packed Multiply-Add Q Format Multi-precision, Saturated
+uint64_t Ifx_MADDM_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MADDMS_H(uint64_t A, uint32_t C, uint32_t D);
+
+//Packed Multiply-Add Q Format with Rounding
+//Packed Multiply-Add Q Format with Rounding, Saturated
+uint32_t Ifx_MADDR_H(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MADDRS_H(uint32_t A, uint32_t B, uint32_t C);
+
+//Multiply-Add Q Format with Rounding
+//Multiply-Add Q Format with Rounding, Saturated
+uint32_t Ifx_MADDR_Q(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MADDRS_Q(uint32_t A, uint32_t B, uint32_t C);
+
+//Packed Multiply-Add/Subtract Q Format
+//Packed Multiply-Add/Subtract Q Format Saturated
+uint64_t Ifx_MADDSU_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MADDSUS_H(uint64_t A, uint32_t C, uint32_t D);
+
+//Packed Multiply-Add/Subtract Q Format Multi-precision
+//Packed Multiply-Add/Subtract Q Format Multi-precision Saturated
+uint64_t Ifx_MADDSUM_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MADDSUMS_H(uint64_t A, uint32_t C, uint32_t D);
+
+//Packed Multiply-Add/Subtract Q Format with Rounding
+//Packed Multiply-Add/Subtract Q Format with Rounding Saturated
+uint32_t Ifx_MADDSUR_H(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MADDSURS_H(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_Rand32(uint32_t seed, uint32_t B);
+
 void Ifx_Enable(void);
 
 void Ifx_Nop(void);

@@ -141,8 +141,9 @@ int main(void)
 	_init_uart(BAUDRATE);
 	InitLED();
 
-	printf("%s CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
-			__TIME__,
+	printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
+			__TRICORE_NAME__,
+			__TRICORE_CORE__,
 			SYSTEM_GetCpuClock()/1000000,
 			SYSTEM_GetSysClock()/1000000,
 			SYSTEM_GetStmClock()/1000000,
@@ -164,180 +165,70 @@ int main(void)
 	volatile pack32 packD;
 	volatile int32_t ai;
 	volatile int32_t bi;
+	volatile int32_t ci;
+	volatile int32_t di;
 	volatile uint32_t res;
 	volatile int32_t res_i;
 	volatile uint64_t a64;
 	volatile uint64_t res64;
 	volatile float fA;
 	volatile float fB;
+	volatile float fC;
 	volatile float f_res;
 	volatile pack64 p_res_64;
 	volatile pack64 p_a_64;
 	volatile pack32 p_b_32;
 
-	printf("\nTest LD.A\n");
-	a = 0x10000;
+	printf("\nTest MADD\n");
+	ai = 0x100;
+	bi = 0x200;
+	ci = 0x300;
+	di = Ifx_MADD(ai, bi, ci);
+	printf("MADD[%i+%i*%i] = %i\n", ai, bi, ci, di);
+	flush_stdout();
+
+	printf("\nTest MADDS\n");
+	ai = 0x10000;
+	bi = 0x20000;
+	ci = 0x30000;
+	di = Ifx_MADDS(ai, bi, ci);
+	printf("MADDS[%i+%i*%i] = %i\n", ai, bi, ci, di);
+	flush_stdout();
+
+	printf("\nTest MADD_U\n");
+	a64 = 0x10000;
 	b = 0x20000;
-	p_a = Ifx_LD_A(&a);
-	p_b = Ifx_LD_A(&b);
-	printf("LD.A[%p] = %p\n", &a, p_a);
-	printf("LD.A[%p] = %p\n", &b, p_b);
+	c = 0x30000;
+	res64 = Ifx_MADD_U(a64, b, c);
+	printf("MADD_U[%llu+%u*%u] = %llu\n", a64, b, c, res64);
 	flush_stdout();
 
-	printf("\nTest LD.B\n");
-	a = 0x12345678;
-	b = 0x9ABCDEF0;
-	int8_t byte_a = Ifx_LD_B(&a);
-	int8_t byte_b = Ifx_LD_B(&b);
-	printf("LD.B[%p] = %02X\n", &a, byte_a);
-	printf("LD.B[%p] = %02X\n", &b, byte_b);
-	flush_stdout();
-
-	printf("\nTest LD.BU\n");
-	uint8_t ubyte_a = Ifx_LD_BU(&a);
-	uint8_t ubyte_b = Ifx_LD_BU(&b);
-	printf("LD.BU[%p] = %02X\n", &a, ubyte_a);
-	printf("LD.BU[%p] = %02X\n", &b, ubyte_b);
-	flush_stdout();
-
-	printf("\nTest LD.D\n");
-	a64 = 0x123456789ABCDEF0;
-	res64 = Ifx_LD_D(&a64);
-	printf("LD.D[%016llx] = %016llx\n", a64, res64);
-	flush_stdout();
-
-	printf("\nTest LD.A\n");
-	a64 = 0x123456789ABCDEF0;
-	uint64_t* p64 = Ifx_LD_DA(&a64);
-	printf("LD.DA[%p] = %016llx\n", &a64, p64);
-	flush_stdout();
-
-	printf("\nTest LD.H\n");
-	a = 0x12345678;
-	b = 0x9ABCDEF0;
-	int16_t i16_a = Ifx_LD_H(&a);
-	int16_t i16_b = Ifx_LD_H(&b);
-	printf("LD.H[%p] = %i\n", &a, i16_a);
-	printf("LD.H[%p] = %i\n", &b, i16_b);
-	flush_stdout();
-
-	printf("\nTest LD.HU\n");
-	uint16_t u16_a = Ifx_LD_HU(&a);
-	uint16_t u16_b = Ifx_LD_HU(&b);
-	printf("LD.HU[%p] = %u\n", &a, u16_a);
-	printf("LD.HU[%p] = %u\n", &b, u16_b);
-	flush_stdout();
-
-//	Ifx_LDUCX();
-//	Ifx_LDLCX();
-
-	printf("\nTest LD.Q\n");
-	a = 0x10000;
-	p_a = &a;
-	c = Ifx_LD_Q(p_a);
-	printf("LD.Q[%p] = %08X\n", &a, c);
-	flush_stdout();
-
-	printf("\nTest LD.W\n");
-	a = 0x10000;
+	printf("\nTest MADDS_U\n");
+	a64 = 0x10000;
 	b = 0x20000;
-	c = Ifx_LD_W(&a);
-	d = Ifx_LD_W(&b);
-	printf("LD.W[%p] = %08X\n", &a, c);
-	printf("LD.W[%p] = %08X\n", &b, d);
+	c = 0x30000;
+	res64 = Ifx_MADDS_U(a64, b, c);
+	printf("MADDS_U[%llu+%u*%u] = %llu\n", a64, b, c, res64);
 	flush_stdout();
 
-//	printf("\nTest LDMST\n");
-//	a64 = 0x123456789ABCDEF0;
-//	Ifx_LDMST(a64);
-//	printf("LDMST[%016llx] = %016llx\n", 0x123456789ABCDEF0, a64);
+	printf("\nTest MADD_F\n");
+	fA = 1.1;
+	fB = 2.2;
+	fC = 3.3;
+	f_res = Ifx_MADD_F(fA, fB, fC);
+	printf("MADD_F[%f+%f*%f] = %f\n", fA, fB, fC, f_res);
 	flush_stdout();
 
-	printf("\nTest LEA\n");
-	p_a = Ifx_LEA();
-	printf("LEA[%p] = %p\n", &a, p_a);
-	flush_stdout();
+#define	TEST_RAND_N	10
+	printf("\nTest Random Number Generator\n");
+	uint32_t test_rand32[TEST_RAND_N];
+	for(uint32_t i=0; i<TEST_RAND_N; ++i)
+	{
+		a = Ifx_Rand32(a, 0xfdf9ad);
+		test_rand32[i] = a;
 
-	printf("\nTest LOOP\n");
-	a = 1;
-	b = 10;
-	d = Ifx_LOOP(a, b);
-	printf("LOOP[%u, %u] = %u\n", a, b, d);
-	flush_stdout();
-
-	printf("\nTest LOOPU\n");
-	a = 1;
-	b = 10;
-	c = 20;
-	d = Ifx_LOOPU(a, b, c);
-	printf("LOOPU[%u, %u, %u] = %u\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest LT\n");
-	a = 1;
-	b = -10;
-	d = Ifx_LT(a, b);
-	printf("LT[%08X, %08X] = %08X\n", a, b, d);
-	flush_stdout();
-
-	printf("\nTest LT.U\n");
-	a = 1;
-	b = -10;
-	d = Ifx_LT_U(a, b);
-	printf("LT.U[%08X, %08X] = %08X\n", a, b, d);
-	flush_stdout();
-
-	printf("\nTest LT.W\n");
-	a = 1;
-	b = -10;
-	d = Ifx_LT_W(a, b);
-	printf("LT.W[%08X, %08X] = %08X\n", a, b, d);
-	flush_stdout();
-
-	printf("\nTest LT.WU\n");
-	a = 1;
-	b = -10;
-	d = Ifx_LT_WU(a, b);
-	printf("LT.WU[%08X, %08X] = %08X\n", a, b, d);
-	flush_stdout();
-
-	printf("\nTest LT.B\n");
-	packA.u32 = 0x11AA22BB;
-	packB.u32 = 0x339988F0;
-	packC = Ifx_LT_B(packA, packB);
-	printf("LT.B[%08X, %08X] = %08X\n", packA.u32, packB.u32, packC.u32);
-	flush_stdout();
-
-	printf("\nTest LT.BU\n");
-	packA.u32 = 0x11AA22BB;
-	packB.u32 = 0x339988F0;
-	packC = Ifx_LT_BU(packA, packB);
-	printf("LT.BU[%08X, %08X] = %08X\n", packA.u32, packB.u32, packC.u32);
-	flush_stdout();
-
-	printf("\nTest LT.H\n");
-	packA.u32 = 0x1234DEF0;
-	packB.u32 = 0x9ABC5678;
-	packC = Ifx_LT_H(packA, packB);
-	printf("LT.B[%08X, %08X] = %08X\n", packA.u32, packB.u32, packC.u32);
-	flush_stdout();
-
-	printf("\nTest LT.BU\n");
-	packA.u32 = 0x1234DEF0;
-	packB.u32 = 0x9ABC5678;
-	packC = Ifx_LT_HU(packA, packB);
-	printf("LT.HU[%08X, %08X] = %08X\n", packA.u32, packB.u32, packC.u32);
-	flush_stdout();
-
-	printf("\nTest LT.A\n");
-	p_a = 0x12345678;
-	p_b = 0x9ABCDEF0;
-	a = Ifx_LT_A(p_a, p_b);
-	printf("LT.A[%08X, %08X] = %08X\n", p_a, p_b, a);
-	p_a = &a;
-	p_b = &b;
-	a = Ifx_LT_A(p_a, p_b);
-	printf("LT.A[%08X, %08X] = %08X\n", p_a, p_b, a);
+		printf("%08X ",a);
+	}
 	flush_stdout();
 
 	g_regular_task_flag = true;
@@ -354,12 +245,14 @@ int main(void)
 
 			LEDTOGGLE(0);
 
-			printf("%s CPU:%u MHz,Sys:%u MHz, %u, CacheEn:%d\n",
-					__TIME__,
+			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d, %u\n",
+					__TRICORE_NAME__,
+					__TRICORE_CORE__,
 					SYSTEM_GetCpuClock()/1000000,
 					SYSTEM_GetSysClock()/1000000,
-					HAL_GetTick(),
-					SYSTEM_IsCacheEnabled());
+					SYSTEM_GetStmClock()/1000000,
+					SYSTEM_IsCacheEnabled(),
+					HAL_GetTick());
 
 			__asm__ volatile ("nop" ::: "memory");
 			__asm volatile ("" : : : "memory");
