@@ -228,6 +228,49 @@ uint32_t Ifx_LT_U(uint32_t A, uint32_t B);
 int32_t Ifx_LT_W(int32_t A, int32_t B);
 uint32_t Ifx_LT_WU(uint32_t A, uint32_t B);
 
+//M Initial
+//uint32_t Ifx_MFCR(void);
+//uint32_t Ifx_MTCR(void);
+
+uint32_t Ifx_MOV(uint32_t A);
+uint32_t Ifx_MOV_U(void);
+uint32_t Ifx_MOVH(void);
+
+uint32_t* Ifx_MOVH_A(void);
+uint32_t* Ifx_MOV_A(uint32_t A);
+uint32_t* Ifx_MOV_AA(uint32_t* pA);
+
+uint32_t Ifx_MOV_D(uint32_t* pA);
+
+int32_t Ifx_MAX(int32_t A, int32_t B);
+uint32_t Ifx_MAX_U(uint32_t A, uint32_t B);
+pack32 Ifx_MAX_B(pack32 A, pack32 B);
+pack32 Ifx_MAX_BU(pack32 A, pack32 B);
+pack32 Ifx_MAX_H(pack32 A, pack32 B);
+pack32 Ifx_MAX_HU(pack32 A, pack32 B);
+
+int32_t Ifx_MIN(int32_t A, int32_t B);
+uint32_t Ifx_MIN_U(uint32_t A, uint32_t B);
+pack32 Ifx_MIN_B(pack32 A, pack32 B);
+pack32 Ifx_MIN_BU(pack32 A, pack32 B);
+pack32 Ifx_MIN_H(pack32 A, pack32 B);
+pack32 Ifx_MIN_HU(pack32 A, pack32 B);
+
+int32_t Ifx_MUL(int32_t A, int32_t B);
+int32_t Ifx_MULS(int32_t A, int32_t B);
+uint64_t Ifx_MUL_U(uint32_t A, uint32_t B);
+uint32_t Ifx_MULS_U(uint32_t A, uint32_t B);
+
+int32_t Ifx_MUL_Q(int32_t A, int32_t B);
+uint64_t Ifx_MUL_H(uint32_t A, uint32_t B);
+uint64_t Ifx_MULM_H(uint32_t A, uint32_t B);
+uint64_t Ifx_MULMS_H(uint32_t A, uint32_t B);
+int32_t Ifx_MULR_H(int32_t A, int32_t B);
+int32_t Ifx_MULR_Q(int32_t A, int32_t B);
+
+float Ifx_MUL_F(float fA, float fB);
+
+
 void Ifx_Enable(void);
 
 void Ifx_Nop(void);

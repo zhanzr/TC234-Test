@@ -131,7 +131,6 @@ void TestFunc(void)
 int main(void)
 {
 	SYSTEM_Init();
-	SYSTEM_EnaDisCache(1);
 
 	/* initialise timer at SYSTIME_CLOCK rate */
 	TimerInit(SYSTIME_CLOCK);
@@ -141,8 +140,9 @@ int main(void)
 	_init_uart(BAUDRATE);
 	InitLED();
 
-	printf("%s CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
-			__TIME__,
+	printf("Tricore %04X Core:%04X CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
+			__TRICORE_NAME__,
+			__TRICORE_CORE__,
 			SYSTEM_GetCpuClock()/1000000,
 			SYSTEM_GetSysClock()/1000000,
 			SYSTEM_GetStmClock()/1000000,
@@ -164,6 +164,7 @@ int main(void)
 	volatile pack32 packD;
 	volatile int32_t ai;
 	volatile int32_t bi;
+	volatile int32_t ci;
 	volatile uint32_t res;
 	volatile int32_t res_i;
 	volatile uint64_t a64;
@@ -175,170 +176,221 @@ int main(void)
 	volatile pack64 p_a_64;
 	volatile pack32 p_b_32;
 
-	printf("\nTest LD.A\n");
-	a = 0x10000;
-	b = 0x20000;
-	p_a = Ifx_LD_A(&a);
-	p_b = Ifx_LD_A(&b);
-	printf("LD.A[%p] = %p\n", &a, p_a);
-	printf("LD.A[%p] = %p\n", &b, p_b);
+	printf("\nTest MFCR\n");
+	b = _mfcr(CPU_CORE_ID);
+	printf("MFCR[%X] = %08X\n", CPU_CORE_ID, b);
 	flush_stdout();
 
-	printf("\nTest LD.B\n");
+	printf("\nTest MTCR\n");
+	SYSTEM_EnaDisCache(0);
+	printf("PCON0 = %08X\n", _mfcr(CPU_PCON0));
+	printf("DCON0 = %08X\n", _mfcr(CPU_DCON0));
+	flush_stdout();
+	SYSTEM_EnaDisCache(1);
+	printf("PCON0 = %08X\n", _mfcr(CPU_PCON0));
+	printf("DCON0 = %08X\n", _mfcr(CPU_DCON0));
+	flush_stdout();
+
+	printf("\nTest MOV\n");
+	a = Ifx_MOV(0x123);
+	b = Ifx_MOV(0x456);
+	printf("MOV[%X] = %08X\n", 0x123, a);
+	printf("MOV[%X] = %08X\n", 0x456, b);
+	flush_stdout();
+
+	printf("\nTest MOVU\n");
+	a = Ifx_MOV_U();
+	printf("MOVU[%X] = %08X\n", 0x1234, a);
+	flush_stdout();
+
+	printf("\nTest MOVU\n");
+	a = Ifx_MOVH();
+	printf("MOVH[%X] = %08X\n", 0x1234, a);
+	flush_stdout();
+
+	printf("\nTest MOVA\n");
 	a = 0x12345678;
-	b = 0x9ABCDEF0;
-	int8_t byte_a = Ifx_LD_B(&a);
-	int8_t byte_b = Ifx_LD_B(&b);
-	printf("LD.B[%p] = %02X\n", &a, byte_a);
-	printf("LD.B[%p] = %02X\n", &b, byte_b);
+	p_a = Ifx_MOV_A(a);
+	printf("MOVA[%X] = %p\n", a, p_a);
 	flush_stdout();
 
-	printf("\nTest LD.BU\n");
-	uint8_t ubyte_a = Ifx_LD_BU(&a);
-	uint8_t ubyte_b = Ifx_LD_BU(&b);
-	printf("LD.BU[%p] = %02X\n", &a, ubyte_a);
-	printf("LD.BU[%p] = %02X\n", &b, ubyte_b);
+	printf("\nTest MOVH_A\n");
+	p_a = Ifx_MOVH_A();
+	printf("MOVA[%X] = %p\n", 0x1234,  p_a);
 	flush_stdout();
 
-	printf("\nTest LD.D\n");
-	a64 = 0x123456789ABCDEF0;
-	res64 = Ifx_LD_D(&a64);
-	printf("LD.D[%016llx] = %016llx\n", a64, res64);
+	printf("\nTest MOV_AA\n");
+	p_a = Ifx_MOV_AA(&a);
+	printf("MOVA[%X] = %p\n", &a, p_a);
 	flush_stdout();
 
-	printf("\nTest LD.A\n");
-	a64 = 0x123456789ABCDEF0;
-	uint64_t* p64 = Ifx_LD_DA(&a64);
-	printf("LD.DA[%p] = %016llx\n", &a64, p64);
+	printf("\nTest MOVD\n");
+	b = Ifx_MOV_D(&a);
+	printf("MOVD[%X] = %08X\n", a,  b);
 	flush_stdout();
 
-	printf("\nTest LD.H\n");
+	printf("\nTest MAX\n");
+	ai = 0x12345678;
+	bi = 0x89ABCDEF;
+	ci = Ifx_MAX(ai, bi);
+	printf("MAX[%i %i] = %i\n", ai,  bi, ci);
+	flush_stdout();
+
+	printf("\nTest MAXU\n");
 	a = 0x12345678;
-	b = 0x9ABCDEF0;
-	int16_t i16_a = Ifx_LD_H(&a);
-	int16_t i16_b = Ifx_LD_H(&b);
-	printf("LD.H[%p] = %i\n", &a, i16_a);
-	printf("LD.H[%p] = %i\n", &b, i16_b);
+	b = 0x89ABCDEF;
+	c = Ifx_MAX_U(a, b);
+	printf("MAX[%u %u] = %u\n", a,  b, c);
 	flush_stdout();
 
-	printf("\nTest LD.HU\n");
-	uint16_t u16_a = Ifx_LD_HU(&a);
-	uint16_t u16_b = Ifx_LD_HU(&b);
-	printf("LD.HU[%p] = %u\n", &a, u16_a);
-	printf("LD.HU[%p] = %u\n", &b, u16_b);
+	printf("\nTest MAX_B\n");
+	packA.i32 = 0x119922AA;
+	packB.i32 = 0x33778866;
+	packC = Ifx_MAX_B(packA, packB);
+	printf("MAXB[%08X %08X] = %08X\n", packA.u32,  packB.u32, packC.u32);
 	flush_stdout();
 
-//	Ifx_LDUCX();
-//	Ifx_LDLCX();
-
-	printf("\nTest LD.Q\n");
-	a = 0x10000;
-	p_a = &a;
-	c = Ifx_LD_Q(p_a);
-	printf("LD.Q[%p] = %08X\n", &a, c);
+	printf("\nTest MAX_BU\n");
+	packA.i32 = 0x119922AA;
+	packB.i32 = 0x33778866;
+	packC = Ifx_MAX_BU(packA, packB);
+	printf("MAXBU[%08X %08X] = %08X\n", packA.u32,  packB.u32, packC.u32);
 	flush_stdout();
 
-	printf("\nTest LD.W\n");
-	a = 0x10000;
-	b = 0x20000;
-	c = Ifx_LD_W(&a);
-	d = Ifx_LD_W(&b);
-	printf("LD.W[%p] = %08X\n", &a, c);
-	printf("LD.W[%p] = %08X\n", &b, d);
+	printf("\nTest MAX_H\n");
+	packA.i32 = 0x119922AA;
+	packB.i32 = 0x33778866;
+	packC = Ifx_MAX_H(packA, packB);
+	printf("MAXH[%08X %08X] = %08X\n", packA.u32,  packB.u32, packC.u32);
 	flush_stdout();
 
-//	printf("\nTest LDMST\n");
-//	a64 = 0x123456789ABCDEF0;
-//	Ifx_LDMST(a64);
-//	printf("LDMST[%016llx] = %016llx\n", 0x123456789ABCDEF0, a64);
+	printf("\nTest MAX_HU\n");
+	packA.i32 = 0x119922AA;
+	packB.i32 = 0x33778866;
+	packC = Ifx_MAX_HU(packA, packB);
+	printf("MAXHU[%08X %08X] = %08X\n", packA.u32,  packB.u32, packC.u32);
 	flush_stdout();
 
-	printf("\nTest LEA\n");
-	p_a = Ifx_LEA();
-	printf("LEA[%p] = %p\n", &a, p_a);
+	printf("\nTest MIN\n");
+	ai = 0x12345678;
+	bi = 0x89ABCDEF;
+	ci = Ifx_MIN(ai, bi);
+	printf("MIN[%i %i] = %i\n", ai,  bi, ci);
 	flush_stdout();
 
-	printf("\nTest LOOP\n");
-	a = 1;
-	b = 10;
-	d = Ifx_LOOP(a, b);
-	printf("LOOP[%u, %u] = %u\n", a, b, d);
+	printf("\nTest MINU\n");
+	a = 0x12345678;
+	b = 0x89ABCDEF;
+	c = Ifx_MIN_U(a, b);
+	printf("MIN[%u %u] = %u\n", a,  b, c);
 	flush_stdout();
 
-	printf("\nTest LOOPU\n");
-	a = 1;
-	b = 10;
-	c = 20;
-	d = Ifx_LOOPU(a, b, c);
-	printf("LOOPU[%u, %u, %u] = %u\n", a, b, c, d);
+	printf("\nTest MIN_B\n");
+	packA.i32 = 0x119922AA;
+	packB.i32 = 0x33778866;
+	packC = Ifx_MIN_B(packA, packB);
+	printf("MINB[%08X %08X] = %08X\n", packA.u32,  packB.u32, packC.u32);
 	flush_stdout();
 
-	printf("\nTest LT\n");
-	a = 1;
-	b = -10;
-	d = Ifx_LT(a, b);
-	printf("LT[%08X, %08X] = %08X\n", a, b, d);
+	printf("\nTest MIN_BU\n");
+	packA.i32 = 0x119922AA;
+	packB.i32 = 0x33778866;
+	packC = Ifx_MIN_BU(packA, packB);
+	printf("MINBU[%08X %08X] = %08X\n", packA.u32,  packB.u32, packC.u32);
 	flush_stdout();
 
-	printf("\nTest LT.U\n");
-	a = 1;
-	b = -10;
-	d = Ifx_LT_U(a, b);
-	printf("LT.U[%08X, %08X] = %08X\n", a, b, d);
+	printf("\nTest MIN_H\n");
+	packA.i32 = 0x119922AA;
+	packB.i32 = 0x33778866;
+	packC = Ifx_MIN_H(packA, packB);
+	printf("MINH[%08X %08X] = %08X\n", packA.u32,  packB.u32, packC.u32);
 	flush_stdout();
 
-	printf("\nTest LT.W\n");
-	a = 1;
-	b = -10;
-	d = Ifx_LT_W(a, b);
-	printf("LT.W[%08X, %08X] = %08X\n", a, b, d);
+	printf("\nTest MIN_HU\n");
+	packA.i32 = 0x119922AA;
+	packB.i32 = 0x33778866;
+	packC = Ifx_MIN_HU(packA, packB);
+	printf("MINHU[%08X %08X] = %08X\n", packA.u32,  packB.u32, packC.u32);
 	flush_stdout();
 
-	printf("\nTest LT.WU\n");
-	a = 1;
-	b = -10;
-	d = Ifx_LT_WU(a, b);
-	printf("LT.WU[%08X, %08X] = %08X\n", a, b, d);
+	printf("\nTest MUL\n");
+	ai = 0x11112222;
+	bi = 2;
+	ci = Ifx_MUL(ai, bi);
+	printf("MUL[%i %i] = %i\n", ai,  bi, ci);
 	flush_stdout();
 
-	printf("\nTest LT.B\n");
-	packA.u32 = 0x11AA22BB;
-	packB.u32 = 0x339988F0;
-	packC = Ifx_LT_B(packA, packB);
-	printf("LT.B[%08X, %08X] = %08X\n", packA.u32, packB.u32, packC.u32);
+	printf("\nTest MULS\n");
+	ai = 0x12345678;
+	bi = 0x89ABCDEF;
+	ci = Ifx_MULS(ai, bi);
+	printf("MULS[%i %i] = %i\n", ai,  bi, ci);
 	flush_stdout();
 
-	printf("\nTest LT.BU\n");
-	packA.u32 = 0x11AA22BB;
-	packB.u32 = 0x339988F0;
-	packC = Ifx_LT_BU(packA, packB);
-	printf("LT.BU[%08X, %08X] = %08X\n", packA.u32, packB.u32, packC.u32);
+	printf("\nTest MUL_U\n");
+	a = 0x12345678;
+	b = 0x89ABCDEF;
+	res64 = Ifx_MUL_U(a, b);
+	printf("MUL[%u %u] = %016llu\n", a,  b, res64);
 	flush_stdout();
 
-	printf("\nTest LT.H\n");
-	packA.u32 = 0x1234DEF0;
-	packB.u32 = 0x9ABC5678;
-	packC = Ifx_LT_H(packA, packB);
-	printf("LT.B[%08X, %08X] = %08X\n", packA.u32, packB.u32, packC.u32);
+	printf("\nTest MULS_U\n");
+	a = 0x12345678;
+	b = 0x89ABCDEF;
+	c = Ifx_MULS_U(a, b);
+	printf("MULS[%u %u] = %u\n", a,  b, c);
 	flush_stdout();
 
-	printf("\nTest LT.BU\n");
-	packA.u32 = 0x1234DEF0;
-	packB.u32 = 0x9ABC5678;
-	packC = Ifx_LT_HU(packA, packB);
-	printf("LT.HU[%08X, %08X] = %08X\n", packA.u32, packB.u32, packC.u32);
+	printf("\nTest MUL_F\n");
+	fA = 1.1;
+	fB = 9.9;
+	f_res = Ifx_MUL_F(fA, fB);
+	printf("MUL[%f %f] = %f\n", fA,  fB, f_res);
 	flush_stdout();
 
-	printf("\nTest LT.A\n");
-	p_a = 0x12345678;
-	p_b = 0x9ABCDEF0;
-	a = Ifx_LT_A(p_a, p_b);
-	printf("LT.A[%08X, %08X] = %08X\n", p_a, p_b, a);
-	p_a = &a;
-	p_b = &b;
-	a = Ifx_LT_A(p_a, p_b);
-	printf("LT.A[%08X, %08X] = %08X\n", p_a, p_b, a);
+	//Fixed Point DSP
+	printf("\nTest MUL.Q\n");
+	ai = 0x12345678;
+	bi = 0x89ABCDEF;
+	ci = Ifx_MUL_Q(ai, bi);
+	printf("MUL.Q[%08X %08X] = %08X\n", ai,  bi, ci);
 	flush_stdout();
+
+	printf("\nTest MULR.H\n");
+	ai = 0x12345678;
+	bi = 0x89ABCDEF;
+	ci = Ifx_MULR_H(ai, bi);
+	printf("MULR.H[%08X %08X] = %08X\n", ai,  bi, ci);
+	flush_stdout();
+
+	printf("\nTest MULR.Q\n");
+	ai = 0x12345678;
+	bi = 0x89ABCDEF;
+	ci = Ifx_MULR_Q(ai, bi);
+	printf("MULR.Q[%08X %08X] = %08X\n", ai,  bi, ci);
+	flush_stdout();
+
+	printf("\nTest MUL.H\n");
+	a = 0x12345678;
+	b = 0x89ABCDEF;
+	res64 = Ifx_MUL_H(a, b);
+	printf("MUL.H[%08X %08X] = %016llX\n", a,  b, res64);
+	flush_stdout();
+
+	printf("\nTest MULM.H\n");
+	a = 0x12345678;
+	b = 0x89ABCDEF;
+	res64 = Ifx_MULM_H(a, b);
+	printf("MULM.H[%08X %08X] = %016llX\n", a,  b, res64);
+	flush_stdout();
+
+	//Deprecated in TC2!
+//	printf("\nTest MULMS.H\n");
+//	a = 0x12345678;
+//	b = 0x89ABCDEF;
+//	res64 = Ifx_MULMS_H(a, b);
+//	printf("MULMS.H[%08X %08X] = %016llX\n", a,  b, res64);
+//	flush_stdout();
 
 	g_regular_task_flag = true;
 	while(1)
@@ -354,18 +406,15 @@ int main(void)
 
 			LEDTOGGLE(0);
 
-			printf("%s CPU:%u MHz,Sys:%u MHz, %u, CacheEn:%d\n",
-					__TIME__,
+			printf("Tricore %04X Core:%04X CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d, %u\n",
+					__TRICORE_NAME__,
+					__TRICORE_CORE__,
 					SYSTEM_GetCpuClock()/1000000,
 					SYSTEM_GetSysClock()/1000000,
-					HAL_GetTick(),
-					SYSTEM_IsCacheEnabled());
-
-			__asm__ volatile ("nop" ::: "memory");
-			__asm volatile ("" : : : "memory");
-			/* wait until sending has finished */
-			while (_uart_sending())
-				;
+					SYSTEM_GetStmClock()/1000000,
+					SYSTEM_IsCacheEnabled(),
+					HAL_GetTick());
+			flush_stdout();
 		}
 	}
 
