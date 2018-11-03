@@ -107,11 +107,11 @@
 						</toolChain>
 					</folderInfo>
 					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1125921551" name="generate_template.py" rcbsApplicability="disable" resourcePath="asm/generate_template.py" toolsToInvoke=""/>
-					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1616188767" name="test_J.S" rcbsApplicability="disable" resourcePath="asm/test_J.S" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.1916653988">
-						<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.1916653988" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.694596367"/>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1627436101" name="test_M_2.S" rcbsApplicability="disable" resourcePath="asm/test_M_2.S" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.396862804">
+						<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.396862804" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.694596367"/>
 					</fileInfo>
 					<sourceEntries>
-						<entry excluding="test_J.S|test_G_I.S|test_E_F.S|test_D.S|test_B_C.S|generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
+						<entry excluding="test_M_2.S|test_L.S|test_J.S|test_G_I.S|test_E_F.S|test_D.S|test_B_C.S|generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
