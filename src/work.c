@@ -141,8 +141,9 @@ int main(void)
 	_init_uart(BAUDRATE);
 	InitLED();
 
-	printf("%s CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
-			__TIME__,
+	printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
+			__TRICORE_NAME__,
+			__TRICORE_CORE__,
 			SYSTEM_GetCpuClock()/1000000,
 			SYSTEM_GetSysClock()/1000000,
 			SYSTEM_GetStmClock()/1000000,
@@ -164,27 +165,140 @@ int main(void)
 	volatile pack32 packD;
 	volatile int32_t ai;
 	volatile int32_t bi;
+	volatile int32_t ci;
+	volatile int32_t di;
 	volatile uint32_t res;
 	volatile int32_t res_i;
 	volatile uint64_t a64;
 	volatile uint64_t res64;
 	volatile float fA;
 	volatile float fB;
+	volatile float fC;
 	volatile float f_res;
 	volatile pack64 p_res_64;
 	volatile pack64 p_a_64;
 	volatile pack32 p_b_32;
 
-	printf("\nTest LD.A\n");
-	a = 0x10000;
-	b = 0x20000;
-	p_a = Ifx_LD_A(&a);
-	p_b = Ifx_LD_A(&b);
-	printf("LD.A[%p] = %p\n", &a, p_a);
-	printf("LD.A[%p] = %p\n", &b, p_b);
+	printf("\nTest MSUB\n");
+	ai = 0x100;
+	bi = 0x200;
+	ci = 0x300;
+	di = Ifx_MSUB(ai, bi, ci);
+	printf("MSUB[%i-%i*%i] = %i\n", ai, bi, ci, di);
 	flush_stdout();
 
+	printf("\nTest MSUBS\n");
+	ai = 0x10000;
+	bi = 0x20000;
+	ci = 0x30000;
+	di = Ifx_MSUBS(ai, bi, ci);
+	printf("MSUBS[%i-%i*%i] = %i\n", ai, bi, ci, di);
+	flush_stdout();
 
+	printf("\nTest MSUB_U\n");
+	a64 = 0x10000000;
+	b = 0x200;
+	c = 0x300;
+	res64 = Ifx_MSUB_U(a64, b, c);
+	printf("MSUB_U[%llu-%u*%u] = %llu\n", a64, b, c, res64);
+	flush_stdout();
+
+	printf("\nTest MSUBS_U\n");
+	a64 = 0;
+	b = 0x20000;
+	c = 0x30000;
+	res64 = Ifx_MSUBS_U(a64, b, c);
+	printf("MSUBS_U[%llu-%u*%u] = %llu\n", a64, b, c, res64);
+	flush_stdout();
+
+	printf("\nTest MSUB_F\n");
+	fA = 1.1;
+	fB = 2.2;
+	fC = 3.3;
+	f_res = Ifx_MSUB_F(fA, fB, fC);
+	printf("MSUB_F[%f-%f*%f] = %f\n", fA, fB, fC, f_res);
+	flush_stdout();
+
+	printf("\nTest NAND\n");
+	a = 0xFFFFFFFF;
+	b = 0x22222222;
+	c = Ifx_NAND(a, b);
+	printf("NAND[%08X, %08X] = %08X\n", a, b, c);
+	b = 0x11111111;
+	c = Ifx_NAND(a, b);
+	printf("NAND[%08X, %08X] = %08X\n", a, b, c);
+	flush_stdout();
+
+	printf("\nTest NAND_T\n");
+	a = 0xFFFFFFFF;
+	b = 0x22222222;
+	c = Ifx_NAND_T(a, b);
+	printf("NAND_T[%08X, %08X, 0] = %08X\n", a, b, c);
+	b = 0x11111111;
+	c = Ifx_NAND_T(a, b);
+	printf("NAND_T[%08X, %08X, 0] = %08X\n", a, b, c);
+	flush_stdout();
+
+	printf("\nTest NE\n");
+	a = 0x12345678;
+	b = 0x55AACCDD;
+	c = Ifx_NE(a, b);
+	printf("NE[%08X, %08X] = %08X\n", a, b, c);
+	b = a;
+	c = Ifx_NE(a, b);
+	printf("NE[%08X, %08X] = %08X\n", a, b, c);
+	flush_stdout();
+
+	printf("\nTest NE_A\n");
+	p_a = &a;
+	p_b = &b;
+	c = Ifx_NE_A(p_a, p_b);
+	printf("NE_A[%08X, %08X] = %08X\n", p_a, p_b, c);
+	p_b = p_a;
+	c = Ifx_NE_A(p_a, p_b);
+	printf("NE_A[%08X, %08X] = %08X\n", p_a, p_b, c);
+	flush_stdout();
+
+	printf("\nTest NEZ_A\n");
+	p_a = &a;
+	c = Ifx_NEZ_A(p_a);
+	printf("NEZ_A[%08X] = %08X\n", p_a, c);
+	p_a = 0;
+	c = Ifx_NEZ_A(p_a);
+	printf("NEZ_A[%08X] = %08X\n", p_a, c);
+	flush_stdout();
+
+	printf("\nTest NOP\n");
+	Ifx_NOP();
+
+	printf("\nTest NOR\n");
+	a = 0xAAAA5555;
+	b = 0x22222222;
+	c = Ifx_NOR(a, b);
+	printf("NOR[%08X, %08X] = %08X\n", a, b, c);
+	b = 0x11111111;
+	c = Ifx_NOR(a, b);
+	printf("NOR[%08X, %08X] = %08X\n", a, b, c);
+	flush_stdout();
+
+	printf("\nTest NOR_T\n");
+	a = 0xAAAA5555;
+	b = 0x22222222;
+	c = Ifx_NOR_T(a, b);
+	printf("NOR_T[%08X, %08X, 0] = %08X\n", a, b, c);
+	b = 0x11111111;
+	c = Ifx_NOR_T(a, b);
+	printf("NOR_T[%08X, %08X, 0] = %08X\n", a, b, c);
+	flush_stdout();
+
+	printf("\nTest NOT\n");
+	a = 0xAAAA5555;
+	c = Ifx_NOT(a);
+	printf("NOT[%08X] = %08X\n", a, c);
+	a = 0x11111111;
+	c = Ifx_NOT(a);
+	printf("NOT[%08X] = %08X\n", a, c);
+	flush_stdout();
 
 	g_regular_task_flag = true;
 	while(1)
@@ -200,18 +314,16 @@ int main(void)
 
 			LEDTOGGLE(0);
 
-			printf("%s CPU:%u MHz,Sys:%u MHz, %u, CacheEn:%d\n",
-					__TIME__,
+			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d, %u\n",
+					__TRICORE_NAME__,
+					__TRICORE_CORE__,
 					SYSTEM_GetCpuClock()/1000000,
 					SYSTEM_GetSysClock()/1000000,
-					HAL_GetTick(),
-					SYSTEM_IsCacheEnabled());
+					SYSTEM_GetStmClock()/1000000,
+					SYSTEM_IsCacheEnabled(),
+					HAL_GetTick());
 
-			__asm__ volatile ("nop" ::: "memory");
-			__asm volatile ("" : : : "memory");
-			/* wait until sending has finished */
-			while (_uart_sending())
-				;
+			flush_stdout();
 		}
 	}
 

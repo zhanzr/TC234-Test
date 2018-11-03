@@ -228,6 +228,59 @@ uint32_t Ifx_LT_U(uint32_t A, uint32_t B);
 int32_t Ifx_LT_W(int32_t A, int32_t B);
 uint32_t Ifx_LT_WU(uint32_t A, uint32_t B);
 
+int32_t Ifx_MSUB(int32_t A, int32_t B, int32_t C);
+int32_t Ifx_MSUBS(int32_t A, int32_t B, int32_t C);
+uint64_t Ifx_MSUB_U(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MSUBS_U(uint64_t A, uint32_t B, uint32_t C);
+
+float Ifx_MSUB_F(float A, float B, float C);
+
+uint64_t Ifx_MSUB_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MSUBS_H(uint64_t A, uint32_t C, uint32_t D);
+
+uint32_t Ifx_MSUB_Q(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MSUBS_Q(uint32_t A, uint32_t B, uint32_t C);
+
+//Packed Multiply-Subtract Q Format Multi-precision
+//Packed Multiply-Subtract Q Format Multi-precision, Saturated
+uint64_t Ifx_MSUBM_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MSUBMS_H(uint64_t A, uint32_t C, uint32_t D);
+
+//Packed Multiply-Subtract Q Format with Rounding
+//Packed Multiply-Subtract Q Format with Rounding, Saturated
+uint32_t Ifx_MSUBR_H(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MSUBRS_H(uint32_t A, uint32_t B, uint32_t C);
+
+//Multiply-Subtract Q Format with Rounding
+//Multiply-Subtract Q Format with Rounding, Saturated
+uint32_t Ifx_MSUBR_Q(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MSUBRS_Q(uint32_t A, uint32_t B, uint32_t C);
+
+//Packed Multiply-Subtract/Add Q Format
+//Packed Multiply-Subtract/Add Q Format Saturated
+uint64_t Ifx_MSUBAD_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MSUBADS_H(uint64_t A, uint32_t C, uint32_t D);
+
+//Packed Multiply-Subtract/Add Q Format Multi-precision
+//Packed Multiply-Subtract/Add Q Format Multi-precision Saturated
+uint64_t Ifx_MSUBADM_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MSUBADMS_H(uint64_t A, uint32_t C, uint32_t D);
+
+//Packed Multiply-Subtract/Add Q Format with Rounding
+//Packed Multiply-Subtract/Add Q Format with Rounding Saturated
+uint32_t Ifx_MSUBADR_H(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MSUBADRS_H(uint32_t A, uint32_t B, uint32_t C);
+
+uint32_t Ifx_NAND(uint32_t A, uint32_t B);
+uint32_t Ifx_NAND_T(uint32_t A, uint32_t B);
+uint32_t Ifx_NE(uint32_t A, uint32_t B);
+uint32_t Ifx_NE_A(uint32_t* pA, uint32_t* pB);
+uint32_t Ifx_NEZ_A(uint32_t* pA);
+uint32_t Ifx_NOP(void);
+uint32_t Ifx_NOR(uint32_t A, uint32_t B);
+uint32_t Ifx_NOR_T(uint32_t A, uint32_t B);
+uint32_t Ifx_NOT(uint32_t A);
+
 void Ifx_Enable(void);
 
 void Ifx_Nop(void);
