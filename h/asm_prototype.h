@@ -281,6 +281,24 @@ uint32_t Ifx_NOR(uint32_t A, uint32_t B);
 uint32_t Ifx_NOR_T(uint32_t A, uint32_t B);
 uint32_t Ifx_NOT(uint32_t A);
 
+uint32_t Ifx_OR(uint32_t A, uint32_t B);
+uint32_t Ifx_OR_T(uint32_t A, uint32_t B);
+uint32_t Ifx_ORN(uint32_t A, uint32_t B);
+uint32_t Ifx_ORN_T(uint32_t A, uint32_t B);
+
+uint32_t Ifx_OR_AND_T(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_OR_ANDN_T(uint32_t A, uint32_t B, uint32_t C);
+
+uint32_t Ifx_OR_NOR_T(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_OR_OR_T(uint32_t A, uint32_t B, uint32_t C);
+
+uint32_t Ifx_OR_EQ(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_OR_NE(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_OR_GE(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_OR_GE_U(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_OR_LT(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_OR_LT_U(uint32_t A, uint32_t B, uint32_t C);
+
 void Ifx_Enable(void);
 
 void Ifx_Nop(void);

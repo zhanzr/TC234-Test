@@ -184,6 +184,7 @@
     <ObjectFile Name="asm\test_J.o"/>
     <ObjectFile Name="asm\test_L.o"/>
     <ObjectFile Name="asm\test_M_3_N.o"/>
+    <ObjectFile Name="asm\test_O.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>
