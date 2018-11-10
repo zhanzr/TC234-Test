@@ -123,11 +123,6 @@ static inline void flush_stdout(void)
 	}
 }
 
-void TestFunc(void)
-{
-	printf("%s_%d\n", __func__, __LINE__);
-}
-
 int main(void)
 {
 	SYSTEM_Init();
@@ -235,12 +230,12 @@ int main(void)
 	printf("\nTest RFM\n");
 	printf("\nTest RSLCX\n");
 	printf("\nTest RSTV\n");
-//	Ifx_RESTORE();
-//	Ifx_RET();
-//	Ifx_RFE();
-//	Ifx_RFM();
-//	Ifx_RSLCX();
-//	Ifx_RSTV();
+	//	Ifx_RESTORE();
+	//	Ifx_RET();
+	//	Ifx_RFE();
+	//	Ifx_RFM();
+	//	Ifx_RSLCX();
+	//	Ifx_RSTV();
 	flush_stdout();
 
 	printf("\nTest RSUB\n");
@@ -284,14 +279,14 @@ int main(void)
 
 			LEDTOGGLE(0);
 
-//			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d, %u\n",
-//					__TRICORE_NAME__,
-//					__TRICORE_CORE__,
-//					SYSTEM_GetCpuClock()/1000000,
-//					SYSTEM_GetSysClock()/1000000,
-//					SYSTEM_GetStmClock()/1000000,
-//					SYSTEM_IsCacheEnabled(),
-//					HAL_GetTick());
+			//			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d, %u\n",
+			//					__TRICORE_NAME__,
+			//					__TRICORE_CORE__,
+			//					SYSTEM_GetCpuClock()/1000000,
+			//					SYSTEM_GetSysClock()/1000000,
+			//					SYSTEM_GetStmClock()/1000000,
+			//					SYSTEM_IsCacheEnabled(),
+			//					HAL_GetTick());
 
 			flush_stdout();
 		}
