@@ -314,8 +314,32 @@ int32_t Ifx_RSUB(int32_t A);
 int32_t Ifx_RSUBS(int32_t A);
 uint32_t Ifx_RSUBS_U(uint32_t A);
 
-void Ifx_Enable(void);
+int32_t Ifx_SAT_B(int32_t A);
+uint32_t Ifx_SAT_BU(uint32_t A);
+int32_t Ifx_SAT_H(int32_t A);
+uint32_t Ifx_SAT_HU(uint32_t A);
+uint32_t Ifx_SEL(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SELN(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH(uint32_t A, int32_t B);
+uint32_t Ifx_SH_H(uint32_t A, int32_t B);
+uint32_t Ifx_SH_AND_T(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_ANDN_T(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_EQ(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_GE(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_GE_U(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_LT(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_LT_U(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_NAND_T(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_NE(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_NOR_T(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_OR_T(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_ORN_T(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_XNOR_T(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_SH_XOR_T(uint32_t A, uint32_t B, uint32_t C);
+int32_t Ifx_SHA(int32_t A, int32_t B);
+int32_t Ifx_SHAS(int32_t A, int32_t B);
+uint32_t Ifx_SHA_H(uint32_t A, int32_t B);
 
-void Ifx_Nop(void);
+void Ifx_Enable(void);
 
 #endif /* ASM_PROTOTYPE_H_ */
