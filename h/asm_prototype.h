@@ -299,10 +299,23 @@ uint32_t Ifx_OR_GE_U(uint32_t A, uint32_t B, uint32_t C);
 uint32_t Ifx_OR_LT(uint32_t A, uint32_t B, uint32_t C);
 uint32_t Ifx_OR_LT_U(uint32_t A, uint32_t B, uint32_t C);
 
+float Ifx_PACK(uint64_t A64, int32_t sign);
+uint64_t Ifx_UNPACK(float fA);
+uint32_t Ifx_PARITY(uint32_t A);
+float Ifx_Q31TOF(uint32_t Q, uint32_t exp);
+float Ifx_QSEED_F(float fA);
+uint32_t Ifx_RESTORE(void);
+uint32_t Ifx_RET(void);
+uint32_t Ifx_RFE(void);
+uint32_t Ifx_RFM(void);
+uint32_t Ifx_RSLCX(void);
+uint32_t Ifx_RSTV(void);
+int32_t Ifx_RSUB(int32_t A);
+int32_t Ifx_RSUBS(int32_t A);
+uint32_t Ifx_RSUBS_U(uint32_t A);
+
 void Ifx_Enable(void);
 
 void Ifx_Nop(void);
-
-uint32_t Ifx_Rslcx(void);
 
 #endif /* ASM_PROTOTYPE_H_ */
