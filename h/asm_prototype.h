@@ -368,6 +368,35 @@ uint32_t Ifx_SUBS_HU(uint32_t A, uint32_t B);
 void Ifx_SWAP_W(uint32_t* pA, uint32_t A);
 void Ifx_SYSCALL(uint32_t tin);
 
+//Trap on Sticky Overflow
+void Ifx_TRAPSV(void);
+//Trap on Overflow
+void Ifx_TRAPV(void);
+//Update Flags
+void Ifx_UPDFL(uint32_t A);
+//Unsigned to Floating-point
+float Ifx_UTOF(uint32_t A);
+//Bitwise XOR
+uint32_t Ifx_XOR(uint32_t A, uint32_t B);
+//Bitwise XNOR
+uint32_t Ifx_XNOR(uint32_t A, uint32_t B);
+//Bit Logical XOR
+uint32_t Ifx_XOR_T(uint32_t A, uint32_t B, uint32_t C);
+//Bit Logical XNOR
+uint32_t Ifx_XNOR_T(uint32_t A, uint32_t B, uint32_t C);
+//Equal Accumulating
+uint32_t Ifx_XOR_EQ(uint32_t A, uint32_t B, uint32_t C);
+//Not Equal Accumulating
+uint32_t Ifx_XOR_NE(uint32_t A, uint32_t B, uint32_t C);
+//Greater Than or Equal Accumulating
+uint32_t Ifx_XOR_GE(uint32_t A, uint32_t B, uint32_t C);
+//Greater Than or Equal Accumulating Unsigned
+uint32_t Ifx_XOR_GE_U(uint32_t A, uint32_t B, uint32_t C);
+//Less Than or Equal Accumulating
+uint32_t Ifx_XOR_LT(uint32_t A, uint32_t B, uint32_t C);
+//Less Than or Equal Accumulating Unsigned
+uint32_t Ifx_XOR_LT_U(uint32_t A, uint32_t B, uint32_t C);
+
 void Ifx_Enable(void);
 
 #endif /* ASM_PROTOTYPE_H_ */
