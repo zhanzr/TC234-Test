@@ -1,18 +1,3 @@
 TC234 Demo.
 
-Assemble Language Demo for these Instructions:
-
-TRAPSV
-TRAPV
-UPDFL
-UTOF
-XNOR
-XNOR.T
-XOR
-XOR.EQ
-XOR.GE
-XOR.GE.U
-XOR.LT
-XOR.LT.U
-XOR.NE
-XOR.T
+Test whether the Ethernet interface is available.

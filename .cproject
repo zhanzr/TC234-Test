@@ -46,6 +46,7 @@
 								</option>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths.1959146808" name="Include Paths" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;../h&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;H:\HIGHTEC\toolchains\tricore\v4.9.1.0-infineon-1.1\bsp\tricore\TriBoard-TC23xx\h&quot;"/>
 								</option>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization.111267155" name="Optimization Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.code.optimization.none" valueType="enumerated"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.830677023" name="Debug Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.3" valueType="enumerated"/>
@@ -105,12 +106,12 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.2139967422" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1072815968" name="test_S_2.S" rcbsApplicability="disable" resourcePath="asm/test_S_2.S" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.261638984">
-						<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.261638984" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.694596367"/>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.874398949" name="test_S_2.S" rcbsApplicability="disable" resourcePath="asm/test_S_2.S" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.783506114">
+						<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.783506114" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.694596367"/>
 					</fileInfo>
 					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1125921551" name="generate_template.py" rcbsApplicability="disable" resourcePath="asm/generate_template.py" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry excluding="test_S_2.S|test_S_1.S|test_P_R.S|test_O.S|test_M_3_N.S|test_M_2.S|test_L.S|test_J.S|test_G_I.S|test_E_F.S|test_D.S|test_B_C.S|generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
+						<entry excluding="test_T_U_X.S|test_S_1.S|test_P_R.S|test_O.S|test_M_3_N.S|test_M_2.S|test_L.S|test_J.S|test_G_I.S|test_E_F.S|test_D.S|test_B_C.S|generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>

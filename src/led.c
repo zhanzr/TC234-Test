@@ -11,10 +11,10 @@
 #include "led.h"
 #include "uart_int.h"
 
-#include "tc27xc/IfxStm_reg.h"
-#include "tc27xc/IfxStm_bf.h"
-#include "tc27xc/IfxCpu_reg.h"
-#include "tc27xc/IfxCpu_bf.h"
+#include "tc23xa/IfxStm_reg.h"
+#include "tc23xa/IfxStm_bf.h"
+#include "tc23xa/IfxCpu_reg.h"
+#include "tc23xa/IfxCpu_bf.h"
 
 #include "system_tc2x.h"
 #include "machine/intrinsics.h"

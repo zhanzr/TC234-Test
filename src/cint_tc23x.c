@@ -54,34 +54,34 @@ void __int_handler(int arg);
    must be called "TriCore_trap_table", as it is referenced below
    in order to program the BTV register.  */
 
-__asm (	".section .traptab, \"ax\", @progbits\n"
-		".align 8\n"
-		".global TriCore_trap_table\n"
-		"TriCore_trap_table:\n"
-);
-
-# define DEFINE_TRAP(i)									\
-		__asm (".global __trap_" #i);						\
-		__asm ("__trap_" #i ":");							\
-		__asm ("svlcx");									\
-		__asm ("movh.a %a15,hi:Tdisptab+(4*" #i ")");		\
-		__asm ("ld.w %d4,[%a15]lo:Tdisptab+(4*" #i ")");	\
-		__asm ("mov.a %a15, %d4");							\
-		__asm ("mov %d4,%d15");								\
-		__asm ("calli %a15");								\
-		__asm ("rslcx");									\
-		__asm ("rfe");										\
-		__asm (".align 5")
-
-
-DEFINE_TRAP(0);		/* trap class 0 (Reset) */
-DEFINE_TRAP(1);		/* trap class 1 (Internal Protection Traps) */
-DEFINE_TRAP(2);		/* trap class 2 (Instruction Errors) */
-DEFINE_TRAP(3);		/* trap class 3 (Context Management) */
-DEFINE_TRAP(4);		/* trap class 4 (System Bus and Peripheral Errors) */
-DEFINE_TRAP(5);		/* trap class 5 (Assertion Traps) */
-DEFINE_TRAP(6);		/* trap class 6 (System Call) */
-DEFINE_TRAP(7);		/* trap class 7 (Non-Maskable Interrupt) */
+//__asm (	".section .traptab, \"ax\", @progbits\n"
+//		".align 8\n"
+//		".global TriCore_trap_table\n"
+//		"TriCore_trap_table:\n"
+//);
+//
+//# define DEFINE_TRAP(i)									\
+//		__asm (".global __trap_" #i);						\
+//		__asm ("__trap_" #i ":");							\
+//		__asm ("svlcx");									\
+//		__asm ("movh.a %a15,hi:Tdisptab+(4*" #i ")");		\
+//		__asm ("ld.w %d4,[%a15]lo:Tdisptab+(4*" #i ")");	\
+//		__asm ("mov.a %a15, %d4");							\
+//		__asm ("mov %d4,%d15");								\
+//		__asm ("calli %a15");								\
+//		__asm ("rslcx");									\
+//		__asm ("rfe");										\
+//		__asm (".align 5")
+//
+//
+//DEFINE_TRAP(0);		/* trap class 0 (Reset) */
+//DEFINE_TRAP(1);		/* trap class 1 (Internal Protection Traps) */
+//DEFINE_TRAP(2);		/* trap class 2 (Instruction Errors) */
+//DEFINE_TRAP(3);		/* trap class 3 (Context Management) */
+//DEFINE_TRAP(4);		/* trap class 4 (System Bus and Peripheral Errors) */
+//DEFINE_TRAP(5);		/* trap class 5 (Assertion Traps) */
+//DEFINE_TRAP(6);		/* trap class 6 (System Call) */
+//DEFINE_TRAP(7);		/* trap class 7 (Non-Maskable Interrupt) */
 
 __asm (".text");
 
@@ -424,6 +424,7 @@ static void __class_7_trap_handler(int tin)
 	__asm volatile ("debug"); /* NMI -- Non-maskable Interrupt  */
 }
 
+#if 0
 /* This is the default interrupt vector table, which consists of 32
    entries, each consisting of eight words (32 bytes).  The table
    must be put into the section ".inttab", must be aligned to a
@@ -715,6 +716,8 @@ DEFINE_INT(252);
 DEFINE_INT(253);
 DEFINE_INT(254);
 DEFINE_INT(255);
+#endif
+
 #endif
 
 __asm (".text");
