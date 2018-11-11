@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <assert.h>
 #include <math.h>
 #include <limits.h>
 
@@ -18,6 +19,7 @@
 #include "interrupts.h"
 #include "led.h"
 #include "uart_int.h"
+#include "cint.h"
 
 #include "asm_prototype.h"
 
@@ -123,6 +125,16 @@ static inline void flush_stdout(void)
 	}
 }
 
+static void prvTrapYield( int iTrapIdentification )
+{
+	switch( iTrapIdentification )
+	{
+	default:
+		printf("Syscall Tin:%d\n", iTrapIdentification);
+		break;
+	}
+}
+
 int main(void)
 {
 	SYSTEM_Init();
@@ -146,6 +158,10 @@ int main(void)
 
 	flush_stdout();
 
+	/* Install the Syscall Handler for yield calls. */
+	extern void (*Tdisptab[MAX_TRAPS])(int tin);
+	Tdisptab[6] = prvTrapYield;
+
 	volatile uint32_t a;
 	volatile uint32_t b;
 	volatile uint32_t c;
@@ -165,6 +181,7 @@ int main(void)
 	volatile uint32_t res;
 	volatile int32_t res_i;
 	volatile uint64_t a64;
+	volatile uint64_t b64;
 	volatile uint64_t res64;
 	volatile float fA;
 	volatile float fB;
@@ -174,327 +191,208 @@ int main(void)
 	volatile pack64 p_a_64;
 	volatile pack32 p_b_32;
 
-	printf("\nTest SAT.B\n");
-	ai = -1000;
-	bi = 1000;
-	ci = Ifx_SAT_B(ai);
-	di = Ifx_SAT_B(bi);
-	printf("SAT.B[%i] = %i\n", ai, ci);
-	printf("SAT.B[%i] = %i\n", bi, di);
-	ai = -128;
-	bi = 127;
-	ci = Ifx_SAT_B(ai);
-	di = Ifx_SAT_B(bi);
-	printf("SAT.B[%i] = %i\n", ai, ci);
-	printf("SAT.B[%i] = %i\n", bi, di);
+	printf("\nTest ST.A\n");
+	p_b = 0x12345678;
+	Ifx_ST_A(&a, p_b);
+	printf("ST.A[%08X] = %08X\t%08X\n", &a, a, p_b);
 	flush_stdout();
 
-	printf("\nTest SAT.H\n");
-	ai = -1000;
-	bi = 1000;
-	ci = Ifx_SAT_H(ai);
-	di = Ifx_SAT_H(bi);
-	printf("SAT.H[%i] = %i\n", ai, ci);
-	printf("SAT.H[%i] = %i\n", bi, di);
-	ai = INT16_MIN-1;
-	bi = INT16_MAX+1;
-	ci = Ifx_SAT_H(ai);
-	di = Ifx_SAT_H(bi);
-	printf("SAT.H[%i] = %i\n", ai, ci);
-	printf("SAT.H[%i] = %i\n", bi, di);
+	printf("\nTest ST.B\n");
+	b = 0x12345678;
+	Ifx_ST_B(&a, b);
+	printf("ST.B[%08X] = %08X\t%08X\n", &a, a, b);
 	flush_stdout();
 
-	printf("\nTest SAT.BU\n");
-	a = (uint32_t)-1000;
-	b = 1000;
-	c = Ifx_SAT_BU(a);
-	d = Ifx_SAT_BU(b);
-	printf("SAT.BU[%u] = %u\n", a, c);
-	printf("SAT.BU[%u] = %u\n", b, d);
+	printf("\nTest ST.H\n");
+	b = 0x12345678;
+	Ifx_ST_H(&a, b);
+	printf("ST.H[%08X] = %08X\t%08X\n", &a, a, b);
+	flush_stdout();
+
+	printf("\nTest ST.W\n");
+	b = 0x12345678;
+	Ifx_ST_W(&a, b);
+	printf("ST.W[%08X] = %08X\t%08X\n", &a, a, b);
+	flush_stdout();
+
+	printf("\nTest ST.Q\n");
+	b = 0x12345678;
+	Ifx_ST_Q(&a, b);
+	printf("[%08X] = %08X\t%08X\n", &a, a, b);
+	flush_stdout();
+
+	printf("\nTest ST.D\n");
+	b64 = 0x9ABCDEF012345678;
+	Ifx_ST_W(&a64, b64);
+	printf("[%08X] = %016llX\t%0016llX\n", &a64, a64, b64);
+	flush_stdout();
+
+	printf("\nTest ST.DA\n");
+	b64 = 0x123456789ABCDEF0;
+	Ifx_ST_W(&a, &b64);
+	printf("[%08X %08X] = %08X %08X\t%0016llX\n", &a, &b, a, b, b64);
+	flush_stdout();
+
+#define TEST_ADDR	0xD0020000
+	printf("\nTest ST.T\n");
+	Ifx_ST_T();
+	printf("[%08X] = %08X\n", TEST_ADDR, *((uint32_t*)TEST_ADDR));
+	flush_stdout();
+
+	uint32_t tmpCSA[16] = {0};
+	printf("\nTest STLCX\n");
+//	Ifx_STLCX(tmpCSA);
+//	for(uint32_t i=0; i<16; ++i)
+//	{
+//		printf("%08X ", tmpCSA[i]);
+//	}
+//	printf("\r\n");
+	flush_stdout();
+
+	printf("\nTest STUCX\n");
+//	Ifx_STUCX(tmpCSA);
+//	for(uint32_t i=0; i<16; ++i)
+//	{
+//		printf("%08X ", tmpCSA[i]);
+//	}
+//	printf("\r\n");
+	flush_stdout();
+
+	printf("\nTest SVLCX\n");
+	//Ifx_SVLCX();
+	flush_stdout();
+
+	printf("\nTest SUB\n");
+	ai = 1;
+	bi = 10;
+	ci = Ifx_SUB(ai, bi);
+	printf("[%i - %i] = %i\n", ai, bi, ci);
+	ai = INT32_MIN;
+	bi = 10;
+	ci = Ifx_SUB(ai, bi);
+	printf("[%i - %i] = %i\n", ai, bi, ci);
+	flush_stdout();
+
+	printf("\nTest SUBS\n");
+	ai = 1;
+	bi = 10;
+	ci = Ifx_SUBS(ai, bi);
+	printf("[%i - %i] = %i\n", ai, bi, ci);
+	ai = INT32_MIN;
+	bi = 10;
+	ci = Ifx_SUBS(ai, bi);
+	printf("[%i - %i] = %i\n", ai, bi, ci);
+	flush_stdout();
+
+	printf("\nTest SUBS.U\n");
 	a = 0;
-	b = UINT8_MAX;
-	c = Ifx_SAT_BU(a);
-	d = Ifx_SAT_BU(b);
-	printf("SAT.BU[%u] = %u\n", a, c);
-	printf("SAT.BU[%u] = %u\n", b, d);
+	b = UINT32_MAX;
+	c = Ifx_SUBS_U(a, b);
+	printf("[%08X - %08X] = %08X\n", a, b, c);
+	a = 0x12345678;
+	b = 0x11111111;
+	c = Ifx_SUBS_U(a, b);
+	printf("[%08X - %08X] = %08X\n", a, b, c);
 	flush_stdout();
 
-	printf("\nTest SAT.HU\n");
-	a = (uint32_t)INT16_MIN+1;
-	b = INT16_MAX;
-	c = Ifx_SAT_HU(a);
-	d = Ifx_SAT_HU(b);
-	printf("SAT.HU[%u] = %u\n", a, c);
-	printf("SAT.HU[%u] = %u\n", b, d);
-	a = (uint32_t)INT16_MIN-1;
-	b = INT16_MAX+1;
-	c = Ifx_SAT_HU(a);
-	d = Ifx_SAT_HU(b);
-	printf("SAT.HU[%u] = %u\n", a, c);
-	printf("SAT.HU[%u] = %u\n", b, d);
-	flush_stdout();
-
-	printf("\nTest SEL\n");
+	printf("\nTest SUB.B\n");
 	a = 0;
-	b = UINT16_MAX;
-	c = UINT16_MAX/2;
-	d = Ifx_SEL(a, b, c);
-	printf("SEL[%u %u %u] = %u\n", a, b, c, d);
+	b = UINT32_MAX;
+	c = Ifx_SUB_B(a, b);
+	printf("[%08X - %08X] = %08X\n", a, b, c);
+	a = 0x12345678;
+	b = 0x11111111;
+	c = Ifx_SUB_B(a, b);
+	printf("[%08X - %08X] = %08X\n", a, b, c);
+	flush_stdout();
+
+	printf("\nTest SUB.H\n");
+	a = 0;
+	b = UINT32_MAX;
+	c = Ifx_SUB_H(a, b);
+	printf("[%08X - %08X] = %08X\n", a, b, c);
+	a = 0x12345678;
+	b = 0x11111111;
+	c = Ifx_SUB_H(a, b);
+	printf("[%08X - %08X] = %08X\n", a, b, c);
+	flush_stdout();
+
+	printf("\nTest SUBS.H\n");
+	a = 0;
+	b = UINT32_MAX;
+	c = Ifx_SUBS_H(a, b);
+	printf("[%08X - %08X] = %08X\n", a, b, c);
+	a = 0x12345678;
+	b = 0x11111111;
+	c = Ifx_SUBS_H(a, b);
+	printf("[%08X - %08X] = %08X\n", a, b, c);
+	flush_stdout();
+
+	printf("\nTest SUBS.HU\n");
+	a = 0;
+	b = UINT32_MAX;
+	c = Ifx_SUBS_HU(a, b);
+	printf("[%08X - %08X] = %08X\n", a, b, c);
+	a = 0x12345678;
+	b = 0x11111111;
+	c = Ifx_SUBS_HU(a, b);
+	printf("[%08X - %08X] = %08X\n", a, b, c);
+	flush_stdout();
+
+	printf("\nTest SUB.A\n");
+	p_a = Ifx_SUB_A(&a, &b);
+	printf("[%08X - %08X] = %08X\n", (uint32_t)&a, (uint32_t)&b, (uint32_t)p_a);
+	p_a = Ifx_SUB_A(&ai, &bi);
+	printf("[%08X - %08X] = %08X\n", (uint32_t)&ai, (uint32_t)&bi, (uint32_t)p_a);
+	flush_stdout();
+
+	printf("\nTest SUBC\n");
+	ai = 1;
+	bi = 10;
+	ci = Ifx_SUBC(ai, bi);
+	printf("[%i - %i] = %i\n", ai, bi, ci);
+	ai = 101;
+	bi = 10;
+	ci = Ifx_SUBC(ai, bi);
+	printf("[%i - %i] = %i\n", ai, bi, ci);
+	flush_stdout();
+
+	printf("\nTest SUBX\n");
+	ai = 1;
+	bi = 10;
+	ci = Ifx_SUBX(ai, bi);
+	printf("[%i - %i] = %i\n", ai, bi, ci);
+	ai = 101;
+	bi = 10;
+	ci = Ifx_SUBX(ai, bi);
+	printf("[%i - %i] = %i\n", ai, bi, ci);
+	flush_stdout();
+
+	printf("\nTest SUBF\n");
+	fA = 1.1;
+	fB = 2.2;
+	fC = Ifx_SUB_F(fA, fB);
+	printf("[%f - %f] = %f\n", fA, fB, fC);
+	fA = 3.3;
+	fB = 9.9;
+	fC = Ifx_SUB_F(fA, fB);
+	printf("[%f - %f] = %f\n", fA, fB, fC);
+	flush_stdout();
+
+	printf("\nTest SWAP.W\n");
 	a = 1;
-	b = UINT16_MAX/8;
-	c = UINT16_MAX/4;
-	d = Ifx_SEL(a, b, c);
-	printf("SEL[%u %u %u] = %u\n", a, b, c, d);
+	b = 2;
+	Ifx_SWAP_W(&a, b);
+	printf("[%08X %08X] = %08X %08X\n", (uint32_t)&a, (uint32_t)&b, a, b);
+	a = INT32_MAX;
+	b = UINT32_MAX;
+	Ifx_SWAP_W(&a, b);
+	printf("[%08X %08X] = %08X %08X\n", (uint32_t)&a, (uint32_t)&b, a, b);
 	flush_stdout();
 
-	printf("\nTest SELN\n");
-	a = 0;
-	b = UINT16_MAX;
-	c = UINT16_MAX/2;
-	d = Ifx_SELN(a, b, c);
-	printf("SELN[%u %u %u] = %u\n", a, b, c, d);
-	a = 1;
-	b = UINT16_MAX/8;
-	c = UINT16_MAX/4;
-	d = Ifx_SELN(a, b, c);
-	printf("SELN[%u %u %u] = %u\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH\n");
-	a = 0xFF;
-	bi = 4;
-	c = Ifx_SH(a, bi);
-	printf("SH[%08X %i] = %08X\n", a, bi, c);
-	a = 0xFF;
-	bi = -4;
-	c = Ifx_SH(a, bi);
-	printf("SH[%08X %i] = %08X\n", a, bi, c);
-	flush_stdout();
-
-	printf("\nTest SH_H\n");
-	a = 0x001100FF;
-	bi = 4;
-	c = Ifx_SH(a, bi);
-	printf("SH_H[%08X %i] = %08X\n", a, bi, c);
-	a = 0x001100FF;
-	bi = -4;
-	c = Ifx_SH(a, bi);
-	printf("SH_H[%08X %i] = %08X\n", a, bi, c);
-	flush_stdout();
-
-	printf("\nTest SH.AND.T\n");
-	a = 0xFF80;
-	b = 1;
-	c = 1;
-	d = Ifx_SH_AND_T(a, b, c);
-	printf("SH.AND.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_AND_T(a, b, c);
-	printf("SH.AND.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.ANDN.T\n");
-	a = 0xFF80;
-	b = 1;
-	c = 1;
-	d = Ifx_SH_ANDN_T(a, b, c);
-	printf("SH.ANDN.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_ANDN_T(a, b, c);
-	printf("SH.ANDN.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.NAND.T\n");
-	a = 0xFF80;
-	b = 1;
-	c = 1;
-	d = Ifx_SH_NAND_T(a, b, c);
-	printf("SH.NAND.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_NAND_T(a, b, c);
-	printf("SH.NAND.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.NOR.T\n");
-	a = 0xFF80;
-	b = 0;
-	c = 0;
-	d = Ifx_SH_NOR_T(a, b, c);
-	printf("SH.NOR.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_NOR_T(a, b, c);
-	printf("SH.NOR.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.OR.T\n");
-	a = 0xFF80;
-	b = 0;
-	c = 0;
-	d = Ifx_SH_OR_T(a, b, c);
-	printf("SH.OR.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_OR_T(a, b, c);
-	printf("SH.OR.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.ORN.T\n");
-	a = 0xFF80;
-	b = 0;
-	c = 0;
-	d = Ifx_SH_ORN_T(a, b, c);
-	printf("SH.ORN.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_ORN_T(a, b, c);
-	printf("SH.ORN.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.XOR.T\n");
-	a = 0xFF80;
-	b = 0;
-	c = 0;
-	d = Ifx_SH_XOR_T(a, b, c);
-	printf("SH.XOR.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_XOR_T(a, b, c);
-	printf("SH.XOR.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.XNOR.T\n");
-	a = 0xFF80;
-	b = 0;
-	c = 0;
-	d = Ifx_SH_XNOR_T(a, b, c);
-	printf("SH.XNOR.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_XNOR_T(a, b, c);
-	printf("SH.XNOR.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.EQ.T\n");
-	a = 0xFF80;
-	b = 0;
-	c = 0;
-	d = Ifx_SH_EQ(a, b, c);
-	printf("SH.EQ.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_EQ(a, b, c);
-	printf("SH.EQ.T[%08X %08X D0 %08X D0] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.NE.T\n");
-	a = 0xFF80;
-	b = 0;
-	c = 0;
-	d = Ifx_SH_NE(a, b, c);
-	printf("SH.NE[%08X %08X %08X] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_NE(a, b, c);
-	printf("SH.NE[%08X %08X %08X] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.GE\n");
-	a = 0xFF80;
-	b = 0;
-	c = (uint32_t)-1;
-	d = Ifx_SH_GE(a, b, c);
-	printf("SH.GE[%08X %08X %08X] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_GE(a, b, c);
-	printf("SH.GE[%08X %08X %08X] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.GE.U\n");
-	a = 0xFF80;
-	b = 0;
-	c = (uint32_t)-1;
-	d = Ifx_SH_GE_U(a, b, c);
-	printf("SH.GE.U[%08X %08X %08X] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_GE_U(a, b, c);
-	printf("SH.GE.U[%08X %08X %08X] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.LT\n");
-	a = 0xFF80;
-	b = 0;
-	c = (uint32_t)-1;
-	d = Ifx_SH_LT(a, b, c);
-	printf("SH.LT[%08X %08X %08X] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_LT(a, b, c);
-	printf("SH.LT[%08X %08X %08X] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SH.LT.U\n");
-	a = 0xFF80;
-	b = 0;
-	c = (uint32_t)-1;
-	d = Ifx_SH_LT_U(a, b, c);
-	printf("SH.LT.U[%08X %08X %08X] = %08X\n", a, b, c, d);
-	a = 0xFF80;
-	b = 1;
-	c = 0;
-	d = Ifx_SH_LT_U(a, b, c);
-	printf("SH.LT.U[%08X %08X %08X] = %08X\n", a, b, c, d);
-	flush_stdout();
-
-	printf("\nTest SHA\n");
-	ai = 0x80007FFF;
-	bi = 4;
-	ci = Ifx_SHA(ai, bi);
-	printf("SHA[%08X %i] = %08X\n", ai, bi, ci);
-	ai = 0x80007FFF;
-	bi = -4;
-	ci = Ifx_SHA(ai, bi);
-	printf("SHA[%08X %i] = %08X\n", ai, bi, ci);
-	flush_stdout();
-
-	printf("\nTest SHAS\n");
-	ai = 0x80007FFF;
-	bi = 4;
-	ci = Ifx_SHAS(ai, bi);
-	printf("SHAS[%08X %i] = %08X\n", ai, bi, ci);
-	ai = 0x80007FFF;
-	bi = -4;
-	ci = Ifx_SHAS(ai, bi);
-	printf("SHAS[%08X %i] = %08X\n", ai, bi, ci);
-	flush_stdout();
-
-	printf("\nTest SHA.H\n");
-	ai = 0x80007FFF;
-	bi = 4;
-	ci = Ifx_SHA_H(ai, bi);
-	printf("SHA.H[%08X %i] = %08X\n", ai, bi, ci);
-	ai = 0x80007FFF;
-	bi = -4;
-	ci = Ifx_SHA_H(ai, bi);
-	printf("SHA.H[%08X %i] = %08X\n", ai, bi, ci);
+	printf("\nTest SYSCALL\n");
+	Ifx_SYSCALL(0);
+	Ifx_SYSCALL(1);
 	flush_stdout();
 
 	g_regular_task_flag = true;

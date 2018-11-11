@@ -141,7 +141,6 @@
     <InputSection Name="wm4.reent.h.16.5ae3c94b0f86fbd3cb48ca2ac9576746"/>
     <InputSection Name="wm4.tc_inc_path.h.9.edf37d69033d984c657fa37b31a773ea"/>
     <InputSection Name="wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6"/>
-    <InputSection Name="wm4.0.b1bb44d18881a2d90847a2626c0e2173"/>
     <InputSection Name="wm4.ifxcpu_bf.h.28.d558ef760fb5b506d617d899a902fd0b"/>
     <InputSection Name="wm4.ifxcpu_reg.h.60.a87fe5519b726d5973d9b8bbefea77c7"/>
     <InputSection Name="wm4.Ifx_TypesReg.h.27.a0265a21b4a33fc908c22e692c7dc04b"/>
@@ -160,6 +159,9 @@
     <InputSection Name="wm4.ifxscu_reg.h.42.635ad195b6ad8d830f8c237313dbd237"/>
     <InputSection Name="wm4.ifxasclin_reg.h.45.b9fc0f41cb72deda5d5117dbcbcf1abb"/>
     <InputSection Name="wm4.ifxstm_bf.h.28.72ff81a9d174f4a2ba66a2163ff690d8"/>
+    <InputSection Name="wm4.0.1265d37d71cca3ad10109c9369b111d3"/>
+    <InputSection Name="wm4.assert.h.11.7fe9eb241be6b0fee772a1e693b81ae3"/>
+    <InputSection Name="wm4.asm_prototype.h.9.92e3105a828ed714f3c95b693362db2f"/>
   </Input>
   <Files>
     <ObjectFile Name="src\cint_tc23x.o"/>
@@ -187,6 +189,7 @@
     <ObjectFile Name="asm\test_O.o"/>
     <ObjectFile Name="asm\test_P_R.o"/>
     <ObjectFile Name="asm\test_S_1.o"/>
+    <ObjectFile Name="asm\test_S_2.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

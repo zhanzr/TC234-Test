@@ -9,14 +9,11 @@
 
 #include <machine/intrinsics.h>
 #include <machine/wdtcon.h>
-#ifdef USE_IRQ
-#include "interrupts.h"
-#endif /* USE_IRQ */
 
+#include "interrupts.h"
 #include "system_tc2x.h"
 
 #include "tc_inc_path.h"
-
 #include TC_INCLUDE(TCPATH/IfxScu_reg.h)
 #include TC_INCLUDE(TCPATH/IfxScu_bf.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
@@ -274,10 +271,8 @@ static void SYSTEM_InitExt(const PllInitValue_t *pPllInitValue)
 		system_set_pll(pPllInitValue);
 #endif
 
-#ifdef USE_IRQ
 	/* activate interrupt system */
 	InterruptInit();
-#endif /* USE_IRQ */
 }
 
 void SYSTEM_Init(void)

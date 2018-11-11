@@ -27,7 +27,7 @@
 
 /* This variable is set to 1 after the vectabs are initialized.  */
 
-static int _init_vectab_initialized[3] = {0, 0, 0};
+static int _init_vectab_initialized;
 
 /* This structure describes interrupt handlers and their arguments.  */
 
@@ -106,9 +106,9 @@ static inline void flush_stdout_trap(void)
 
 int _install_trap_handler(int trapno, void (*traphandler)(int))
 {
-	int CpuId = _mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK;
+//	int CpuId = _mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK;
 
-	if ((trapno < 0) || (trapno >= MAX_TRAPS) || !_init_vectab_initialized[CpuId])
+	if ((trapno < 0) || (trapno >= MAX_TRAPS) || !_init_vectab_initialized)
 		return 0;
 
 	Tdisptab[trapno] = traphandler;
@@ -734,7 +734,7 @@ int _install_int_handler(int intno, void (*inthandler)(int), int arg)
 {
 	int CpuId = _mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK;
 
-	if ((intno < 0) || (intno >= MAX_INTRS) || !_init_vectab_initialized[CpuId])
+	if ((intno < 0) || (intno >= MAX_INTRS) || !_init_vectab_initialized)
 		return 0;
 
 	Cdisptab[intno].hnd_handler = inthandler;
@@ -756,7 +756,7 @@ void _init_vectab(void)
 	register int *vptr;
 	int vecno;
 
-	if (_init_vectab_initialized[CpuId])
+	if (_init_vectab_initialized)
 		return;
 
 	/* Set BTV and BIV registers.  */
@@ -784,5 +784,5 @@ void _init_vectab(void)
 		Cdisptab[vecno].hnd_arg = vecno;
 	}
 
-	_init_vectab_initialized[CpuId] = 1;
+	_init_vectab_initialized = 1;
 }

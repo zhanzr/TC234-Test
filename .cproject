@@ -43,7 +43,6 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155" name="TriCore C Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c">
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.symbols.defined.223010303" name="Defined symbols (-D)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.symbols.defined" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="APPKIT_TC234TFT"/>
-									<listOptionValue builtIn="false" value="USE_IRQ"/>
 								</option>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths.1959146808" name="Include Paths" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;../h&quot;"/>
@@ -106,12 +105,9 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.2139967422" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.911822461" name="test_P_R.S" rcbsApplicability="disable" resourcePath="asm/test_P_R.S" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.1964495076">
-						<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.1964495076" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.694596367"/>
-					</fileInfo>
 					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1125921551" name="generate_template.py" rcbsApplicability="disable" resourcePath="asm/generate_template.py" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry excluding="test_P_R.S|test_O.S|test_M_3_N.S|test_M_2.S|test_L.S|test_J.S|test_G_I.S|test_E_F.S|test_D.S|test_B_C.S|generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
+						<entry excluding="test_S_1.S|test_P_R.S|test_O.S|test_M_3_N.S|test_M_2.S|test_L.S|test_J.S|test_G_I.S|test_E_F.S|test_D.S|test_B_C.S|generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>

@@ -41,6 +41,9 @@ typedef union union_pack64
 	int8_t i8[8];
 }pack64;
 
+#define portCSA_TO_ADDRESS( pCSA )			( ( uint32_t * )( ( ( ( pCSA ) & 0x000F0000 ) << 12 ) | ( ( ( pCSA ) & 0x0000FFFF ) << 6 ) ) )
+#define portADDRESS_TO_CSA( pAddress )		( ( uint32_t )( ( ( ( (uint32_t)( pAddress ) ) & 0xF0000000 ) >> 12 ) | ( ( ( uint32_t )( pAddress ) & 0x003FFFC0 ) >> 6 ) ) )
+
 //Absolute
 uint32_t Ifx_Abs_B(uint32_t X);
 uint32_t Ifx_Abs_H(uint32_t X);
@@ -339,6 +342,31 @@ uint32_t Ifx_SH_XOR_T(uint32_t A, uint32_t B, uint32_t C);
 int32_t Ifx_SHA(int32_t A, int32_t B);
 int32_t Ifx_SHAS(int32_t A, int32_t B);
 uint32_t Ifx_SHA_H(uint32_t A, int32_t B);
+
+void Ifx_ST_A(uint32_t* pA, uint32_t* pB);
+void Ifx_ST_B(uint32_t* pA, uint32_t B);
+void Ifx_ST_H(uint32_t* pA, uint32_t B);
+void Ifx_ST_W(uint32_t* pA, uint32_t B);
+void Ifx_ST_D(uint32_t* pA, uint64_t B64);
+void Ifx_ST_Q(uint32_t* pA, uint32_t B);
+void Ifx_ST_DA(uint32_t* pA, uint64_t* pC);
+void Ifx_ST_T(void);
+void Ifx_STLCX(uint32_t* pA);
+void Ifx_STUCX(uint32_t* pA);
+void Ifx_SVLCX(void);
+int32_t Ifx_SUB(int32_t A, int32_t B);
+uint32_t* Ifx_SUB_A(uint32_t* pA, uint32_t* pB);
+uint32_t Ifx_SUB_B(uint32_t A, uint32_t B);
+float Ifx_SUB_F(float A, float B);
+uint32_t Ifx_SUB_H(uint32_t A, uint32_t B);
+int32_t Ifx_SUBC(int32_t A, int32_t B);
+int32_t Ifx_SUBX(int32_t A, int32_t B);
+int32_t Ifx_SUBS(int32_t A, int32_t B);
+uint32_t Ifx_SUBS_U(uint32_t A, uint32_t B);
+uint32_t Ifx_SUBS_H(uint32_t A, uint32_t B);
+uint32_t Ifx_SUBS_HU(uint32_t A, uint32_t B);
+void Ifx_SWAP_W(uint32_t* pA, uint32_t A);
+void Ifx_SYSCALL(uint32_t tin);
 
 void Ifx_Enable(void);
 
