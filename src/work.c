@@ -18,6 +18,8 @@
 #include "tc23xa/IfxCpu_bf.h"
 #include "tc23xa/IfxEth_reg.h"
 #include "tc23xa/IfxEth_bf.h"
+#include "tc23xa/IfxScu_reg.h"
+#include "tc23xa/IfxScu_bf.h"
 
 #include "system_tc2x.h"
 #include "interrupts.h"
@@ -216,7 +218,10 @@ int main(void)
 	printf("M2CNT\t%08X\t:%08X\n\n", CPU_M2CNT, _mfcr(CPU_M2CNT));
 	printf("M3CNT\t%08X\t:%08X\n\n", CPU_M3CNT, _mfcr(CPU_M3CNT));
 
-//	printf("ETH_ID\t%08X\t:%08X\n\n", &ETH_ID, ETH_ID);
+	//	printf("ETH_ID\t%08X\t:%08X\n\n", &ETH_ID, ETH_ID);
+	printf("SCU_ID\t%08X\t:%08X\n\n", &SCU_ID, SCU_ID);
+	printf("SCU_MANID\t%08X\t:%08X\n\n", &SCU_MANID, SCU_MANID);
+	printf("SCU_CHIPID\t%08X\t:%08X\n\n", &SCU_CHIPID, SCU_CHIPID);
 	Ifx_SYSCALL(0);
 	Ifx_SYSCALL(1);
 
