@@ -159,6 +159,7 @@
     <InputSection Name="wm4.asm_prototype.h.9.92e3105a828ed714f3c95b693362db2f"/>
     <InputSection Name="wm4.ifxeth_reg.h.42.3738a46101f1c87a9d48e4ef8ff7c348"/>
     <InputSection Name="wm4.ifxeth_bf.h.28.1fab7a5371744212b6edd3ee2a158451"/>
+    <InputSection Name="wm4.bspconfig.h.136.7ca98ab85e40abed106b447e5bd12e63"/>
   </Input>
   <Files>
     <ObjectFile Name="src\cint_tc23x.o"/>
@@ -166,7 +167,6 @@
     <ObjectFile Name="src\system_tc23x.o"/>
     <ObjectFile Name="src\uart_init_int.o"/>
     <ObjectFile Name="src\uart_int.o"/>
-    <ObjectFile Name="src\work.o"/>
     <ObjectFile Name="asm\test_ABS.o"/>
     <ObjectFile Name="asm\test_ABSDIF.o"/>
     <ObjectFile Name="asm\test_ABSDIFS.o"/>
@@ -188,6 +188,7 @@
     <ObjectFile Name="asm\test_S_1.o"/>
     <ObjectFile Name="asm\test_S_2.o"/>
     <ObjectFile Name="asm\test_T_U_X.o"/>
+    <ObjectFile Name="src\main.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>
