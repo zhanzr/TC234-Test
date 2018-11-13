@@ -20,6 +20,10 @@
 #include "tc23xa/IfxEth_bf.h"
 #include "tc23xa/IfxScu_reg.h"
 #include "tc23xa/IfxScu_bf.h"
+#include "tc23xa/IfxInt_reg.h"
+#include "tc23xa/IfxInt_bf.h"
+#include "tc23xa/IfxSrc_reg.h"
+#include "tc23xa/IfxSrc_bf.h"
 
 #include "system_tc2x.h"
 #include "interrupts.h"
@@ -32,11 +36,39 @@
 #define SYS_TICK_HZ	1000
 #define STM_CMP0_ISR_PRIO	10
 #define STM_CMP1_ISR_PRIO	11
+#define GPSR0_ISR_PRIO	12
+#define GPSR1_ISR_PRIO	13
+#define GPSR2_ISR_PRIO	14
+#define GPSR3_ISR_PRIO	15
 
 volatile uint32_t g_sys_ticks;
 volatile uint32_t g_cmp1_ticks;
 
-volatile bool g_regular_task_flag;
+volatile bool g_gpsr_flag[4];
+
+static void gpsr0_isr(uint32_t var)
+{
+	SRC_GPSR00.B.SRR = 0;
+	g_gpsr_flag[0] = true;
+}
+
+static void gpsr1_isr(uint32_t var)
+{
+	SRC_GPSR01.B.SRR = 0;
+	g_gpsr_flag[1] = true;
+}
+
+static void gpsr2_isr(uint32_t var)
+{
+	SRC_GPSR02.B.SRR = 0;
+	g_gpsr_flag[2] = true;
+}
+
+static void gpsr3_isr(uint32_t var)
+{
+	SRC_GPSR03.B.SRR = 0;
+	g_gpsr_flag[3] = true;
+}
 
 const uint32_t HAL_GetTick(void)
 {
@@ -165,14 +197,41 @@ typedef struct _Hnd_arg
 	int hnd_arg;
 } Hnd_arg;
 
+void config_gpsr(void)
+{
+	SRC_GPSR00.B.SRR = 0;
+	SRC_GPSR00.B.TOS = 0;
+	SRC_GPSR00.B.SRE = 1;
+	InterruptInstall(SRC_ID_GPSR00, gpsr0_isr, GPSR0_ISR_PRIO, 0);
+
+	SRC_GPSR01.B.SRR = 0;
+	SRC_GPSR01.B.TOS = 0;
+	SRC_GPSR01.B.SRE = 1;
+	InterruptInstall(SRC_ID_GPSR01, gpsr1_isr, GPSR1_ISR_PRIO, 1);
+
+	SRC_GPSR02.B.SRR = 0;
+	SRC_GPSR02.B.TOS = 0;
+	SRC_GPSR02.B.SRE = 1;
+	InterruptInstall(SRC_ID_GPSR02, gpsr2_isr, GPSR2_ISR_PRIO, 2);
+
+	SRC_GPSR03.B.SRR = 0;
+	SRC_GPSR03.B.TOS = 0;
+	SRC_GPSR03.B.SRE = 1;
+	InterruptInstall(SRC_ID_GPSR03, gpsr3_isr, GPSR3_ISR_PRIO, 3);
+}
+
 int main(void)
 {
+	volatile bool g_regular_task_flag;
+
 	SYSTEM_Init();
 	SYSTEM_EnaDisCache(1);
 
 	/* initialise STM CMP 0 at SYS_TICK_HZ rate */
 	stm_init(0, SYS_TICK_HZ);
 	stm_init(1, 10*SYS_TICK_HZ);
+
+	config_gpsr();
 
 	_init_uart(BAUDRATE);
 	InitLED();
@@ -196,12 +255,12 @@ int main(void)
 	printf("\nTest STM\n");
 
 	printf("CPUID\t%08X\t:%08X\n\n", CPU_CPU_ID, _mfcr(CPU_CPU_ID));
-	printf("CCTRL\t%08X\t:%08X\n\n", CPU_CCTRL, _mfcr(CPU_CCTRL));
-	printf("CCNT\t%08X\t:%08X\n\n", CPU_CCNT, _mfcr(CPU_CCNT));
-	printf("ICNT\t%08X\t:%08X\n\n", CPU_ICNT, _mfcr(CPU_ICNT));
-	printf("M1CNT\t%08X\t:%08X\n\n", CPU_M1CNT, _mfcr(CPU_M1CNT));
-	printf("M2CNT\t%08X\t:%08X\n\n", CPU_M2CNT, _mfcr(CPU_M2CNT));
-	printf("M3CNT\t%08X\t:%08X\n\n", CPU_M3CNT, _mfcr(CPU_M3CNT));
+//	printf("CCTRL\t%08X\t:%08X\n\n", CPU_CCTRL, _mfcr(CPU_CCTRL));
+//	printf("CCNT\t%08X\t:%08X\n\n", CPU_CCNT, _mfcr(CPU_CCNT));
+//	printf("ICNT\t%08X\t:%08X\n\n", CPU_ICNT, _mfcr(CPU_ICNT));
+//	printf("M1CNT\t%08X\t:%08X\n\n", CPU_M1CNT, _mfcr(CPU_M1CNT));
+//	printf("M2CNT\t%08X\t:%08X\n\n", CPU_M2CNT, _mfcr(CPU_M2CNT));
+//	printf("M3CNT\t%08X\t:%08X\n\n", CPU_M3CNT, _mfcr(CPU_M3CNT));
 
 	//	printf("ETH_ID\t%08X\t:%08X\n\n", &ETH_ID, ETH_ID);
 	printf("SCU_ID\t%08X\t:%08X\n\n", &SCU_ID, SCU_ID);
@@ -209,6 +268,13 @@ int main(void)
 	printf("SCU_CHIPID\t%08X\t:%08X\n\n", &SCU_CHIPID, SCU_CHIPID);
 	Ifx_SYSCALL(0);
 	Ifx_SYSCALL(1);
+
+	printf("INT_ID\t%08X\t:%08X\n\n", &INT_ID, INT_ID);
+	printf("INT_SRB0\t%08X\t:%08X\n\n", &INT_SRB0, INT_SRB0);
+	printf("SRC_GPSR00\t%08X\t:%08X\n\n", &SRC_GPSR00, SRC_GPSR00);
+	printf("SRC_GPSR01\t%08X\t:%08X\n\n", &SRC_GPSR01, SRC_GPSR01);
+	printf("SRC_GPSR02\t%08X\t:%08X\n\n", &SRC_GPSR02, SRC_GPSR02);
+	printf("SRC_GPSR03\t%08X\t:%08X\n\n", &SRC_GPSR03, SRC_GPSR03);
 
 	extern void _start(void);
 	printf("_start\t:%08X\n\n", (uint32_t)_start);
@@ -296,9 +362,11 @@ int main(void)
 			sizeof(Tdisptab));
 
 	g_regular_task_flag = true;
+
+	uint8_t test_trig_cnt = 0;
 	while(1)
 	{
-		if(0==g_sys_ticks%(2*SYS_TICK_HZ))
+		if(0==g_sys_ticks%(5*SYS_TICK_HZ))
 		{
 			g_regular_task_flag = true;
 		}
@@ -316,12 +384,14 @@ int main(void)
 					SYSTEM_GetSysClock()/1000000,
 					SYSTEM_GetStmClock()/1000000,
 					SYSTEM_IsCacheEnabled());
+			flush_stdout();
 
 			printf("STMID:%08X\n",
 					MODULE_STM0.ID.U);
 
 			printf("%u\n", HAL_GetTick());
 			printf("%u\n", HAL_GetRunTimeTick());
+			flush_stdout();
 
 			printf("%08X %08X %08X %08X %08X %08X\n",
 					MODULE_STM0.TIM0.U,
@@ -331,7 +401,60 @@ int main(void)
 					MODULE_STM0.TIM4.U,
 					MODULE_STM0.TIM5.U
 			);
+			flush_stdout();
 
+			switch(test_trig_cnt)
+			{
+			case 0:
+				INT_SRB0.B.TRIG0 = 1;
+				break;
+
+			case 1:
+				INT_SRB0.B.TRIG1 = 1;
+				break;
+
+			case 2:
+//				INT_SRB0.B.TRIG2 = 1;
+				SRC_GPSR02.B.SETR = 1;
+				break;
+
+			case 3:
+//				INT_SRB0.B.TRIG3 = 1;
+				SRC_GPSR03.B.SETR = 1;
+				break;
+
+			default:
+				break;
+			}
+			test_trig_cnt = (test_trig_cnt+1)%4;
+
+		}
+
+		if(g_gpsr_flag[0])
+		{
+			g_gpsr_flag[0] = false;
+			printf("GPSR 0 Triggered\n");
+			flush_stdout();
+		}
+
+		if(g_gpsr_flag[1])
+		{
+			g_gpsr_flag[1] = false;
+			printf("GPSR 1 Triggered\n");
+			flush_stdout();
+		}
+
+		if(g_gpsr_flag[2])
+		{
+			g_gpsr_flag[2] = false;
+			printf("GPSR 2 Triggered\n");
+			flush_stdout();
+		}
+
+		if(g_gpsr_flag[3])
+		{
+			g_gpsr_flag[3] = false;
+			printf("GPSR 3 Triggered\n");
 			flush_stdout();
 		}
 	}

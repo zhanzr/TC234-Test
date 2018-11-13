@@ -160,6 +160,9 @@
     <InputSection Name="wm4.ifxeth_reg.h.42.3738a46101f1c87a9d48e4ef8ff7c348"/>
     <InputSection Name="wm4.ifxeth_bf.h.28.1fab7a5371744212b6edd3ee2a158451"/>
     <InputSection Name="wm4.bspconfig.h.136.7ca98ab85e40abed106b447e5bd12e63"/>
+    <InputSection Name="wm4.ifxsrc_bf.h.28.44eeb5e1d11a3d6844599194b0382cf1"/>
+    <InputSection Name="wm4.ifxint_reg.h.42.7a57a05f1f4da0a67389fc3f55fe00e7"/>
+    <InputSection Name="wm4.ifxint_bf.h.28.1af56cfab1c54d0fbca221760b5d1e7a"/>
   </Input>
   <Files>
     <ObjectFile Name="src\cint_tc23x.o"/>
