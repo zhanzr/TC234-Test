@@ -52,7 +52,7 @@ const uint32_t HAL_GetRunTimeTick(void)
 static void stm_cmp0_isr(uint32_t reload_value)
 {
 	MODULE_STM0.ISCR.B.CMP1IRR = 1;
-//	MODULE_STM0.CMP[0].U += (uint32_t)reload_value;
+	MODULE_STM0.CMP[0].U += (uint32_t)reload_value;
 
 	++g_sys_ticks;
 }
@@ -60,7 +60,7 @@ static void stm_cmp0_isr(uint32_t reload_value)
 static void stm_cmp1_isr(uint32_t reload_value)
 {
 	MODULE_STM0.ISCR.B.CMP0IRR = 1;
-//	MODULE_STM0.CMP[1].U += (uint32_t)reload_value;
+	MODULE_STM0.CMP[1].U += (uint32_t)reload_value;
 
 	++g_cmp1_ticks;
 }
@@ -309,14 +309,18 @@ int main(void)
 
 			LEDTOGGLE(0);
 
-			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d, %u\n",
+			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
 					__TRICORE_NAME__,
 					__TRICORE_CORE__,
 					SYSTEM_GetCpuClock()/1000000,
 					SYSTEM_GetSysClock()/1000000,
 					SYSTEM_GetStmClock()/1000000,
-					SYSTEM_IsCacheEnabled(),
-					HAL_GetTick());
+					SYSTEM_IsCacheEnabled());
+
+			printf("STMID:%08X\n",
+					MODULE_STM0.ID.U);
+
+			printf("%u\n", HAL_GetTick());
 			printf("%u\n", HAL_GetRunTimeTick());
 
 			printf("%08X %08X %08X %08X %08X %08X\n",
