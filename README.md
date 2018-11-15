@@ -1,18 +1,24 @@
 TC234 Demo.
 
-
-• Four General Purpose Service Requests (GPSR) per CPU that can be used as
-Software Interrupts (not assigned to peripherals or external interrupts)
-• Mechanism to signal General Purpose Service Requests (Software Interrupts)
-simultaneously to multiple Service Providers (Service Request Broadcast Registers,
-SRB)
-
-The TC21x/TC22x/TC23x contains groups of General Purpose Service Request SRNs
-per CPU that support software-initiated interrupts. One group per implemented TriCore
-CPU, each group including four SRNs. These SRNs are not connected to internal or
-external hardware trigger signals and can only be used as software interrupts / software
-initiated service requests. These SRNs are called General Purpose Service Requests
-Nodes (SRC_GPSRxy, x=group number, y=0-3).
-Additionally, any otherwise unused SRN can be employed to generate software
-interrupts.
-
+The Die Temperature Sensor (DTS) generates a measurement result that indicates
+directly the current temperature. The result of the measurement is displayed via bit field
+DTSSTAT.RESULT. In order to start one measurement bit DTSCON.START needs to
+be set.
+The DTS has to be enabled before it can be used via bit DTSCON.PWD. When the DTS
+is powered after the start-up time of the DTS (defined in the Data Sheet) a temperature
+measurement can be started.
+Note: If bit field DTSSTAT.RESULT is read before the first measurement was finished it
+will return 0x000.
+When a measurement is started the result is available after the measurement time
+passed. If the DTS is ready to start a measurement can be checked via bit
+DTSSTAT.RDY. If a started measurement is finished or still in progress is indicated via
+the status bit DTSSTAT.BUSY. The measurement time is also defined in the Data Sheet.
+In order to adjust production variations bit field DTSCON.CAL is available.
+DTSCON.CAL is automatically programmed with a predefined value.
+Note: The first measurement after the DTS was powered delivers a result without
+calibration adjustment and should be ignored therefore.
+The formula to calculate the die temperature is defined in the Data Sheet.
+Note: The maximum resolution is only achieved for a measurement that is part of
+multiple continuous measurements (recommended to ignore are two here).
+An interrupt service request (SRC_SCUDTS) is generated when DTS busy indication
+changes from 1 to 0.

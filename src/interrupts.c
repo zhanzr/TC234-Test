@@ -16,7 +16,6 @@
 
 #include "interrupts.h"
 
-
 extern void _init_vectab(void);
 extern int _install_int_handler(int intno, void (*handler)(int), int arg);
 
