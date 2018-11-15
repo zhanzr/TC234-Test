@@ -200,23 +200,15 @@ typedef struct _Hnd_arg
 void config_gpsr(void)
 {
 	SRC_GPSR00.B.SRR = 0;
-	SRC_GPSR00.B.TOS = 0;
-	SRC_GPSR00.B.SRE = 1;
 	InterruptInstall(SRC_ID_GPSR00, gpsr0_isr, GPSR0_ISR_PRIO, 0);
 
 	SRC_GPSR01.B.SRR = 0;
-	SRC_GPSR01.B.TOS = 0;
-	SRC_GPSR01.B.SRE = 1;
 	InterruptInstall(SRC_ID_GPSR01, gpsr1_isr, GPSR1_ISR_PRIO, 1);
 
 	SRC_GPSR02.B.SRR = 0;
-	SRC_GPSR02.B.TOS = 0;
-	SRC_GPSR02.B.SRE = 1;
 	InterruptInstall(SRC_ID_GPSR02, gpsr2_isr, GPSR2_ISR_PRIO, 2);
 
 	SRC_GPSR03.B.SRR = 0;
-	SRC_GPSR03.B.TOS = 0;
-	SRC_GPSR03.B.SRE = 1;
 	InterruptInstall(SRC_ID_GPSR03, gpsr3_isr, GPSR3_ISR_PRIO, 3);
 }
 
@@ -407,10 +399,12 @@ int main(void)
 			{
 			case 0:
 				INT_SRB0.B.TRIG0 = 1;
+//				SRC_GPSR00.B.SETR = 1;
 				break;
 
 			case 1:
 				INT_SRB0.B.TRIG1 = 1;
+//				SRC_GPSR01.B.SETR = 1;
 				break;
 
 			case 2:
