@@ -243,15 +243,15 @@ static void config_dts(void)
 	InterruptInstall(SRC_ID_SCUDTS, dts_isr, DTS_ISR_PRIO, 0);
 }
 
-static inline uint32_t read_dts(void)
+static inline int16_t read_dts(void)
 {
 	return SCU_DTSSTAT.B.RESULT;
 }
 
 static inline float read_dts_celsius(void)
 {
-	uint32_t raw = read_dts();
-    return ((float)raw * 0.467) - 285.5;
+	int16_t raw = read_dts();
+    return (raw - 607)/2.13;
 }
 
 static inline void start_dts_measure(void)
