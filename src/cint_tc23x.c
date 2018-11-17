@@ -124,7 +124,7 @@ int _install_trap_handler(int trapno, void (*traphandler)(int))
 
 static void __class_0_trap_handler(int tin)
 {
-	LEDTOGGLE(2);
+	led_toggle(2);
 
 	_out_uart('<');
 	flush_stdout_trap();
@@ -155,7 +155,7 @@ static void __class_0_trap_handler(int tin)
 
 static void __class_1_trap_handler(int tin)
 {
-	LEDTOGGLE(2);
+	led_toggle(2);
 
 	_out_uart('<');
 	flush_stdout_trap();
@@ -206,7 +206,7 @@ static void __class_1_trap_handler(int tin)
 
 static void __class_2_trap_handler(int tin)
 {
-	LEDTOGGLE(2);
+	led_toggle(2);
 
 	_out_uart('<');
 	flush_stdout_trap();
@@ -249,7 +249,7 @@ static void __class_2_trap_handler(int tin)
 
 static void __class_3_trap_handler(int tin)
 {
-	LEDTOGGLE(2);
+	led_toggle(2);
 
 	_out_uart('<');
 	flush_stdout_trap();
@@ -300,7 +300,7 @@ static void __class_3_trap_handler(int tin)
 
 static void __class_4_trap_handler(int tin)
 {
-	LEDTOGGLE(3);
+	led_toggle(3);
 
 	_out_uart('<');
 	flush_stdout_trap();
@@ -351,7 +351,7 @@ static void __class_4_trap_handler(int tin)
 
 static void __class_5_trap_handler(int tin)
 {
-	LEDTOGGLE(3);
+	led_toggle(3);
 
 	_out_uart('<');
 	flush_stdout_trap();
@@ -382,7 +382,7 @@ static void __class_5_trap_handler(int tin)
 
 static void __class_6_trap_handler(int tin)
 {
-	LEDTOGGLE(3);
+	led_toggle(3);
 
 	_out_uart('<');
 	flush_stdout_trap();
@@ -405,7 +405,7 @@ static void __class_6_trap_handler(int tin)
 
 static void __class_7_trap_handler(int tin)
 {
-	LEDTOGGLE(3);
+	led_toggle(3);
 
 	_out_uart('<');
 	flush_stdout_trap();

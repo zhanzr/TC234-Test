@@ -101,7 +101,6 @@
     <InputSection Description="Bit variables" Name=".bdata"/>
     <InputSection Description="absolute addressable readonly data" Name=".zdata.rodata"/>
     <InputSection Description="absolute addressable readonly data" Name=".zrodata"/>
-    <InputSection Name="wm4.led.h.17.d9ec8b4820aaaefd8372e009cc67c12f"/>
     <InputSection Name=".debug_macro"/>
     <InputSection Name="wm4.math.h.35.76dc670ff49d2ce743a05eb4427e8ebd"/>
     <InputSection Name="wm4.Ifx_TypesReg.h.27.516539c420f17fe6e9a73c01a48a0369"/>

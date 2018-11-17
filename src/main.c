@@ -41,11 +41,17 @@
 #define GPSR3_ISR_PRIO	15
 #define DTS_ISR_PRIO	16
 
+#define ERS0_ISR_PRIO	17
+#define ERS1_ISR_PRIO	18
+#define ERS2_ISR_PRIO	19
+#define ERS3_ISR_PRIO	20
+
 volatile uint32_t g_sys_ticks;
 volatile uint32_t g_cmp1_ticks;
 
 volatile bool g_gpsr_flag[4];
 volatile bool g_dts_flag;
+volatile bool g_ers_flag[4];
 
 static void gpsr0_isr(uint32_t var)
 {
@@ -69,6 +75,30 @@ static void gpsr3_isr(uint32_t var)
 {
 	SRC_GPSR03.B.SRR = 0;
 	g_gpsr_flag[3] = true;
+}
+
+static void ers0_isr(uint32_t var)
+{
+	MODULE_SCU.FMR.B.FC0 = 1;
+	g_ers_flag[0] = true;
+}
+
+static void ers1_isr(uint32_t var)
+{
+	MODULE_SCU.FMR.B.FC1 = 1;
+	g_ers_flag[1] = true;
+}
+
+static void ers2_isr(uint32_t var)
+{
+	MODULE_SCU.FMR.B.FC2 = 1;
+	g_ers_flag[2] = true;
+}
+
+static void ers3_isr(uint32_t var)
+{
+	MODULE_SCU.FMR.B.FC3 = 1;
+	g_ers_flag[3] = true;
 }
 
 const uint32_t HAL_GetTick(void)
@@ -259,6 +289,112 @@ static inline void start_dts_measure(void)
 	SCU_DTSCON.B.START = 1;
 }
 
+static void config_eru(void)
+{
+	//ERS 0, 2, 3, 6, 7
+//	ERS0:
+//		P15.4		->X102.P33
+//
+//	ERS1:
+//		P14.3
+//
+//	ERS2:
+//		P10.2
+//		P02.1		->X103.P14
+//		P00.4		->X103.P26
+//
+//	ERS3:
+//		P10.3
+//		P14.1
+//		P02.0		->X103.P13
+//
+//	ERS4:
+//		P33.7
+//		P15.5
+//
+//	ERS5:
+//		P15.8
+//
+//	ERS6:
+//		P20.0
+//		P33.11		-> X102.P26
+//		P11.10
+//
+//	ERS7:
+//		P20.9		-> X102.P37
+//		P15.1
+
+	//ERS Channel 0
+	MODULE_P15.IOCR4.B.PC4 = 2;
+
+	MODULE_SCU.EICR[0].B.EXIS0 = 0;
+	MODULE_SCU.EICR[0].B.FEN0 = 1;
+	MODULE_SCU.EICR[0].B.REN0 = 0;
+	MODULE_SCU.EICR[0].B.LDEN0 = 0;
+	MODULE_SCU.EICR[0].B.EIEN0 = 1;
+	MODULE_SCU.EICR[0].B.INP0 = 0;
+
+	MODULE_SCU.IGCR[0].B.IGP0 = 2;
+	MODULE_SCU.IGCR[0].B.GEEN0 = 1;
+
+	//ERS2 Channel 1
+	MODULE_P02.IOCR0.B.PC1 = 2;
+
+	MODULE_SCU.EICR[1].B.EXIS0 = 1;
+	MODULE_SCU.EICR[1].B.FEN0 = 1;
+	MODULE_SCU.EICR[1].B.REN0 = 0;
+	MODULE_SCU.EICR[1].B.LDEN0 = 0;
+	MODULE_SCU.EICR[1].B.EIEN0 = 1;
+	MODULE_SCU.EICR[1].B.INP0 = 0;
+
+	MODULE_SCU.IGCR[1].B.IGP0 = 2;
+	MODULE_SCU.IGCR[1].B.GEEN0 = 1;
+
+	//ERS3 Channel 2
+	MODULE_P02.IOCR0.B.PC0 = 2;
+
+	MODULE_SCU.EICR[1].B.EXIS1 = 2;
+	MODULE_SCU.EICR[1].B.FEN1 = 1;
+	MODULE_SCU.EICR[1].B.REN1 = 0;
+	MODULE_SCU.EICR[1].B.LDEN1 = 0;
+	MODULE_SCU.EICR[1].B.EIEN1 = 1;
+	MODULE_SCU.EICR[1].B.INP1 = 0;
+
+	MODULE_SCU.IGCR[1].B.IGP1 = 2;
+	MODULE_SCU.IGCR[1].B.GEEN1 = 1;
+
+	//ERS6 Channel 2
+	MODULE_P33.IOCR8.B.PC11 = 2;
+
+	MODULE_SCU.EICR[3].B.EXIS0 = 2;
+	MODULE_SCU.EICR[3].B.FEN0 = 1;
+	MODULE_SCU.EICR[3].B.REN0 = 0;
+	MODULE_SCU.EICR[3].B.LDEN0 = 0;
+	MODULE_SCU.EICR[3].B.EIEN0 = 1;
+	MODULE_SCU.EICR[3].B.INP0 = 0;
+
+	MODULE_SCU.IGCR[3].B.IGP0 = 2;
+	MODULE_SCU.IGCR[3].B.GEEN0 = 1;
+
+	//ERS7 Channel 0
+	MODULE_P20.IOCR8.B.PC9 = 2;
+
+	MODULE_SCU.EICR[3].B.EXIS1 = 0;
+	MODULE_SCU.EICR[3].B.FEN1 = 1;
+	MODULE_SCU.EICR[3].B.REN1 = 0;
+	MODULE_SCU.EICR[3].B.LDEN1 = 0;
+	MODULE_SCU.EICR[3].B.EIEN1 = 1;
+	MODULE_SCU.EICR[3].B.INP1 = 0;
+
+	MODULE_SCU.IGCR[3].B.IGP1 = 2;
+	MODULE_SCU.IGCR[3].B.GEEN1 = 1;
+
+	InterruptInstall(SRC_ID_SCUERU0, ers0_isr, ERS0_ISR_PRIO, 0);
+	InterruptInstall(SRC_ID_SCUERU1, ers1_isr, ERS1_ISR_PRIO, 0);
+	InterruptInstall(SRC_ID_SCUERU2, ers2_isr, ERS2_ISR_PRIO, 0);
+	InterruptInstall(SRC_ID_SCUERU3, ers3_isr, ERS3_ISR_PRIO, 0);
+}
+
 int main(void)
 {
 	volatile bool g_regular_task_flag;
@@ -272,9 +408,10 @@ int main(void)
 
 //	config_gpsr();
 	config_dts();
+	config_eru();
 
 	_init_uart(BAUDRATE);
-	InitLED();
+	led_init();
 
 	enable_performance_cnt();
 
@@ -291,7 +428,7 @@ int main(void)
 	extern void (*Tdisptab[MAX_TRAPS])(int tin);
 	Tdisptab[6] = prvTrapYield;
 
-	printf("\nTest DTS\n");
+	printf("\nTest ERU\n");
 
 	printf("CPUID\t%08X\t:%08X\n", CPU_CPU_ID, _mfcr(CPU_CPU_ID));
 //	printf("CCTRL\t%08X\t:%08X\n", CPU_CCTRL, _mfcr(CPU_CCTRL));
@@ -314,6 +451,7 @@ int main(void)
 	printf("SRC_GPSR01\t%08X\t:%08X\n", &SRC_GPSR01, SRC_GPSR01);
 	printf("SRC_GPSR02\t%08X\t:%08X\n", &SRC_GPSR02, SRC_GPSR02);
 	printf("SRC_GPSR03\t%08X\t:%08X\n", &SRC_GPSR03, SRC_GPSR03);
+	flush_stdout();
 
 	extern void _start(void);
 	printf("_start\t:%08X\n", (uint32_t)_start);
@@ -326,6 +464,7 @@ int main(void)
 	printf("__USTACK_SIZE\t:%08X\n", (uint32_t)__USTACK_SIZE);
 	extern void __USTACK_END(void);
 	printf("__USTACK_END\t:%08X\n", (uint32_t)__USTACK_END);
+	flush_stdout();
 
 	extern void __ISTACK_BEGIN(void);
 	printf("__ISTACK_BEGIN\t:%08X\n", (uint32_t)__ISTACK_BEGIN);
@@ -335,6 +474,7 @@ int main(void)
 	printf("__ISTACK_SIZE\t:%08X\n", (uint32_t)__ISTACK_SIZE);
 	extern void __ISTACK_END(void);
 	printf("__ISTACK_END\t:%08X\n", (uint32_t)__ISTACK_END);
+	flush_stdout();
 
 	extern void __HEAP_BEGIN(void);
 	printf("__HEAP_BEGIN\t:%08X\n", (uint32_t)__HEAP_BEGIN);
@@ -344,6 +484,7 @@ int main(void)
 	printf("__HEAP_SIZE\t:%08X\n", (uint32_t)__HEAP_SIZE);
 	extern void __HEAP_END(void);
 	printf("__HEAP_END\t:%08X\n", (uint32_t)__HEAP_END);
+	flush_stdout();
 
 	extern void __CSA_BEGIN(void);
 	printf("__CSA_BEGIN\t:%08X\n", (uint32_t)__CSA_BEGIN);
@@ -353,6 +494,7 @@ int main(void)
 	printf("__CSA_SIZE\t:%08X\n", (uint32_t)__CSA_SIZE);
 	extern void __CSA_END(void);
 	printf("__CSA_END\t:%08X\n", (uint32_t)__CSA_END);
+	flush_stdout();
 
 	extern void _SMALL_DATA_(void);
 	printf("_SMALL_DATA_\t:%08X\n", (uint32_t)_SMALL_DATA_);
@@ -365,6 +507,7 @@ int main(void)
 	printf("BIV\t%08X\t:%08X\n", CPU_BIV, _mfcr(CPU_BIV));
 	extern void TriCore_int_table(void);
 	printf("TriCore_int_table\t:%08X\n", (uint32_t)TriCore_int_table);
+	flush_stdout();
 
 	extern void __interrupt_1(void);
 	printf("__interrupt_1\t:%08X\n", (uint32_t)__interrupt_1);
@@ -372,6 +515,7 @@ int main(void)
 	printf("___interrupt_1\t:%08X\n", (uint32_t)___interrupt_1);
 	extern void __interrupt_2(void);
 	printf("__interrupt_2\t:%08X\n", (uint32_t)__interrupt_2);
+	flush_stdout();
 
 	extern Hnd_arg Cdisptab[MAX_INTRS];
 	printf("Soft Interrupt vector table %08X:%u * %u = %u\n",
@@ -379,6 +523,7 @@ int main(void)
 			sizeof(Cdisptab[0]),
 			MAX_INTRS,
 			sizeof(Cdisptab));
+	flush_stdout();
 
 	printf("BTV\t%08X\t:%08X\n", CPU_BTV, _mfcr(CPU_BTV));
 	extern void TriCore_trap_table(void);
@@ -392,6 +537,7 @@ int main(void)
 	printf("__trap_6\t:%08X\n", (uint32_t)__trap_6);
 	extern void ___trap_6(void);
 	printf("___trap_6\t:%08X\n", (uint32_t)___trap_6);
+	flush_stdout();
 
 	extern void (*Tdisptab[MAX_TRAPS]) (int tin);
 	printf("Soft Trap vector table %08X:%u * %u = %u\n",
@@ -399,13 +545,14 @@ int main(void)
 			sizeof(Tdisptab[0]),
 			MAX_TRAPS,
 			sizeof(Tdisptab));
+	flush_stdout();
 
 	g_regular_task_flag = true;
 
 	uint8_t test_trig_cnt = 0;
 	while(1)
 	{
-		if(0==g_sys_ticks%(5*SYS_TICK_HZ))
+		if(0==g_sys_ticks%(2*SYS_TICK_HZ))
 		{
 			g_regular_task_flag = true;
 		}
@@ -414,7 +561,10 @@ int main(void)
 		{
 			g_regular_task_flag = false;
 
-			LEDTOGGLE(0);
+			led_toggle(0);
+			led_toggle(1);
+			led_toggle(2);
+			led_toggle(3);
 
 			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
 					__TRICORE_NAME__,
@@ -426,6 +576,10 @@ int main(void)
 			flush_stdout();
 
 			start_dts_measure();
+
+			printf("EIFR:%08X P15_IN:%08X\n",
+					MODULE_SCU.EIFR.U, MODULE_P15.IN.U);
+			flush_stdout();
 
 //			printf("SCU_DTSCON\t%08X\t:%08X\n", &SCU_DTSCON, SCU_DTSCON);
 //			printf("SCU_DTSSTAT\t%08X\t:%08X\n", &SCU_DTSSTAT, SCU_DTSSTAT);
@@ -485,6 +639,34 @@ int main(void)
 			flush_stdout();
 		}
 
+		if(g_ers_flag[0])
+		{
+			g_ers_flag[0] = false;
+			printf("External Interrupt Channel 0 Triggered\n");
+			flush_stdout();
+		}
+
+		if(g_ers_flag[1])
+		{
+			g_ers_flag[1] = false;
+			printf("External Interrupt Channel 1 Triggered\n");
+			flush_stdout();
+		}
+
+		if(g_ers_flag[2])
+		{
+			g_ers_flag[2] = false;
+			printf("External Interrupt Channel 2 Triggered\n");
+			flush_stdout();
+		}
+
+		if(g_ers_flag[3])
+		{
+			g_ers_flag[3] = false;
+			printf("External Interrupt Channel 3 Triggered\n");
+			flush_stdout();
+		}
+
 //		if(g_gpsr_flag[0])
 //		{
 //			g_gpsr_flag[0] = false;
@@ -512,6 +694,8 @@ int main(void)
 //			printf("GPSR 3 Triggered\n");
 //			flush_stdout();
 //		}
+
+
 	}
 
 	return EXIT_SUCCESS;

@@ -8,56 +8,99 @@
 #include <math.h>
 #include <limits.h>
 
+#include "machine/intrinsics.h"
+
 #include "led.h"
 #include "uart_int.h"
-
-#include "tc23xa/IfxStm_reg.h"
-#include "tc23xa/IfxStm_bf.h"
-#include "tc23xa/IfxCpu_reg.h"
-#include "tc23xa/IfxCpu_bf.h"
-
 #include "system_tc2x.h"
-#include "machine/intrinsics.h"
 #include "interrupts.h"
 
+#include TC_INCLUDE(TCPATH/IfxStm_reg.h)
+#include TC_INCLUDE(TCPATH/IfxStm_bf.h)
+#include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
+#include TC_INCLUDE(TCPATH/IfxCpu_bf.h)
+
 /* AppKit-TC2X4: P13.0 .. P13.3 --> LED D107 ... D110 */
-static Ifx_P * const portLED = (Ifx_P *)&MODULE_P13;
+#define	PORT_LED	MODULE_P13
 
-/* OMR is WO ==> don't use load-modify-store access! */
-/* set PSx pin */
-#define LED_PIN_SET(x)			(1 << (LED_PIN_NR + (x)))
-/* set PCLx pin */
-#define LED_PIN_RESET(x)		(1 << (LED_PIN_NR + IFX_P_OMR_PCL0_OFF + (x)))
-
-void LEDON(int nr)
+void led_on(uint8_t n)
 {
-	if (nr < MAX_LED)
+	switch (n)
 	{
-		portLED->OMR.U = LED_PIN_RESET(nr);
+	case 0:
+		PORT_LED.OMR.B.PCL0 = 1;
+		break;
+	case 1:
+		PORT_LED.OMR.B.PCL1 = 1;
+		break;
+	case 2:
+		PORT_LED.OMR.B.PCL2 = 1;
+		break;
+	case 3:
+		PORT_LED.OMR.B.PCL3 = 1;
+		break;
+
+	default:
+		break;
 	}
 }
 
-void LEDOFF(int nr)
+void led_off(uint8_t n)
 {
-	if (nr < MAX_LED)
+	switch (n)
 	{
-		portLED->OMR.U = LED_PIN_SET(nr);
+	case 0:
+		PORT_LED.OMR.B.PS0 = 1;
+		break;
+	case 1:
+		PORT_LED.OMR.B.PS1 = 1;
+		break;
+	case 2:
+		PORT_LED.OMR.B.PS2 = 1;
+		break;
+	case 3:
+		PORT_LED.OMR.B.PS3 = 1;
+		break;
+
+	default:
+		break;
 	}
 }
 
-void LEDTOGGLE(int nr)
+void led_toggle(uint8_t n)
 {
-	if (nr < MAX_LED)
+	switch (n)
 	{
-		/* set PCLx and PSx pin to 1 ==> toggle pin state */
-		portLED->OMR.U = LED_PIN_RESET(nr) | LED_PIN_SET(nr);
+	case 0:
+		PORT_LED.OMR.U |= ((1<<IFX_P_OMR_PS0_OFF)|(1<<IFX_P_OMR_PCL0_OFF));
+		break;
+	case 1:
+		PORT_LED.OMR.U |= ((1<<IFX_P_OMR_PS1_OFF)|(1<<IFX_P_OMR_PCL1_OFF));
+		break;
+	case 2:
+		PORT_LED.OMR.U |= ((1<<IFX_P_OMR_PS2_OFF)|(1<<IFX_P_OMR_PCL2_OFF));
+		break;
+	case 3:
+		PORT_LED.OMR.U |= ((1<<IFX_P_OMR_PS3_OFF)|(1<<IFX_P_OMR_PCL3_OFF));
+		break;
+
+	default:
+		break;
 	}
 }
 
-void InitLED(void)
+void led_init(void)
 {
 	/* initialise all LEDs (P13.0 .. P13.3) */
-	portLED->IOCR0.U = 0x80808080;	/* OUT_PPGPIO */
+	/* OUT_PPGPIO */
+	PORT_LED.IOCR0.B.PC0 = 0x18;
+	PORT_LED.IOCR0.B.PC1 = 0x18;
+	PORT_LED.IOCR0.B.PC2 = 0x18;
+	PORT_LED.IOCR0.B.PC3 = 0x18;
+
 	/* all LEDs OFF */
-	portLED->OMR.U = (MASK_ALL_LEDS << LED_PIN_NR);
+	PORT_LED.OMR.B.PS0 = 1;
+	PORT_LED.OMR.B.PS1 = 1;
+	PORT_LED.OMR.B.PS2 = 1;
+	PORT_LED.OMR.B.PS3 = 1;
 }
