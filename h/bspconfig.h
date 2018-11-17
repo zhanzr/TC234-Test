@@ -1,10 +1,10 @@
 /*====================================================================
-* Project:  Board Support Package (BSP)
-* Function: BSP configuration header file.
-*           (Infineon TC23xx boards)
-*
-* Copyright HighTec EDV-Systeme GmbH 1982-2016
-*====================================================================*/
+ * Project:  Board Support Package (BSP)
+ * Function: BSP configuration header file.
+ *           (Infineon TC23xx boards)
+ *
+ * Copyright HighTec EDV-Systeme GmbH 1982-2016
+ *====================================================================*/
 
 #ifndef __BSPCONFIG_H__
 #define __BSPCONFIG_H__
@@ -17,15 +17,19 @@ extern "C" {
 
 #include <machine/intrinsics.h>
 
+# define BOARD_NAME				"AppKit-TC234TFT"
+# define BOARD_TITLE			"TC234TFT AppKit"
+# define MCU_NAME				"TC234A"
 #include "tc_inc_path.h"
 
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
 #include TC_INCLUDE(TCPATH/IfxStm_reg.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_bf.h)
 
-# define BOARD_NAME				"AppKit-TC234TFT"
-# define BOARD_TITLE			"TC234TFT AppKit"
-# define MCU_NAME				"TC234A"
+#include TC_INCLUDE(TCPATH/IfxPort_reg.h)
+#include TC_INCLUDE(TCPATH/IfxPort_bf.h)
+
+#include "interrupts.h"
 
 #define CPU_CLOCK				200
 #define TIM_CLOCK				(CPU_CLOCK)
@@ -38,23 +42,15 @@ extern "C" {
 #define DEFAULT_PLL_VALUE		PLL_VALUE_200_100
 #endif /* DEFAULT_PLL_VALUE */
 
-#include TC_INCLUDE(TCPATH/IfxPort_reg.h)
-#include TC_INCLUDE(TCPATH/IfxPort_bf.h)
-
 /*********************************************************/
 /* Common UART settings (interrupt and polling variants) */
 /*********************************************************/
-#if (defined(MODULE_UART_INT) || defined(MODULE_UART_POLL))
-
 #include TC_INCLUDE(TCPATH/IfxAsclin_reg.h)
 #include TC_INCLUDE(TCPATH/IfxAsclin_bf.h)
 
 static Ifx_ASCLIN * const asclin0 = (Ifx_ASCLIN *)&MODULE_ASCLIN0;
-#if (RUN_ON_APPKIT == 1)
-static Ifx_P * const port = (Ifx_P *)&MODULE_P14;
-#else
-static Ifx_P * const port = (Ifx_P *)&MODULE_P15;
-#endif /* RUN_ON_APPKIT */
+
+static Ifx_P * const port_UART = (Ifx_P *)&MODULE_P14;
 
 #define UARTBASE				asclin0
 
@@ -89,12 +85,12 @@ static Ifx_P * const port = (Ifx_P *)&MODULE_P15;
 
 /* definitions for RX error conditions */
 #define ASC_ERROR_MASK			((IFX_ASCLIN_FLAGS_PE_MSK << IFX_ASCLIN_FLAGS_PE_OFF) | \
-								 (IFX_ASCLIN_FLAGS_FE_MSK << IFX_ASCLIN_FLAGS_FE_OFF) | \
-								 (IFX_ASCLIN_FLAGS_RFO_MSK << IFX_ASCLIN_FLAGS_RFO_OFF))
+		(IFX_ASCLIN_FLAGS_FE_MSK << IFX_ASCLIN_FLAGS_FE_OFF) | \
+		(IFX_ASCLIN_FLAGS_RFO_MSK << IFX_ASCLIN_FLAGS_RFO_OFF))
 
 #define ASC_CLRERR_MASK			((IFX_ASCLIN_FLAGSCLEAR_PEC_MSK << IFX_ASCLIN_FLAGSCLEAR_PEC_OFF) | \
-								 (IFX_ASCLIN_FLAGSCLEAR_FEC_MSK << IFX_ASCLIN_FLAGSCLEAR_FEC_OFF) | \
-								 (IFX_ASCLIN_FLAGSCLEAR_RFOC_MSK << IFX_ASCLIN_FLAGSCLEAR_RFOC_OFF))
+		(IFX_ASCLIN_FLAGSCLEAR_FEC_MSK << IFX_ASCLIN_FLAGSCLEAR_FEC_OFF) | \
+		(IFX_ASCLIN_FLAGSCLEAR_RFOC_MSK << IFX_ASCLIN_FLAGSCLEAR_RFOC_OFF))
 
 /* UART primitives */
 #define RX_CLEAR(u)				((u)->FLAGSCLEAR.U = (IFX_ASCLIN_FLAGSCLEAR_RFLC_MSK << IFX_ASCLIN_FLAGSCLEAR_RFLC_OFF))
@@ -103,9 +99,6 @@ static Ifx_P * const port = (Ifx_P *)&MODULE_P15;
 #define GET_CHAR(u)				((u)->RXDATA.U)
 #define GET_ERROR_STATUS(u)		(((u)->FLAGS.U) & ASC_ERROR_MASK)
 #define RESET_ERROR(u)			((u)->FLAGSCLEAR.U = ASC_CLRERR_MASK)
-
-#endif /* (defined(MODULE_UART_INT) || defined(MODULE_UART_POLL)) */
-
 
 /************************/
 /* Polling variant UART */
@@ -123,9 +116,6 @@ static Ifx_P * const port = (Ifx_P *)&MODULE_P15;
 /**************************/
 /* Interrupt variant UART */
 /**************************/
-#ifdef MODULE_UART_INT
-
-#include "interrupts.h"
 
 extern void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_isr)(int arg));
 
@@ -136,8 +126,6 @@ extern void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*ua
 #define TX_INT_START(u)			((u)->FLAGSENABLE.B.TFLE = 1, (u)->FLAGSSET.U = (IFX_ASCLIN_FLAGSSET_TFLS_MSK << IFX_ASCLIN_FLAGSSET_TFLS_OFF))
 #define TX_INT_STOP(u)			((u)->FLAGSENABLE.B.TFLE = 0)
 #define TX_INT_CHECK(u)			((u)->FLAGSENABLE.B.TFLE)
-
-#endif /* MODULE_UART_INT */
 
 #define UNUSED(x) (void)(x)
 

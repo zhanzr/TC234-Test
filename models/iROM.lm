@@ -158,10 +158,14 @@
     <InputSection Name="wm4.asm_prototype.h.9.92e3105a828ed714f3c95b693362db2f"/>
     <InputSection Name="wm4.ifxeth_reg.h.42.3738a46101f1c87a9d48e4ef8ff7c348"/>
     <InputSection Name="wm4.ifxeth_bf.h.28.1fab7a5371744212b6edd3ee2a158451"/>
-    <InputSection Name="wm4.bspconfig.h.136.7ca98ab85e40abed106b447e5bd12e63"/>
     <InputSection Name="wm4.ifxsrc_bf.h.28.44eeb5e1d11a3d6844599194b0382cf1"/>
     <InputSection Name="wm4.ifxint_reg.h.42.7a57a05f1f4da0a67389fc3f55fe00e7"/>
     <InputSection Name="wm4.ifxint_bf.h.28.1af56cfab1c54d0fbca221760b5d1e7a"/>
+    <InputSection Name="wm4.bspconfig.h.56.55807972dfe39951ac5bef256a16d423"/>
+    <InputSection Name="wm4.bspconfig.h.129.e329bf74d993f4acf924a360efde7f1b"/>
+    <InputSection Name="wm4.bspconfig.h.55.af1c968758735fdd62d272669ffeb649"/>
+    <InputSection Name="wm4.bspconfig.h.10.a8408fffb29f9c9125bde176ae3d565b"/>
+    <InputSection Name="wm4.bspconfig.h.34.6228359b840d5c9aae057ef461027e39"/>
   </Input>
   <Files>
     <ObjectFile Name="src\cint_tc23x.o"/>

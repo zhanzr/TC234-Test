@@ -22,19 +22,11 @@ void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_i
 	InterruptInstall(SRC_ID_ASCLIN0TX, uart_tx_isr, XMIT_INTERRUPT, 0);
 	InterruptInstall(SRC_ID_ASCLIN0RX, uart_rx_isr, RECV_INTERRUPT, 0);
 
-#if (RUN_ON_APPKIT == 1)
 	/* on board wiggler is connected to ASCLIN0 */
 	/* ARX0A/P14.1 (RXD), ATX0/P14.0 (TXD) */
 	/* Set TXD/P14.0 to "output" and "high" */
-	port->IOCR0.B.PC0 = OUT_PPALT2;
-	port->OMR.B.PS0 = 1;
-#else
-	/* on board wiggler is connected to ASCLIN0 */
-	/* ARX0B/P15.3 (RXD), ATX0/P15.2 (TXD) */
-	/* Set TXD/P15.2 to "output" and "high" */
-	port->IOCR0.B.PC2 = OUT_PPALT2;
-	port->OMR.B.PS2 = 1;
-#endif /* RUN_ON_APPKIT */
+	port_UART->IOCR0.B.PC0 = OUT_PPALT2;
+	port_UART->OMR.B.PS0 = 1;
 
 	/* baudrate values at 100 MHz */
 	denominator = 3125;

@@ -18,6 +18,7 @@
 #include "uart_int.h"
 #include "cint.h"
 #include "asm_prototype.h"
+#include "bspconfig.h"
 
 #include TC_INCLUDE(TCPATH/IfxStm_reg.h)
 #include TC_INCLUDE(TCPATH/IfxStm_bf.h)
@@ -325,7 +326,7 @@ static void config_eru(void)
 //		P15.1
 
 	//ERS Channel 0
-	MODULE_P15.IOCR4.B.PC4 = 2;
+	MODULE_P15.IOCR4.B.PC4 = IN_PULLUP;
 
 	MODULE_SCU.EICR[0].B.EXIS0 = 0;
 	MODULE_SCU.EICR[0].B.FEN0 = 1;
@@ -338,7 +339,7 @@ static void config_eru(void)
 	MODULE_SCU.IGCR[0].B.GEEN0 = 1;
 
 	//ERS2 Channel 1
-	MODULE_P02.IOCR0.B.PC1 = 2;
+	MODULE_P02.IOCR0.B.PC1 = IN_PULLUP;
 
 	MODULE_SCU.EICR[1].B.EXIS0 = 1;
 	MODULE_SCU.EICR[1].B.FEN0 = 1;
@@ -351,7 +352,7 @@ static void config_eru(void)
 	MODULE_SCU.IGCR[1].B.GEEN0 = 1;
 
 	//ERS3 Channel 2
-	MODULE_P02.IOCR0.B.PC0 = 2;
+	MODULE_P02.IOCR0.B.PC0 = IN_PULLUP;
 
 	MODULE_SCU.EICR[1].B.EXIS1 = 2;
 	MODULE_SCU.EICR[1].B.FEN1 = 1;
@@ -364,7 +365,7 @@ static void config_eru(void)
 	MODULE_SCU.IGCR[1].B.GEEN1 = 1;
 
 	//ERS6 Channel 2
-	MODULE_P33.IOCR8.B.PC11 = 2;
+	MODULE_P33.IOCR8.B.PC11 = IN_PULLUP;
 
 	MODULE_SCU.EICR[3].B.EXIS0 = 2;
 	MODULE_SCU.EICR[3].B.FEN0 = 1;
@@ -377,7 +378,7 @@ static void config_eru(void)
 	MODULE_SCU.IGCR[3].B.GEEN0 = 1;
 
 	//ERS7 Channel 0
-	MODULE_P20.IOCR8.B.PC9 = 2;
+	MODULE_P20.IOCR8.B.PC9 = IN_PULLUP;
 
 	MODULE_SCU.EICR[3].B.EXIS1 = 0;
 	MODULE_SCU.EICR[3].B.FEN1 = 1;
@@ -552,19 +553,39 @@ int main(void)
 	uint8_t test_trig_cnt = 0;
 	while(1)
 	{
-		if(0==g_sys_ticks%(2*SYS_TICK_HZ))
+		if(0==g_sys_ticks%(SYS_TICK_HZ))
 		{
 			g_regular_task_flag = true;
 		}
+
+		uint32_t test_trigger_cnt = g_sys_ticks/(SYS_TICK_HZ);
 
 		if(g_regular_task_flag)
 		{
 			g_regular_task_flag = false;
 
-			led_toggle(0);
-			led_toggle(1);
-			led_toggle(2);
-			led_toggle(3);
+			if(0==test_trigger_cnt%4)
+			{
+				led_on(0);
+				led_off(1);
+				led_off(2);
+			}
+			else if(1==test_trigger_cnt%4)
+			{
+				led_off(0);
+				led_on(1);
+				led_off(2);
+			}
+			else if(2==test_trigger_cnt%4)
+			{
+				led_off(0);
+				led_off(1);
+				led_on(2);
+			}
+			else
+			{
+				led_toggle(3);
+			}
 
 			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
 					__TRICORE_NAME__,
@@ -577,9 +598,9 @@ int main(void)
 
 			start_dts_measure();
 
-			printf("EIFR:%08X P15_IN:%08X\n",
-					MODULE_SCU.EIFR.U, MODULE_P15.IN.U);
-			flush_stdout();
+//			printf("EIFR:%08X P15_IN:%08X\n",
+//					MODULE_SCU.EIFR.U, MODULE_P15.IN.U);
+//			flush_stdout();
 
 //			printf("SCU_DTSCON\t%08X\t:%08X\n", &SCU_DTSCON, SCU_DTSCON);
 //			printf("SCU_DTSSTAT\t%08X\t:%08X\n", &SCU_DTSSTAT, SCU_DTSSTAT);
@@ -635,35 +656,37 @@ int main(void)
 		if(g_dts_flag)
 		{
 			g_dts_flag = false;
-			printf("DTS Triggered %.3f\n", read_dts_celsius());
+			printf("DTS Triggered %.3f P15.4:%u\n",
+					read_dts_celsius(),
+					MODULE_P15.IN.B.P4);
 			flush_stdout();
 		}
 
 		if(g_ers_flag[0])
 		{
 			g_ers_flag[0] = false;
-			printf("External Interrupt Channel 0 Triggered\n");
+//			printf("External Interrupt Channel 0 Triggered\n");
 			flush_stdout();
 		}
 
 		if(g_ers_flag[1])
 		{
 			g_ers_flag[1] = false;
-			printf("External Interrupt Channel 1 Triggered\n");
+//			printf("External Interrupt Channel 1 Triggered\n");
 			flush_stdout();
 		}
 
 		if(g_ers_flag[2])
 		{
 			g_ers_flag[2] = false;
-			printf("External Interrupt Channel 2 Triggered\n");
+//			printf("External Interrupt Channel 2 Triggered\n");
 			flush_stdout();
 		}
 
 		if(g_ers_flag[3])
 		{
 			g_ers_flag[3] = false;
-			printf("External Interrupt Channel 3 Triggered\n");
+//			printf("External Interrupt Channel 3 Triggered\n");
 			flush_stdout();
 		}
 
