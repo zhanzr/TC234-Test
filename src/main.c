@@ -12,13 +12,7 @@
 #include <machine/intrinsics.h>
 #include <machine/wdtcon.h>
 
-#include "system_tc2x.h"
-#include "interrupts.h"
-#include "led.h"
-#include "uart_int.h"
-#include "cint.h"
-#include "asm_prototype.h"
-#include "bspconfig.h"
+#include "bspconfig_tc23x.h"
 
 #include TC_INCLUDE(TCPATH/IfxStm_reg.h)
 #include TC_INCLUDE(TCPATH/IfxStm_bf.h)
@@ -33,160 +27,25 @@
 #include TC_INCLUDE(TCPATH/IfxSrc_reg.h)
 #include TC_INCLUDE(TCPATH/IfxSrc_bf.h)
 
-#define SYS_TICK_HZ	1000
-#define STM_CMP0_ISR_PRIO	10
-#define STM_CMP1_ISR_PRIO	11
-#define GPSR0_ISR_PRIO	12
-#define GPSR1_ISR_PRIO	13
-#define GPSR2_ISR_PRIO	14
-#define GPSR3_ISR_PRIO	15
-#define DTS_ISR_PRIO	16
+#include "core_tc23x.h"
+#include "system_tc2x.h"
+#include "cint_trap_tc23x.h"
+#include "interrupts_tc23x.h"
+#include "led.h"
+#include "uart_int.h"
+#include "asm_prototype.h"
+#include "dts.h"
+#include "timer.h"
+#include "gpsr.h"
+#include "scu_eru.h"
+#include "data_flash.h"
 
-#define ERS0_ISR_PRIO	17
-#define ERS1_ISR_PRIO	18
-#define ERS2_ISR_PRIO	19
-#define ERS3_ISR_PRIO	20
-
-volatile uint32_t g_sys_ticks;
-volatile uint32_t g_cmp1_ticks;
-
-volatile bool g_gpsr_flag[4];
-volatile bool g_dts_flag;
-volatile bool g_ers_flag[4];
-
-static void gpsr0_isr(uint32_t var)
+static void prvTrapYield( int tin )
 {
-	SRC_GPSR00.B.SRR = 0;
-	g_gpsr_flag[0] = true;
-}
-
-static void gpsr1_isr(uint32_t var)
-{
-	SRC_GPSR01.B.SRR = 0;
-	g_gpsr_flag[1] = true;
-}
-
-static void gpsr2_isr(uint32_t var)
-{
-	SRC_GPSR02.B.SRR = 0;
-	g_gpsr_flag[2] = true;
-}
-
-static void gpsr3_isr(uint32_t var)
-{
-	SRC_GPSR03.B.SRR = 0;
-	g_gpsr_flag[3] = true;
-}
-
-static void ers0_isr(uint32_t var)
-{
-	MODULE_SCU.FMR.B.FC0 = 1;
-	g_ers_flag[0] = true;
-}
-
-static void ers1_isr(uint32_t var)
-{
-	MODULE_SCU.FMR.B.FC1 = 1;
-	g_ers_flag[1] = true;
-}
-
-static void ers2_isr(uint32_t var)
-{
-	MODULE_SCU.FMR.B.FC2 = 1;
-	g_ers_flag[2] = true;
-}
-
-static void ers3_isr(uint32_t var)
-{
-	MODULE_SCU.FMR.B.FC3 = 1;
-	g_ers_flag[3] = true;
-}
-
-const uint32_t HAL_GetTick(void)
-{
-	return g_sys_ticks;
-}
-
-const uint32_t HAL_GetRunTimeTick(void)
-{
-	return g_cmp1_ticks;
-}
-
-/* timer interrupt routine */
-static void stm_cmp0_isr(uint32_t reload_value)
-{
-	MODULE_STM0.ISCR.B.CMP1IRR = 1;
-	MODULE_STM0.CMP[0].U += (uint32_t)reload_value;
-
-	++g_sys_ticks;
-}
-
-static void stm_cmp1_isr(uint32_t reload_value)
-{
-	MODULE_STM0.ISCR.B.CMP0IRR = 1;
-	MODULE_STM0.CMP[1].U += (uint32_t)reload_value;
-
-	++g_cmp1_ticks;
-}
-
-/* Initialise timer at rate <hz> */
-void stm_init(uint8_t ch, uint32_t hz)
-{
-	uint32_t freq_stm = SYSTEM_GetStmClock();
-
-	uint32_t reload_value = freq_stm / hz;
-
-	if(0==ch)
-	{
-		InterruptInstall(SRC_ID_STM0SR0, stm_cmp0_isr, STM_CMP0_ISR_PRIO, reload_value);
-
-		/* Determine how many bits are used without changing other bits in the CMCON register. */
-		MODULE_STM0.CMCON.B.MSIZE0 &= ~0x1fUL;
-		MODULE_STM0.CMCON.B.MSIZE0 |= (0x1f - __builtin_clz( reload_value));
-
-		/* reset interrupt flag */
-		MODULE_STM0.ISCR.B.CMP0IRR = 1;
-		/* prepare compare register */
-		MODULE_STM0.CMP[0].U = MODULE_STM0.TIM0.U + reload_value;
-
-		MODULE_STM0.ICR.B.CMP0OS = 0;
-		MODULE_STM0.ICR.B.CMP0EN = 1;
-	}
-	else
-	{
-		InterruptInstall(SRC_ID_STM0SR1, stm_cmp1_isr, STM_CMP1_ISR_PRIO, reload_value);
-
-		/* Determine how many bits are used without changing other bits in the CMCON register. */
-		MODULE_STM0.CMCON.B.MSIZE1 &= ~0x1fUL;
-		MODULE_STM0.CMCON.B.MSIZE1 |= (0x1f - __builtin_clz( reload_value));
-
-		/* reset interrupt flag */
-		MODULE_STM0.ISCR.B.CMP1IRR = 1;
-		/* prepare compare register */
-		MODULE_STM0.CMP[1].U = MODULE_STM0.TIM0.U + reload_value;
-
-		MODULE_STM0.ICR.B.CMP1OS = 1;
-		MODULE_STM0.ICR.B.CMP1EN = 1;
-	}
-}
-
-static inline void flush_stdout(void)
-{
-	__asm__ volatile ("nop" ::: "memory");
-	__asm volatile ("" : : : "memory");
-	/* wait until sending has finished */
-	while (_uart_sending())
-	{
-		;
-	}
-}
-
-static void prvTrapYield( int iTrapIdentification )
-{
-	switch( iTrapIdentification )
+	switch( tin )
 	{
 	default:
-		printf("Syscall Tin:%d\n", iTrapIdentification);
+		printf("Trap6 Tin:%d\n", tin);
 		break;
 	}
 }
@@ -229,172 +88,6 @@ typedef struct _Hnd_arg
 	int hnd_arg;
 } Hnd_arg;
 
-void config_gpsr(void)
-{
-	SRC_GPSR00.B.SRR = 0;
-	InterruptInstall(SRC_ID_GPSR00, gpsr0_isr, GPSR0_ISR_PRIO, 0);
-
-	SRC_GPSR01.B.SRR = 0;
-	InterruptInstall(SRC_ID_GPSR01, gpsr1_isr, GPSR1_ISR_PRIO, 1);
-
-	SRC_GPSR02.B.SRR = 0;
-	InterruptInstall(SRC_ID_GPSR02, gpsr2_isr, GPSR2_ISR_PRIO, 2);
-
-	SRC_GPSR03.B.SRR = 0;
-	InterruptInstall(SRC_ID_GPSR03, gpsr3_isr, GPSR3_ISR_PRIO, 3);
-}
-
-bool IfxDts_isReady(void)
-{
-    return SCU_DTSSTAT.B.RDY == 1 ? true : false;
-}
-
-static void dts_isr(uint32_t para)
-{
-	g_dts_flag = true;
-}
-
-static void config_dts(void)
-{
-//	printf("SCU_DTSCON\t%08X\t:%08X\n", &SCU_DTSCON, SCU_DTSCON);
-//	printf("SCU_DTSSTAT\t%08X\t:%08X\n", &SCU_DTSSTAT, SCU_DTSSTAT);
-//	printf("SCU_DTSLIM\t%08X\t:%08X\n", &SCU_DTSLIM, SCU_DTSLIM);
-//	flush_stdout();
-
-	SCU_DTSCON.B.PWD = 0;
-	SCU_DTSCON.B.START = 1;
-
-	if(IfxDts_isReady())
-	{
-	    /* one dummy read to a SCU register which ensures that the BUSY flag is synchronized
-	     * into the status register before IfxDts_Dts_isBusy() is called */
-		_nop();
-	}
-
-	InterruptInstall(SRC_ID_SCUDTS, dts_isr, DTS_ISR_PRIO, 0);
-}
-
-static inline int16_t read_dts(void)
-{
-	return SCU_DTSSTAT.B.RESULT;
-}
-
-static inline float read_dts_celsius(void)
-{
-	int16_t raw = read_dts();
-    return (raw - 607)/2.13;
-}
-
-static inline void start_dts_measure(void)
-{
-	SCU_DTSCON.B.START = 1;
-}
-
-static void config_eru(void)
-{
-	//ERS 0, 2, 3, 6, 7
-//	ERS0:
-//		P15.4		->X102.P33
-//
-//	ERS1:
-//		P14.3
-//
-//	ERS2:
-//		P10.2
-//		P02.1		->X103.P14
-//		P00.4		->X103.P26
-//
-//	ERS3:
-//		P10.3
-//		P14.1
-//		P02.0		->X103.P13
-//
-//	ERS4:
-//		P33.7
-//		P15.5
-//
-//	ERS5:
-//		P15.8
-//
-//	ERS6:
-//		P20.0
-//		P33.11		-> X102.P26
-//		P11.10
-//
-//	ERS7:
-//		P20.9		-> X102.P37
-//		P15.1
-
-	//ERS Channel 0
-	MODULE_P15.IOCR4.B.PC4 = IN_PULLUP;
-
-	MODULE_SCU.EICR[0].B.EXIS0 = 0;
-	MODULE_SCU.EICR[0].B.FEN0 = 1;
-	MODULE_SCU.EICR[0].B.REN0 = 0;
-	MODULE_SCU.EICR[0].B.LDEN0 = 0;
-	MODULE_SCU.EICR[0].B.EIEN0 = 1;
-	MODULE_SCU.EICR[0].B.INP0 = 0;
-
-	MODULE_SCU.IGCR[0].B.IGP0 = 2;
-	MODULE_SCU.IGCR[0].B.GEEN0 = 1;
-
-	//ERS2 Channel 1
-	MODULE_P02.IOCR0.B.PC1 = IN_PULLUP;
-
-	MODULE_SCU.EICR[1].B.EXIS0 = 1;
-	MODULE_SCU.EICR[1].B.FEN0 = 1;
-	MODULE_SCU.EICR[1].B.REN0 = 0;
-	MODULE_SCU.EICR[1].B.LDEN0 = 0;
-	MODULE_SCU.EICR[1].B.EIEN0 = 1;
-	MODULE_SCU.EICR[1].B.INP0 = 0;
-
-	MODULE_SCU.IGCR[1].B.IGP0 = 2;
-	MODULE_SCU.IGCR[1].B.GEEN0 = 1;
-
-	//ERS3 Channel 2
-	MODULE_P02.IOCR0.B.PC0 = IN_PULLUP;
-
-	MODULE_SCU.EICR[1].B.EXIS1 = 2;
-	MODULE_SCU.EICR[1].B.FEN1 = 1;
-	MODULE_SCU.EICR[1].B.REN1 = 0;
-	MODULE_SCU.EICR[1].B.LDEN1 = 0;
-	MODULE_SCU.EICR[1].B.EIEN1 = 1;
-	MODULE_SCU.EICR[1].B.INP1 = 0;
-
-	MODULE_SCU.IGCR[1].B.IGP1 = 2;
-	MODULE_SCU.IGCR[1].B.GEEN1 = 1;
-
-	//ERS6 Channel 2
-	MODULE_P33.IOCR8.B.PC11 = IN_PULLUP;
-
-	MODULE_SCU.EICR[3].B.EXIS0 = 2;
-	MODULE_SCU.EICR[3].B.FEN0 = 1;
-	MODULE_SCU.EICR[3].B.REN0 = 0;
-	MODULE_SCU.EICR[3].B.LDEN0 = 0;
-	MODULE_SCU.EICR[3].B.EIEN0 = 1;
-	MODULE_SCU.EICR[3].B.INP0 = 0;
-
-	MODULE_SCU.IGCR[3].B.IGP0 = 2;
-	MODULE_SCU.IGCR[3].B.GEEN0 = 1;
-
-	//ERS7 Channel 0
-	MODULE_P20.IOCR8.B.PC9 = IN_PULLUP;
-
-	MODULE_SCU.EICR[3].B.EXIS1 = 0;
-	MODULE_SCU.EICR[3].B.FEN1 = 1;
-	MODULE_SCU.EICR[3].B.REN1 = 0;
-	MODULE_SCU.EICR[3].B.LDEN1 = 0;
-	MODULE_SCU.EICR[3].B.EIEN1 = 1;
-	MODULE_SCU.EICR[3].B.INP1 = 0;
-
-	MODULE_SCU.IGCR[3].B.IGP1 = 2;
-	MODULE_SCU.IGCR[3].B.GEEN1 = 1;
-
-	InterruptInstall(SRC_ID_SCUERU0, ers0_isr, ERS0_ISR_PRIO, 0);
-	InterruptInstall(SRC_ID_SCUERU1, ers1_isr, ERS1_ISR_PRIO, 0);
-	InterruptInstall(SRC_ID_SCUERU2, ers2_isr, ERS2_ISR_PRIO, 0);
-	InterruptInstall(SRC_ID_SCUERU3, ers3_isr, ERS3_ISR_PRIO, 0);
-}
 
 int main(void)
 {
@@ -407,12 +100,13 @@ int main(void)
 	stm_init(0, SYS_TICK_HZ);
 	stm_init(1, 10*SYS_TICK_HZ);
 
-//	config_gpsr();
-	config_dts();
-	config_eru();
-
 	_init_uart(BAUDRATE);
 	led_init();
+
+	config_dts();
+//	config_gpsr();
+//	config_eru();
+	config_dflash();
 
 	enable_performance_cnt();
 
@@ -429,22 +123,125 @@ int main(void)
 	extern void (*Tdisptab[MAX_TRAPS])(int tin);
 	Tdisptab[6] = prvTrapYield;
 
-	printf("\nTest ERU\n");
+	printf("\nTest data flash\n");
+	flush_stdout();
+
+
+	extern void __PMI_PSPR_BEGIN(void);
+	extern void __PMI_PSPR_SIZE(void);
+	printf("PSRR:%08X %08X\n", (uint32_t)__PMI_PSPR_BEGIN, (uint32_t)__PMI_PSPR_SIZE);
+	for(uint32_t i=0; i<0x20/4; ++i)
+	{
+		printf("%08X ", *((uint32_t*)((uint32_t)__PMI_PSPR_BEGIN+i*4)));
+	}
+	printf("\n");
+	flush_stdout();
+
+	//Read UCB
+//#define	UCB_ADDR	(0xAF100000)
+//#define	UCB_SIZE	(0x4000)
+//	printf("UCB:%08X %08X\n", (uint32_t)UCB_ADDR, (uint32_t)UCB_SIZE);
+//	for(uint32_t i=0; i<UCB_SIZE/4; ++i)
+//	{
+//		printf("%08X ", *((uint32_t*)((uint32_t)UCB_ADDR+i*4)));
+//	}
+//	printf("\n");
+//	flush_stdout();
+
+//	printf("BMHD0:%08X\n", BMHD_ADDR_0);
+//	flush_stdout();
+//	for(uint32_t i=0; i<0x20/4; ++i)
+//	{
+//		printf("%08X ", *((uint32_t*)(BMHD_ADDR_0+i*4)));
+//		flush_stdout();
+//	}
+
+//	unlock_wdtcon();
+//	uint32_t tmpU32 = *((uint32_t*)(BMHD_ADDR_1));
+//	lock_wdtcon();
+//	printf("%08X\n", tmpU32);
+//	flush_stdout();
+//
+//	printf("BMHD1:%08X\n", BMHD_ADDR_1);
+//	flush_stdout();
+//
+//	unlock_wdtcon();
+//	for(uint32_t i=0; i<0x20/4; ++i)
+//	{
+//		printf("%08X ", *((uint32_t*)(BMHD_ADDR_1+i*4)));
+//	}
+//	lock_wdtcon();
+//	flush_stdout();
+
+//	printf("BMHD2:%08X\n", BMHD_ADDR_2);
+//	flush_stdout();
+//	for(uint32_t i=0; i<0x20/4; ++i)
+//	{
+//		printf("%08X ", *((uint32_t*)(BMHD_ADDR_2+i*4)));
+//		flush_stdout();
+//	}
+//
+//	printf("BMHD3:%08X\n", BMHD_ADDR_3);
+//	flush_stdout();
+//	for(uint32_t i=0; i<0x20/4; ++i)
+//	{
+//		printf("%08X ", *((uint32_t*)(BMHD_ADDR_3+i*4)));
+//		flush_stdout();
+//	}
+
+//	unlock_wdtcon();
+//	printf("BMHD1, STADABM:%08X, BMI:%04X, BMHDID:%04X, CHKSTART:%08X, CHKEND:%08X, CRCRANGE:%08X, nCRCRANGE:%08X, CRCHEAD:%08X, nCRCHEAD:%08X\n",
+//			(uint32_t)P_BMHD_1->startAddress,
+//			P_BMHD_1->bmIndex,
+//			P_BMHD_1->bmhdID,
+//			P_BMHD_1->chkStart,
+//			P_BMHD_1->chkEnd,
+//			P_BMHD_1->crcRange,
+//			P_BMHD_1->invCrcRange,
+//			P_BMHD_1->crcHead,
+//			P_BMHD_1->invCrcHead);
+//	flush_stdout();
+//	lock_wdtcon();
+
+//	printf("BMHD2, STADABM:%08X, BMI:%04X, BMHDID:%04X, CHKSTART:%08X, CHKEND:%08X, CRCRANGE:%08X, nCRCRANGE:%08X, CRCHEAD:%08X, nCRCHEAD:%08X\n",
+//			(uint32_t)P_BMHD_2->startAddress,
+//			P_BMHD_2->bmIndex,
+//			P_BMHD_2->bmhdID,
+//			P_BMHD_2->chkStart,
+//			P_BMHD_2->chkEnd,
+//			P_BMHD_2->crcRange,
+//			P_BMHD_2->invCrcRange,
+//			P_BMHD_2->crcHead,
+//			P_BMHD_2->invCrcHead);
+//	flush_stdout();
+//
+//	printf("P_BMHD_3, STADABM:%08X, BMI:%04X, BMHDID:%04X, CHKSTART:%08X, CHKEND:%08X, CRCRANGE:%08X, nCRCRANGE:%08X, CRCHEAD:%08X, nCRCHEAD:%08X\n",
+//			(uint32_t)P_BMHD_3->startAddress,
+//			P_BMHD_3->bmIndex,
+//			P_BMHD_3->bmhdID,
+//			P_BMHD_3->chkStart,
+//			P_BMHD_3->chkEnd,
+//			P_BMHD_3->crcRange,
+//			P_BMHD_3->invCrcRange,
+//			P_BMHD_3->crcHead,
+//			P_BMHD_3->invCrcHead);
+//	flush_stdout();
 
 	printf("CPUID\t%08X\t:%08X\n", CPU_CPU_ID, _mfcr(CPU_CPU_ID));
-//	printf("CCTRL\t%08X\t:%08X\n", CPU_CCTRL, _mfcr(CPU_CCTRL));
-//	printf("CCNT\t%08X\t:%08X\n", CPU_CCNT, _mfcr(CPU_CCNT));
-//	printf("ICNT\t%08X\t:%08X\n", CPU_ICNT, _mfcr(CPU_ICNT));
-//	printf("M1CNT\t%08X\t:%08X\n", CPU_M1CNT, _mfcr(CPU_M1CNT));
-//	printf("M2CNT\t%08X\t:%08X\n", CPU_M2CNT, _mfcr(CPU_M2CNT));
-//	printf("M3CNT\t%08X\t:%08X\n", CPU_M3CNT, _mfcr(CPU_M3CNT));
+	//	printf("CCTRL\t%08X\t:%08X\n", CPU_CCTRL, _mfcr(CPU_CCTRL));
+	//	printf("CCNT\t%08X\t:%08X\n", CPU_CCNT, _mfcr(CPU_CCNT));
+	//	printf("ICNT\t%08X\t:%08X\n", CPU_ICNT, _mfcr(CPU_ICNT));
+	//	printf("M1CNT\t%08X\t:%08X\n", CPU_M1CNT, _mfcr(CPU_M1CNT));
+	//	printf("M2CNT\t%08X\t:%08X\n", CPU_M2CNT, _mfcr(CPU_M2CNT));
+	//	printf("M3CNT\t%08X\t:%08X\n", CPU_M3CNT, _mfcr(CPU_M3CNT));
 
 	//	printf("ETH_ID\t%08X\t:%08X\n", &ETH_ID, ETH_ID);
 	printf("SCU_ID\t%08X\t:%08X\n", &SCU_ID, SCU_ID);
 	printf("SCU_MANID\t%08X\t:%08X\n", &SCU_MANID, SCU_MANID);
 	printf("SCU_CHIPID\t%08X\t:%08X\n", &SCU_CHIPID, SCU_CHIPID);
-	Ifx_SYSCALL(0);
-	Ifx_SYSCALL(1);
+
+	_syscall(0);
+	_syscall(1);
 
 	printf("INT_ID\t%08X\t:%08X\n", &INT_ID, INT_ID);
 	printf("INT_SRB0\t%08X\t:%08X\n", &INT_SRB0, INT_SRB0);
@@ -553,12 +350,13 @@ int main(void)
 	uint8_t test_trig_cnt = 0;
 	while(1)
 	{
-		if(0==g_sys_ticks%(SYS_TICK_HZ))
+#define	DELAY_TICK	(10*SYS_TICK_HZ)
+		if(0==HAL_GetTick()%(DELAY_TICK))
 		{
 			g_regular_task_flag = true;
 		}
 
-		uint32_t test_trigger_cnt = g_sys_ticks/(SYS_TICK_HZ);
+		uint32_t test_trigger_cnt = HAL_GetTick()/(DELAY_TICK);
 
 		if(g_regular_task_flag)
 		{
@@ -598,126 +396,41 @@ int main(void)
 
 			start_dts_measure();
 
-//			printf("EIFR:%08X P15_IN:%08X\n",
-//					MODULE_SCU.EIFR.U, MODULE_P15.IN.U);
-//			flush_stdout();
+			//			printf("EIFR:%08X P15_IN:%08X\n",
+			//					MODULE_SCU.EIFR.U, MODULE_P15.IN.U);
+			//			flush_stdout();
 
-//			printf("SCU_DTSCON\t%08X\t:%08X\n", &SCU_DTSCON, SCU_DTSCON);
-//			printf("SCU_DTSSTAT\t%08X\t:%08X\n", &SCU_DTSSTAT, SCU_DTSSTAT);
-//			printf("SCU_DTSLIM\t%08X\t:%08X\n", &SCU_DTSLIM, SCU_DTSLIM);
-//			flush_stdout();
+			//			printf("SCU_DTSCON\t%08X\t:%08X\n", &SCU_DTSCON, SCU_DTSCON);
+			//			printf("SCU_DTSSTAT\t%08X\t:%08X\n", &SCU_DTSSTAT, SCU_DTSSTAT);
+			//			printf("SCU_DTSLIM\t%08X\t:%08X\n", &SCU_DTSLIM, SCU_DTSLIM);
+			//			flush_stdout();
 
-//			printf("STMID:%08X\n",
-//					MODULE_STM0.ID.U);
-//
-//			printf("%u\n", HAL_GetTick());
-//			printf("%u\n", HAL_GetRunTimeTick());
-//			flush_stdout();
-//
-//			printf("%08X %08X %08X %08X %08X %08X\n",
-//					MODULE_STM0.TIM0.U,
-//					MODULE_STM0.TIM1.U,
-//					MODULE_STM0.TIM2.U,
-//					MODULE_STM0.TIM3.U,
-//					MODULE_STM0.TIM4.U,
-//					MODULE_STM0.TIM5.U
-//			);
-//			flush_stdout();
+			//			printf("STMID:%08X\n",
+			//					MODULE_STM0.ID.U);
 
-//			switch(test_trig_cnt)
-//			{
-//			case 0:
-//				INT_SRB0.B.TRIG0 = 1;
-////				SRC_GPSR00.B.SETR = 1;
-//				break;
-//
-//			case 1:
-//				INT_SRB0.B.TRIG1 = 1;
-////				SRC_GPSR01.B.SETR = 1;
-//				break;
-//
-//			case 2:
-////				INT_SRB0.B.TRIG2 = 1;
-//				SRC_GPSR02.B.SETR = 1;
-//				break;
-//
-//			case 3:
-////				INT_SRB0.B.TRIG3 = 1;
-//				SRC_GPSR03.B.SETR = 1;
-//				break;
-//
-//			default:
-//				break;
-//			}
-//			test_trig_cnt = (test_trig_cnt+1)%4;
-
-		}
-
-		if(g_dts_flag)
-		{
-			g_dts_flag = false;
-			printf("DTS Triggered %.3f P15.4:%u\n",
-					read_dts_celsius(),
-					MODULE_P15.IN.B.P4);
+			printf("%u\n", HAL_GetTick());
+			printf("%u\n", HAL_GetRunTimeTick());
 			flush_stdout();
+
+			//			printf("%08X %08X %08X %08X %08X %08X\n",
+			//					MODULE_STM0.TIM0.U,
+			//					MODULE_STM0.TIM1.U,
+			//					MODULE_STM0.TIM2.U,
+			//					MODULE_STM0.TIM3.U,
+			//					MODULE_STM0.TIM4.U,
+			//					MODULE_STM0.TIM5.U
+			//			);
+			//			flush_stdout();
+
+			test_trig_cnt = test_trigger_gpsr(test_trig_cnt);
+
 		}
 
-		if(g_ers_flag[0])
-		{
-			g_ers_flag[0] = false;
-//			printf("External Interrupt Channel 0 Triggered\n");
-			flush_stdout();
-		}
+		test_proc_dts();
 
-		if(g_ers_flag[1])
-		{
-			g_ers_flag[1] = false;
-//			printf("External Interrupt Channel 1 Triggered\n");
-			flush_stdout();
-		}
+		test_proc_eru();
 
-		if(g_ers_flag[2])
-		{
-			g_ers_flag[2] = false;
-//			printf("External Interrupt Channel 2 Triggered\n");
-			flush_stdout();
-		}
-
-		if(g_ers_flag[3])
-		{
-			g_ers_flag[3] = false;
-//			printf("External Interrupt Channel 3 Triggered\n");
-			flush_stdout();
-		}
-
-//		if(g_gpsr_flag[0])
-//		{
-//			g_gpsr_flag[0] = false;
-//			printf("GPSR 0 Triggered\n");
-//			flush_stdout();
-//		}
-//
-//		if(g_gpsr_flag[1])
-//		{
-//			g_gpsr_flag[1] = false;
-//			printf("GPSR 1 Triggered\n");
-//			flush_stdout();
-//		}
-//
-//		if(g_gpsr_flag[2])
-//		{
-//			g_gpsr_flag[2] = false;
-//			printf("GPSR 2 Triggered\n");
-//			flush_stdout();
-//		}
-//
-//		if(g_gpsr_flag[3])
-//		{
-//			g_gpsr_flag[3] = false;
-//			printf("GPSR 3 Triggered\n");
-//			flush_stdout();
-//		}
-
+//		test_proc_gpsr();
 
 	}
 

@@ -13,7 +13,7 @@
 #include "led.h"
 #include "uart_int.h"
 #include "system_tc2x.h"
-#include "interrupts.h"
+#include "interrupts_tc23x.h"
 
 #include TC_INCLUDE(TCPATH/IfxStm_reg.h)
 #include TC_INCLUDE(TCPATH/IfxStm_bf.h)

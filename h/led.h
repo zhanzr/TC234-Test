@@ -7,7 +7,7 @@
 #ifndef __LED_H__
 #define __LED_H__
 
-#include "bspconfig.h"
+#include "bspconfig_tc23x.h"
 
 #ifdef __cplusplus
 extern "C" {

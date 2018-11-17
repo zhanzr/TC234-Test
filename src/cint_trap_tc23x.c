@@ -12,15 +12,15 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "bspconfig.h"
+#include "bspconfig_tc23x.h"
 #include "uart_int.h"
 #include "led.h"
 
 #include <machine/intrinsics.h>
 #include <machine/wdtcon.h>
 
-#include "cint.h"
-#include "tc_inc_path.h"
+#include "cint_trap_tc23x.h"
+#include "tc_inc_path_tc23x.h"
 
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_bf.h)

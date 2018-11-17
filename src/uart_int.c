@@ -10,7 +10,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "bspconfig.h"
+#include "bspconfig_tc23x.h"
 #include "uart_int.h"
 
 

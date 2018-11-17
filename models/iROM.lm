@@ -125,7 +125,6 @@
     <InputSection Name="wm4.stdio.h.67.e86186cbfb246ea8547bb52373065166"/>
     <InputSection Name="wm4.stdio.h.31.f48311dde756a2aec27351b58a280fb9"/>
     <InputSection Name="wm4._ansi.h.23.8aa39ec63c47b0c474529e4131d42f04"/>
-    <InputSection Name="wm4.bspconfig.h.26.033b034693c4c2b363e281935e482209"/>
     <InputSection Name="wm4.newlib.h.8.b2a2e540cc2551574077f838d8204237"/>
     <InputSection Name="wm4.ifxcpu_reg.h.48.efae3e83a47a32c1e62d28f181503bc1"/>
     <InputSection Name="wm4.stdbool.h.29.1c9ee6859ce8145f7838a4f2549ccec2"/>
@@ -134,14 +133,10 @@
     <InputSection Name="wm4.types.h.80.d1d5f5bf70b2a7b495c85b558a9744ac"/>
     <InputSection Name="wm4.types.h.2.e9cec8c90ab35f77d9f499e06ae02400"/>
     <InputSection Name="wm4.stdlib.h.13.603ed7eb09a1561ab06840b7c0fcff58"/>
-    <InputSection Name="wm4.interrupts.h.9.5a62b23ea36c4906c67c8ce1135f3f17"/>
     <InputSection Name="wm4.string.h.8.ef946ad0bc9ad5c970c365dcd1fc4b0a"/>
     <InputSection Name="wm4.reent.h.16.5ae3c94b0f86fbd3cb48ca2ac9576746"/>
-    <InputSection Name="wm4.tc_inc_path.h.9.edf37d69033d984c657fa37b31a773ea"/>
     <InputSection Name="wm4.stdarg.h.34.3a23a216c0c293b3d2ea2e89281481e6"/>
     <InputSection Name="wm4.uart_int.h.10.7119d9997e9fbe4795ff202ea06387e3"/>
-    <InputSection Name="wm4.bspconfig.h.59.b0fa0c50cc66e026d36ff6bf8107a8c4"/>
-    <InputSection Name="wm4.bspconfig.h.132.89f640448266357bb917280bacfca622"/>
     <InputSection Name="wm4.stdio.h.27.f2ac352bab34f31f9f478442827b2ba6"/>
     <InputSection Name="wm4.stddef.h.234.7b49b621169e2007451b8fadbcc644ca"/>
     <InputSection Name="wm4.ifxasclin_bf.h.28.82c7a4119e8f5617f7b90a7d670d2dac"/>
@@ -149,27 +144,31 @@
     <InputSection Name="wm4.ifxscu_bf.h.28.9a07903c69e87b761063be2cfe1bc5c5"/>
     <InputSection Name="wm4.ifxsrc_reg.h.42.f44c43a46d4ca81589017945efd8519d"/>
     <InputSection Name="wm4.ifxqspi_reg.h.51.6bbae5556c07695ffbec783b82bacef8"/>
-    <InputSection Name="wm4.cint.h.9.2a620d1ba9e5c2af6127ea3fcd7ce8dd"/>
     <InputSection Name="wm4.ifxscu_reg.h.42.635ad195b6ad8d830f8c237313dbd237"/>
     <InputSection Name="wm4.ifxasclin_reg.h.45.b9fc0f41cb72deda5d5117dbcbcf1abb"/>
     <InputSection Name="wm4.ifxstm_bf.h.28.72ff81a9d174f4a2ba66a2163ff690d8"/>
     <InputSection Name="wm4.0.1265d37d71cca3ad10109c9369b111d3"/>
     <InputSection Name="wm4.assert.h.11.7fe9eb241be6b0fee772a1e693b81ae3"/>
-    <InputSection Name="wm4.asm_prototype.h.9.92e3105a828ed714f3c95b693362db2f"/>
     <InputSection Name="wm4.ifxeth_reg.h.42.3738a46101f1c87a9d48e4ef8ff7c348"/>
     <InputSection Name="wm4.ifxeth_bf.h.28.1fab7a5371744212b6edd3ee2a158451"/>
     <InputSection Name="wm4.ifxsrc_bf.h.28.44eeb5e1d11a3d6844599194b0382cf1"/>
     <InputSection Name="wm4.ifxint_reg.h.42.7a57a05f1f4da0a67389fc3f55fe00e7"/>
     <InputSection Name="wm4.ifxint_bf.h.28.1af56cfab1c54d0fbca221760b5d1e7a"/>
-    <InputSection Name="wm4.bspconfig.h.56.55807972dfe39951ac5bef256a16d423"/>
-    <InputSection Name="wm4.bspconfig.h.129.e329bf74d993f4acf924a360efde7f1b"/>
-    <InputSection Name="wm4.bspconfig.h.55.af1c968758735fdd62d272669ffeb649"/>
-    <InputSection Name="wm4.bspconfig.h.10.a8408fffb29f9c9125bde176ae3d565b"/>
-    <InputSection Name="wm4.bspconfig.h.34.6228359b840d5c9aae057ef461027e39"/>
+    <InputSection Name="wm4.ifxpmu_bf.h.28.07fc612673841a2c9a5dfa67923a6667"/>
+    <InputSection Name="wm4.ifxpmu_reg.h.42.d61df6a66f288cedd84f246887854423"/>
+    <InputSection Name="wm4.bspconfig_tc23x.h.34.6228359b840d5c9aae057ef461027e39"/>
+    <InputSection Name="wm4.tc_inc_path_tc23x.h.9.edf37d69033d984c657fa37b31a773ea"/>
+    <InputSection Name="wm4.bspconfig_tc23x.h.55.1b7702524a7460c10e7fed1bee56771b"/>
+    <InputSection Name="wm4.bspconfig_tc23x.h.20.7c8e003d2c72585883bfb3c983de4327"/>
+    <InputSection Name="wm4.bspconfig_tc23x.h.10.a8408fffb29f9c9125bde176ae3d565b"/>
+    <InputSection Name="wm4.interrupts_tc23x.h.9.c8d78bca33d5f9917a1a8808d3e40720"/>
+    <InputSection Name="wm4.asm_prototype.h.9.44dc5ea9028f9327527fcb9a41f0dc02"/>
+    <InputSection Name="wm4.assert.h.11.7043852a511d37ae606afa012e67e471"/>
+    <InputSection Name="wm4.cint_trap_tc23x.h.9.658be6e43250c91be74140ef37f78c82"/>
+    <InputSection Name="wm4.ifxflash_bf.h.28.768faa5638310add094bc712205f110d"/>
+    <InputSection Name="wm4.ifxflash_reg.h.42.ab16609b7bf4a3c69b268086a14156b3"/>
   </Input>
   <Files>
-    <ObjectFile Name="src\cint_tc23x.o"/>
-    <ObjectFile Name="src\interrupts.o"/>
     <ObjectFile Name="src\system_tc23x.o"/>
     <ObjectFile Name="src\uart_init_int.o"/>
     <ObjectFile Name="src\uart_int.o"/>
@@ -195,6 +194,13 @@
     <ObjectFile Name="asm\test_S_2.o"/>
     <ObjectFile Name="asm\test_T_U_X.o"/>
     <ObjectFile Name="src\main.o"/>
+    <ObjectFile Name="src\dts.o"/>
+    <ObjectFile Name="src\interrupts_tc23x.o"/>
+    <ObjectFile Name="src\timer.o"/>
+    <ObjectFile Name="src\gpsr.o"/>
+    <ObjectFile Name="src\cint_trap_tc23x.o"/>
+    <ObjectFile Name="src\scu_eru.o"/>
+    <ObjectFile Name="src\data_flash.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

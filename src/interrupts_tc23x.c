@@ -8,13 +8,13 @@
 #include <machine/wdtcon.h>
 #include <machine/intrinsics.h>
 
-#include "tc_inc_path.h"
+#include "tc_inc_path_tc23x.h"
 
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_bf.h)
 #include TC_INCLUDE(TCPATH/IfxSrc_reg.h)
 
-#include "interrupts.h"
+#include "interrupts_tc23x.h"
 
 extern void _init_vectab(void);
 extern int _install_int_handler(int intno, void (*handler)(int), int arg);

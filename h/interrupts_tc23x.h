@@ -225,6 +225,22 @@
 extern "C" {
 #endif /* __cplusplus */
 
+//User Priority Definition
+#define XMIT_INTERRUPT			3
+#define RECV_INTERRUPT			4
+
+#define STM_CMP0_ISR_PRIO	10
+#define STM_CMP1_ISR_PRIO	11
+#define GPSR0_ISR_PRIO	12
+#define GPSR1_ISR_PRIO	13
+#define GPSR2_ISR_PRIO	14
+#define GPSR3_ISR_PRIO	15
+#define DTS_ISR_PRIO	16
+
+#define ERS0_ISR_PRIO	17
+#define ERS1_ISR_PRIO	18
+#define ERS2_ISR_PRIO	19
+#define ERS3_ISR_PRIO	20
 
 /* type of an Interrupt Service Routine (ISR) */
 typedef void (*isrhnd_t)(int arg);

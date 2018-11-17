@@ -10,10 +10,10 @@
 #include <machine/intrinsics.h>
 #include <machine/wdtcon.h>
 
-#include "interrupts.h"
+#include "interrupts_tc23x.h"
 #include "system_tc2x.h"
 
-#include "tc_inc_path.h"
+#include "tc_inc_path_tc23x.h"
 #include TC_INCLUDE(TCPATH/IfxScu_reg.h)
 #include TC_INCLUDE(TCPATH/IfxScu_bf.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)

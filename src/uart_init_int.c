@@ -8,7 +8,7 @@
 *====================================================================*/
 #define MODULE_UART_INT
 
-#include "bspconfig.h"
+#include "bspconfig_tc23x.h"
 
 #include <machine/wdtcon.h>
 

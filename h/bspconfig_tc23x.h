@@ -20,7 +20,7 @@ extern "C" {
 # define BOARD_NAME				"AppKit-TC234TFT"
 # define BOARD_TITLE			"TC234TFT AppKit"
 # define MCU_NAME				"TC234A"
-#include "tc_inc_path.h"
+#include "tc_inc_path_tc23x.h"
 
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
 #include TC_INCLUDE(TCPATH/IfxStm_reg.h)
@@ -29,7 +29,7 @@ extern "C" {
 #include TC_INCLUDE(TCPATH/IfxPort_reg.h)
 #include TC_INCLUDE(TCPATH/IfxPort_bf.h)
 
-#include "interrupts.h"
+#include "interrupts_tc23x.h"
 
 #define CPU_CLOCK				200
 #define TIM_CLOCK				(CPU_CLOCK)
@@ -118,9 +118,6 @@ static Ifx_P * const port_UART = (Ifx_P *)&MODULE_P14;
 /**************************/
 
 extern void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_isr)(int arg));
-
-#define XMIT_INTERRUPT			3
-#define RECV_INTERRUPT			4
 
 /* UART primitives */
 #define TX_INT_START(u)			((u)->FLAGSENABLE.B.TFLE = 1, (u)->FLAGSSET.U = (IFX_ASCLIN_FLAGSSET_TFLS_MSK << IFX_ASCLIN_FLAGSSET_TFLS_OFF))

@@ -41,6 +41,21 @@ typedef union union_pack64
 	int8_t i8[8];
 }pack64;
 
+#define	BMHD_ADDR_0	(0x80000000)
+#define	BMHD_ADDR_1	(0x80020000)
+#define	BMHD_ADDR_2	(0x8000FFE0)
+#define	BMHD_ADDR_3	(0x8001FFE0)
+
+//#define	BMHD_ADDR_0	(0xA0000000)
+//#define	BMHD_ADDR_1	(0xA0020000)
+//#define	BMHD_ADDR_2	(0xA000FFE0)
+//#define	BMHD_ADDR_3	(0xA001FFE0)
+
+#define	P_BMHD_0	((const BMHD_t*)BMHD_ADDR_0)
+#define	P_BMHD_1	((const BMHD_t*)BMHD_ADDR_1)
+#define	P_BMHD_2	((const BMHD_t*)BMHD_ADDR_2)
+#define	P_BMHD_3	((const BMHD_t*)BMHD_ADDR_3)
+
 #define portCSA_TO_ADDRESS( pCSA )			( ( uint32_t * )( ( ( ( pCSA ) & 0x000F0000 ) << 12 ) | ( ( ( pCSA ) & 0x0000FFFF ) << 6 ) ) )
 #define portADDRESS_TO_CSA( pAddress )		( ( uint32_t )( ( ( ( (uint32_t)( pAddress ) ) & 0xF0000000 ) >> 12 ) | ( ( ( uint32_t )( pAddress ) & 0x003FFFC0 ) >> 6 ) ) )
 
