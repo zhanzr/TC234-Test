@@ -46,6 +46,7 @@
 								</option>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths.1959146808" name="Include Paths" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;../h&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/Common_Demo_Source/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/FreeRTOS_Source/portable/GCC/TriCore_1782}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/FreeRTOS_Source/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
@@ -113,7 +114,7 @@
 					<sourceEntries>
 						<entry excluding="test_S_2.S|test_T_U_X.S|test_S_1.S|test_P_R.S|test_O.S|test_M_3_N.S|test_M_2.S|test_L.S|test_J.S|test_G_I.S|test_E_F.S|test_D.S|test_B_C.S|generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
-						<entry excluding="FreeRTOS_Source/portable/MemMang/heap_2.c|crt0.S|crt0-tc23x.c|uart_init_poll.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="applproc0_loop.c|FreeRTOS_Source/portable/MemMang/heap_2.c|crt0.S|crt0-tc23x.c|uart_init_poll.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

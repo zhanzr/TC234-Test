@@ -67,95 +67,14 @@
     1 tab == 4 spaces!
 */
 
-#ifndef FREERTOS_CONFIG_H
-#define FREERTOS_CONFIG_H
+#ifndef PARTEST_H
+#define PARTEST_H
 
-/*
- * The following #error directive is to remind users that a batch file must be
- * executed prior to this project being built.  The batch file *cannot* be
- * executed from within the IDE!  Once it has been executed, re-open or refresh
- * the Eclipse project and remove the #error line below.
- */
-//#error Ensure CreateProjectDirectoryStructure.bat has been executed before building.  See comment immediately above.
+#include "led.h"
 
-/*-----------------------------------------------------------
- * Application specific definitions.
- *
- * These definitions should be adjusted for your particular hardware and
- * application requirements.
- *
- * THESE PARAMETERS ARE DESCRIBED WITHIN THE 'CONFIGURATION' SECTION OF THE
- * FreeRTOS API DOCUMENTATION AVAILABLE ON THE FreeRTOS.org WEB SITE.
- *
- * See http://www.freertos.org/a00110.html.
- */
+void vParTestInitialise( void );
+void vParTestSetLED( UBaseType_t uxLED, BaseType_t xValue );
+void vParTestToggleLED( UBaseType_t uxLED );
 
-/*----------------------------------------------------------*/
-
-#define configUSE_PREEMPTION				1
-#define configUSE_IDLE_HOOK					1
-/* CPU is actually 180MHz but FPIDIV is 1 meaning divide by 2 for the
-peripheral clock. */
-#define configCPU_CLOCK_HZ					( ( uint32_t ) 200*1000000UL )
-#define configPERIPHERAL_CLOCK_HZ			( ( uint32_t ) configCPU_CLOCK_HZ / 2UL )
-#define configTICK_RATE_HZ					( ( TickType_t ) 1000UL )
-#define configMAX_PRIORITIES				( 15 )
-#define configMINIMAL_STACK_SIZE			( ( uint16_t ) 64 )
-#define configTOTAL_HEAP_SIZE				( ( size_t ) ( 80U * 1024U ) )
-#define configMAX_TASK_NAME_LEN				( 32 )
-#define configUSE_16_BIT_TICKS				0
-#define configIDLE_SHOULD_YIELD				0
-#define configUSE_MALLOC_FAILED_HOOK 		1
-#define configCHECK_FOR_STACK_OVERFLOW		0
-#define configUSE_TICK_HOOK					1
-#define configUSE_COUNTING_SEMAPHORES 		1
-#define configUSE_RECURSIVE_MUTEXES			1
-#define configUSE_MUTEXES					1
-
-#define	configUSE_TRACE_FACILITY	1
-#define	configUSE_STATS_FORMATTING_FUNCTIONS	1
-
-#define	configGENERATE_RUN_TIME_STATS	1
-#define	configUSE_STATS_FORMATTING_FUNCTIONS	1
-
-#define	configRUN_TIME_STATS_RATE_HZ	(10 * configTICK_RATE_HZ)
-#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()  ConfigureTimeForRunTimeStats()
-#define portGET_RUN_TIME_COUNTER_VALUE()		GetFreeRTOSRunTimeTicks()
-#define configRUNTIME_STAT_INTERRUPT_PRIORITY			STM_CMP1_ISR_PRIO
-
-/* Co-routine definitions. */
-#define configUSE_CO_ROUTINES 				0
-#define configMAX_CO_ROUTINE_PRIORITIES 	( 2 )
-
-/* Software timer configuration. */
-#define configUSE_TIMERS					1
-#define configTIMER_TASK_PRIORITY			( 4 )
-#define configTIMER_QUEUE_LENGTH			( 3 )
-#define configTIMER_TASK_STACK_DEPTH		( ( uint16_t ) 512 )
-
-/* Set the following definitions to 1 to include the API function, or zero
- to exclude the API function. */
-
-#define INCLUDE_vTaskPrioritySet				1
-#define INCLUDE_uxTaskPriorityGet				1
-#define INCLUDE_vTaskDelete						1
-#define INCLUDE_vTaskCleanUpResources			1
-#define INCLUDE_vTaskSuspend					1
-#define INCLUDE_vTaskDelayUntil					1
-#define INCLUDE_vTaskDelay						1
-
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY	64 /* Interrupt above priority 64 are not effected by critical sections, but cannot call interrupt safe FreeRTOS functions. */
-#define configKERNEL_INTERRUPT_PRIORITY			STM_CMP0_ISR_PRIO  /* This is defined here for clarity, but the value must not be changed from 2. */
-#define configKERNEL_YIELD_PRIORITY				GPSR0_ISR_PRIO  /* This is defined here for clarity, but must not be changed from its default value of 1. */
-
-/* Interrupt priorities. */
-#define configINTERRUPT_PRIORITY_TX				TXC_ISR_PRIO
-#define configINTERRUPT_PRIORITY_RX				RXD_ISR_PRIO
-#define configHIGH_FREQUENCY_TIMER_PRIORITY		( configMAX_SYSCALL_INTERRUPT_PRIORITY - 1UL )
-
-/* Default definition of configASSERT(). */
-#define configASSERT( x ) if( ( x ) == 0 ) 		{ portDISABLE_INTERRUPTS(); for( ;; ); }
-
-
-#endif /* FREERTOS_CONFIG_H */
+#endif
 

@@ -39,6 +39,8 @@
 #include "scu_eru.h"
 #include "data_flash.h"
 
+#include "partest.h"
+
 /* Set mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY to 1 to create a simple demo.
 Set mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY to 0 to create a much more
 comprehensive test application.  See the comments at the top of this file, and
@@ -47,57 +49,22 @@ information. */
 #define mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY		1
 
 /*-----------------------------------------------------------*/
-void enable_performance_cnt(void)
-{
-	unlock_wdtcon();
-	{
-		Ifx_CPU_CCTRL tmpCCTRL;
-		tmpCCTRL.U = _mfcr(CPU_CCTRL);
 
-		//Instruction Cache Hit Count
-		//		tmpCCTRL.bits.M1 = 2;
-		//Data Cache Hit Count.
-		tmpCCTRL.B.M1 = 3;
-		//Instruction Cache Miss Count
-
-		//		tmpCCTRL.bits.M2 = 1;
-		//Data Cache Clean Miss Count
-		tmpCCTRL.B.M2 = 3;
-
-		//Data Cache Dirty Miss Count
-		tmpCCTRL.B.M3 = 3;
-
-		//Normal Mode
-		tmpCCTRL.B.CM = 0;
-		//Task Mode
-		//		tmpCCTRL.bits.CM = 1;
-
-		tmpCCTRL.B.CE = 1;
-
-		_mtcr(CPU_CCTRL, tmpCCTRL.U);
-	}
-	lock_wdtcon();
-}
+static void prvSetupHardware( void );
 
 int core0_main(int argc, char** argv)
 {
 	volatile bool g_regular_task_flag;
 
-	system_clk_config_200_100();
+	prvSetupHardware();
 
-	/* activate interrupt system */
-	InterruptInit();
-
-	SYSTEM_Init();
-	SYSTEM_EnaDisCache(1);
+//	SYSTEM_EnaDisCache(1);
 
 	/* initialise STM CMP 0 at configTICK_RATE_HZ rate */
 //	prvSetupTimerInterrupt();
 	ConfigureTimeForRunTimeStats();
 
 	uart_init(BAUDRATE);
-
-	led_init();
 
 	config_dts();
 //	config_gpsr();
@@ -145,25 +112,25 @@ int core0_main(int argc, char** argv)
 
 			if(0==test_trigger_cnt%4)
 			{
-				led_on(0);
-				led_off(1);
-				led_off(2);
+				vParTestSetLED(0, 1);
+				vParTestSetLED(1, 0);
+				vParTestSetLED(2, 0);
 			}
 			else if(1==test_trigger_cnt%4)
 			{
-				led_off(0);
-				led_on(1);
-				led_off(2);
+				vParTestSetLED(0, 1);
+				vParTestSetLED(1, 1);
+				vParTestSetLED(2, 0);
 			}
 			else if(2==test_trigger_cnt%4)
 			{
-				led_off(0);
-				led_off(1);
-				led_on(2);
+				vParTestSetLED(0, 0);
+				vParTestSetLED(1, 0);
+				vParTestSetLED(2, 0);
 			}
 			else
 			{
-				led_toggle(3);
+				vParTestToggleLED(3);
 			}
 
 			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
@@ -198,21 +165,6 @@ int core0_main(int argc, char** argv)
 //			);
 //			flush_stdout();
 
-			printf("%08X %08X %08X %08X %08X %08X    %08X[%08X] %08X[%08X]\n",
-					MODULE_STM0.TIM0.U,
-					MODULE_STM0.CMP[0].U,
-					MODULE_STM0.CMP[1].U,
-					MODULE_STM0.CMCON.U,
-					MODULE_STM0.ICR.U,
-					MODULE_STM0.ISCR.U,
-
-					MODULE_SRC.STM.STM[0].SR0.U,
-					(uint32_t)&MODULE_SRC.STM.STM[0].SR0.U,
-					MODULE_SRC.STM.STM[0].SR1.U,
-					(uint32_t)&MODULE_SRC.STM.STM[0].SR1.U
-			);
-			flush_stdout();
-
 			test_trig_cnt = test_trigger_gpsr(test_trig_cnt);
 		}
 
@@ -227,13 +179,15 @@ int core0_main(int argc, char** argv)
 
 static void prvSetupHardware( void )
 {
-//	extern void set_cpu_frequency(void);
-//
-//	/* Set-up the PLL. */
-//	set_cpu_frequency();
-//
-//	/* Initialise LED outputs. */
-//	vParTestInitialise();
+	system_clk_config_200_100();
+
+	/* activate interrupt system */
+	InterruptInit();
+
+	SYSTEM_Init();
+
+	/* Initialize LED outputs. */
+	vParTestInitialise();
 }
 /*-----------------------------------------------------------*/
 

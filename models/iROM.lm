@@ -277,6 +277,8 @@
     <InputSection Name="wm4.interrupts_tc23x.h.15.f7eabac76be6bfe25ff8438daa24b95e"/>
     <InputSection Name="wm4.interrupts_tc23x.h.9.f54beff0bd677f41e894394c431693e3"/>
     <InputSection Name="wm4.FreeRTOSConfig.h.71.0832b9a9b98e7247f07835289af532c1"/>
+    <InputSection Name="wm4.FreeRTOSConfig.h.71.48f7dbd91269ab5d95e7de6cfad2ff5a"/>
+    <InputSection Name="wm4.interrupts_tc23x.h.9.d00bd7939c506c230f16147d0ca4e047"/>
   </Input>
   <Files>
     <ObjectFile Name="src\system_tc23x.o"/>
@@ -325,6 +327,7 @@
     <ObjectFile Name="src\FreeRTOS_Source\queue.o"/>
     <ObjectFile Name="src\FreeRTOS_Source\tasks.o"/>
     <ObjectFile Name="src\FreeRTOS_Source\timers.o"/>
+    <ObjectFile Name="src\ParTest.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

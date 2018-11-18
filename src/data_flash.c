@@ -306,3 +306,40 @@ void test_proc_dflash(void)
 //			sizeof(Tdisptab));
 //	flush_stdout();
 }
+
+void enable_performance_cnt(void)
+{
+	unlock_wdtcon();
+	{
+		Ifx_CPU_CCTRL tmpCCTRL;
+		tmpCCTRL.U = _mfcr(CPU_CCTRL);
+
+		//Instruction Cache Hit Count
+		//		tmpCCTRL.bits.M1 = 2;
+		//Data Cache Hit Count.
+		tmpCCTRL.B.M1 = 3;
+		//Instruction Cache Miss Count
+
+		//		tmpCCTRL.bits.M2 = 1;
+		//Data Cache Clean Miss Count
+		tmpCCTRL.B.M2 = 3;
+
+		//Data Cache Dirty Miss Count
+		tmpCCTRL.B.M3 = 3;
+
+		//Normal Mode
+		tmpCCTRL.B.CM = 0;
+		//Task Mode
+		//		tmpCCTRL.bits.CM = 1;
+
+		tmpCCTRL.B.CE = 1;
+
+		_mtcr(CPU_CCTRL, tmpCCTRL.U);
+	}
+	lock_wdtcon();
+}
+
+void test_perf_cnt_proc(void)
+{
+
+}

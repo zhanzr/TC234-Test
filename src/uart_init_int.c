@@ -16,8 +16,8 @@
 void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_isr)(int arg))
 {
 	/* install handlers for transmit and receive interrupts */
-	InterruptInstall(SRC_ID_ASCLIN0TX, uart_tx_isr, XMIT_INTERRUPT, 0);
-	InterruptInstall(SRC_ID_ASCLIN0RX, uart_rx_isr, RECV_INTERRUPT, 0);
+	InterruptInstall(SRC_ID_ASCLIN0TX, uart_tx_isr, TXC_ISR_PRIO, 0);
+	InterruptInstall(SRC_ID_ASCLIN0RX, uart_rx_isr, RXD_ISR_PRIO, 0);
 
 	/* on board wiggler is connected to ASCLIN0 */
 	/* ARX0A/P14.1 (RXD), ATX0/P14.0 (TXD) */
@@ -60,7 +60,7 @@ void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_i
 	(void)UARTBASE->CLC.U;
 
 	/* select ARX0A/P14.1 as input pin */
-	UARTBASE->IOCR.B.ALTI = 0;
+	UARTBASE->IOCR.B.ALTI = IN_NOPULL0;
 
 	/* Program ASC0 */
 	UARTBASE->CSR.U = 0;
@@ -82,7 +82,7 @@ void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_i
 	UARTBASE->FRAMECON.U = (1 << 9)		/* STOP: 1 bit */
 								 | (0 << 16)	/* MODE: Init */
 								 | (0 << 30);	/* PEN: no parity */
-	UARTBASE->DATCON.U = (7 << 0);		/* DATLEN: 8 bit */
+	UARTBASE->DATCON.B.DATLEN = 7;		/* DATLEN: 8 bit */
 
 	uint32_t clk_sys = SYSTEM_GetSysClock();
 	/* baudrate values at 100 MHz:3125 */
