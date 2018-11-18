@@ -274,11 +274,13 @@
     <InputSection Name="wm4.semphr.h.81.4d46216825addd405e1402299c69bc73"/>
     <InputSection Name="wm4.assert.h.11.7043852a511d37ae606afa012e67e471"/>
     <InputSection Name="wm4.portmacro.h.113.3dca38a026639d056545f32b8ee9704f"/>
-    <InputSection Name="wm4.interrupts_tc23x.h.15.f7eabac76be6bfe25ff8438daa24b95e"/>
     <InputSection Name="wm4.interrupts_tc23x.h.9.f54beff0bd677f41e894394c431693e3"/>
     <InputSection Name="wm4.FreeRTOSConfig.h.71.0832b9a9b98e7247f07835289af532c1"/>
     <InputSection Name="wm4.FreeRTOSConfig.h.71.48f7dbd91269ab5d95e7de6cfad2ff5a"/>
     <InputSection Name="wm4.interrupts_tc23x.h.9.d00bd7939c506c230f16147d0ca4e047"/>
+    <InputSection Name="wm4.portmacro.h.113.2102b90d4d3a3a9da6815675025b6f44"/>
+    <InputSection Name="wm4.interrupts_tc23x.h.15.e764addd0bb2b4fdbe0d7862e17a92e9"/>
+    <InputSection Name="wm4.interrupts_tc23x.h.9.4203790216fd71fea656e2d7857e14b6"/>
   </Input>
   <Files>
     <ObjectFile Name="src\system_tc23x.o"/>

@@ -99,12 +99,16 @@
 
 /*-----------------------------------------------------------*/
 
-/* System register Definitions. */
-#define portSYSTEM_PROGRAM_STATUS_WORD					( 0x000008FFUL ) /* Supervisor Mode, MPU Register Set 0 and Call Depth Counting disabled. */
-#define portINITIAL_PRIVILEGED_PROGRAM_STATUS_WORD		( 0x000014FFUL ) /* IO Level 1, MPU Register Set 1 and Call Depth Counting disabled. */
-#define portINITIAL_UNPRIVILEGED_PROGRAM_STATUS_WORD	( 0x000010FFUL ) /* IO Level 0, MPU Register Set 1 and Call Depth Counting disabled. */
-#define portINITIAL_PCXI_UPPER_CONTEXT_WORD				( 0x00C00000UL ) /* The lower 20 bits identify the CSA address. */
-#define portINITIAL_SYSCON								( 0x00000000UL ) /* MPU Disable. */
+/* System register Definitions. *//* Supervisor Mode, MPU Register Set 0 and Call Depth Counting disabled. */
+#define portSYSTEM_PROGRAM_STATUS_WORD					( 0x000008FFUL )
+ /* IO Level 1, MPU Register Set 1 and Call Depth Counting disabled. */
+#define portINITIAL_PRIVILEGED_PROGRAM_STATUS_WORD		( 0x000014FFUL )
+/* IO Level 0, MPU Register Set 1 and Call Depth Counting disabled. */
+#define portINITIAL_UNPRIVILEGED_PROGRAM_STATUS_WORD	( 0x000010FFUL )
+/* The lower 20 bits identify the CSA address. */
+#define portINITIAL_PCXI_UPPER_CONTEXT_WORD				( 0x00C00000UL )
+/* MPU Disable. */
+#define portINITIAL_SYSCON								( 0x00000000UL )
 
 /* CSA manipulation macros. */
 #define portCSA_FCX_MASK					( 0x000FFFFFUL )
@@ -176,7 +180,7 @@ StackType_t *pxPortInitialiseStack( StackType_t * pxTopOfStack, TaskFunction_t p
 		_dsync();
 
 		/* Consume two free CSAs. */
-		pulLowerCSA = portCSA_TO_ADDRESS( __MFCR( $FCX ) );
+		pulLowerCSA = portCSA_TO_ADDRESS( _mfcr( CPU_FCX ) );
 		if( NULL != pulLowerCSA )
 		{
 			/* The Lower Links to the Upper. */
@@ -189,7 +193,7 @@ StackType_t *pxPortInitialiseStack( StackType_t * pxTopOfStack, TaskFunction_t p
 			/* Remove the two consumed CSAs from the free CSA list. */
 			_disable();
 			_dsync();
-			__MTCR( $FCX, pulUpperCSA[ 0 ] );
+			_mtcr( CPU_FCX, pulUpperCSA[ 0 ] );
 			_isync();
 			_enable();
 		}

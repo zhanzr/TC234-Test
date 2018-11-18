@@ -88,6 +88,9 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1198579204" name="porttrap.c" rcbsApplicability="disable" resourcePath="src/FreeRTOS_Source/portable/GCC/TriCore_1782/porttrap.c" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155.1615623311">
+						<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155.1615623311" name="TriCore C Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155"/>
+					</fileInfo>
 					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.510529732" name="/" resourcePath="asm">
 						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.239742863" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable" unusedChildren="">
 							<option id="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919.82621482" name="CPU type (-mcpu)" superClass="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919"/>
@@ -114,7 +117,7 @@
 					<sourceEntries>
 						<entry excluding="test_S_2.S|test_T_U_X.S|test_S_1.S|test_P_R.S|test_O.S|test_M_3_N.S|test_M_2.S|test_L.S|test_J.S|test_G_I.S|test_E_F.S|test_D.S|test_B_C.S|generate_template.py|test_AND.S|test_ADDS.S|test_ADD.S|test_ADD.A.S|test_ABSS.S|test_ABSDIFS.S|test_ABSDIF.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
-						<entry excluding="applproc0_loop.c|FreeRTOS_Source/portable/MemMang/heap_2.c|crt0.S|crt0-tc23x.c|uart_init_poll.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="FreeRTOS_Source/portable/GCC/TriCore_1782/porttrap.c|applproc0_loop.c|FreeRTOS_Source/portable/MemMang/heap_2.c|crt0.S|crt0-tc23x.c|uart_init_poll.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

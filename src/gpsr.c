@@ -41,8 +41,8 @@ void gpsr3_isr(uint32_t var)
 
 void config_gpsr(void)
 {
-	SRC_GPSR00.B.SRR = 0;
-	InterruptInstall(SRC_ID_GPSR00, gpsr0_isr, GPSR0_ISR_PRIO, 0);
+//	SRC_GPSR00.B.SRR = 0;
+//	InterruptInstall(SRC_ID_GPSR00, gpsr0_isr, GPSR0_ISR_PRIO, 0);
 
 	SRC_GPSR01.B.SRR = 0;
 	InterruptInstall(SRC_ID_GPSR01, gpsr1_isr, GPSR1_ISR_PRIO, 1);

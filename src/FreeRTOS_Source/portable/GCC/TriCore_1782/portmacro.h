@@ -127,7 +127,7 @@ typedef uint16_t TickType_t;
 #define portMAX_DELAY ( TickType_t ) 0xffff
 #else
 typedef uint32_t TickType_t;
-#define portMAX_DELAY ( TickType_t ) 0xffffffffUL
+#define portMAX_DELAY ((TickType_t )UINT32_MAX)
 
 /* 32-bit tick type on a 32-bit architecture, so reads of the tick count do
  not need to be guarded with a critical section. */
@@ -139,7 +139,7 @@ typedef uint32_t TickType_t;
 #define portSTACK_GROWTH							( -1 )
 #define portTICK_PERIOD_MS							( ( TickType_t ) 1000 / configTICK_RATE_HZ )
 #define portBYTE_ALIGNMENT							4
-#define portNOP()									__asm volatile( " nop " )
+#define portNOP()									_nop()
 #define portCRITICAL_NESTING_IN_TCB					1
 #define portRESTORE_FIRST_TASK_PRIORITY_LEVEL		1
 
@@ -213,7 +213,14 @@ extern uint32_t uxPortSetInterruptMaskFromISR(void);
 #define portSET_INTERRUPT_MASK_FROM_ISR() 	uxPortSetInterruptMaskFromISR()
 
 /* Pend a priority 1 interrupt, which will take care of the context switch. */
-#define portYIELD_FROM_ISR( xHigherPriorityTaskWoken ) 		if( xHigherPriorityTaskWoken != pdFALSE ) {INT_SRB0.B.TRIG0 = 1;; _isync(); }
+#define portYIELD_FROM_ISR( xHigherPriorityTaskWoken ) 		\
+		{\
+			if( xHigherPriorityTaskWoken != pdFALSE )\
+			{\
+				INT_SRB0.B.TRIG0 = 1;\
+				_isync();\
+			}\
+		}
 
 /*---------------------------------------------------------------------------*/
 

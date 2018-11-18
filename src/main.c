@@ -62,7 +62,7 @@ int core0_main(int argc, char** argv)
 
 	/* initialise STM CMP 0 at configTICK_RATE_HZ rate */
 //	prvSetupTimerInterrupt();
-	ConfigureTimeForRunTimeStats();
+//	ConfigureTimeForRunTimeStats();
 
 	uart_init(BAUDRATE);
 

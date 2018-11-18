@@ -232,10 +232,10 @@ extern "C" {
 #define STM_CMP0_ISR_PRIO	2
 #define STM_CMP1_ISR_PRIO	3
 
-#define GPSR0_ISR_PRIO	12
 #define GPSR1_ISR_PRIO	13
 #define GPSR2_ISR_PRIO	14
 #define GPSR3_ISR_PRIO	15
+
 #define DTS_ISR_PRIO	16
 
 #define ERS0_ISR_PRIO	17
