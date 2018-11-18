@@ -27,19 +27,11 @@
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_bf.h)
 
-/* This variable is set to 1 after the vectabs are initialized.  */
-
-static bool _init_vectab_initialized;
-
 /* This array holds the functions to be called when a trap occurs. */
-
 void (*Tdisptab[MAX_TRAPS])(int tin);
 
 /* This array holds the functions to be called when an interrupt occurs.  */
-
 Hnd_arg Cdisptab[MAX_INTRS];
-
-void default_isr(int arg);
 
 #if 0
 /* This is the default trap vector table, which consists of eight
@@ -101,7 +93,7 @@ static inline void flush_stdout_trap(void)
 
 int _install_trap_handler(int trapno, void (*traphandler)(int))
 {
-	if ((trapno < 0) || (trapno >= MAX_TRAPS) || !_init_vectab_initialized)
+	if ((trapno < 0) || (trapno >= MAX_TRAPS))
 		return 0;
 
 	Tdisptab[trapno] = traphandler;
@@ -690,22 +682,19 @@ DEFINE_INT(255);
 
 #endif
 
-__asm (".text");
-
-
 /* The default handler for interrupts.  */
 
-void default_isr(int arg)
+static void default_isr(int arg)
 {
 	/* Just ignore this interrupt.  */
-	(void)arg;
+	UNUSED(arg);
 }
 
 /* Install INTHANDLER for interrupt INTNO and remember ARG for later use.  */
 
 int _install_int_handler(int intno, void (*inthandler)(int), int arg)
 {
-	if ((intno < 0) || (intno >= MAX_INTRS) || !_init_vectab_initialized)
+	if ((intno < 0) || (intno >= MAX_INTRS))
 		return 0;
 
 	Cdisptab[intno].hnd_handler = inthandler;
@@ -721,13 +710,19 @@ void _init_vectab(void);
 extern int TriCore_trap_table[];
 extern int TriCore_int_table[];
 
-extern void prvTrapYield( int tin );
+/* System Call #tin  */
+void prvTrapYield(int tin)
+{
+	switch( tin )
+	{
+	default:
+		printf("SC Trap:%d\n", tin);
+		break;
+	}
+}
 
 void _init_vectab(void)
 {
-	if (_init_vectab_initialized)
-		return;
-
 	/* Set BTV and BIV registers.  */
 	unlock_wdtcon();
 	_mtcr(CPU_BTV, (uint32_t)TriCore_trap_table);
@@ -750,6 +745,4 @@ void _init_vectab(void)
 		Cdisptab[vecno].hnd_handler = default_isr;
 		Cdisptab[vecno].hnd_arg = vecno;
 	}
-
-	_init_vectab_initialized = true;
 }

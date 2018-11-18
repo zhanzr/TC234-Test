@@ -13,40 +13,14 @@
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_bf.h)
 #include TC_INCLUDE(TCPATH/IfxSrc_reg.h)
+#include TC_INCLUDE(TCPATH/IfxSrc_bf.h)
 
 #include "interrupts_tc23x.h"
 
 extern void _init_vectab(void);
 extern int _install_int_handler(int intno, void (*handler)(int), int arg);
 
-
-/* Service Request Control register */
-typedef union _Ifx_SRC_t
-{
-	volatile unsigned int R;
-	struct _bits
-	{
-		volatile unsigned int SRPN   : 8;	/* [7:0] Service Request Priority Number (rw) */
-		volatile unsigned int        : 2;
-		volatile unsigned int SRE    : 1;	/* [10:10] Service Request Enable (rw) */
-		volatile unsigned int TOS    : 2;	/* [12:11] Type of Service Control (rw) */
-		volatile unsigned int        : 3;
-		volatile unsigned int ECC    : 6;	/* [21:16] ECC (rwh) */
-		volatile unsigned int        : 2;
-		volatile unsigned int SRR    : 1;	/* [24:24] Service Request Flag (rh) */
-		volatile unsigned int CLRR   : 1;	/* [25:25] Request Clear Bit (w) */
-		volatile unsigned int SETR   : 1;	/* [26:26] Request Set Bit (w) */
-		volatile unsigned int IOV    : 1;	/* [27:27] Interrupt Trigger Overflow Bit (rh) */
-		volatile unsigned int IOVCLR : 1;	/* [28:28] Interrupt Trigger Overflow Clear Bit (w) */
-		volatile unsigned int SWS    : 1;	/* [29:29] SW Sticky Bit (rh) */
-		volatile unsigned int SWSCLR : 1;	/* [30:30] SW Sticky Clear Bit (w) */
-		volatile unsigned int        : 1;
-	} B;
-} Ifx_SRC_t;
-
-
-static Ifx_SRC_t * const tabSRC = (Ifx_SRC_t *)&MODULE_SRC;
-
+static Ifx_SRC_SRCR_Bits * const tabSRC = (Ifx_SRC_SRCR_Bits *)&MODULE_SRC;
 
 /*---------------------------------------------------------------------
 	Function:	InterruptInit
@@ -85,8 +59,8 @@ void InterruptInstall(int irqNum, isrhnd_t isrProc, int prio, int arg)
 	_install_int_handler(prio, isrProc, arg);
 
 	/* set processor and priority values */
-	tabSRC[irqNum].B.TOS  = coreId;
-	tabSRC[irqNum].B.SRPN = prio;
+	tabSRC[irqNum].TOS = coreId;
+	tabSRC[irqNum].SRPN = prio;
 	/* ... and enable it */
-	tabSRC[irqNum].B.SRE = 1;
+	tabSRC[irqNum].SRE = 1;
 }
