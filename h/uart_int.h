@@ -15,7 +15,7 @@ extern "C" {
 
 #define BAUDRATE	115200
 
-void _init_uart(int baudrate);
+void uart_init(uint32_t baudrate);
 int _uart_send(const char *buffer, int len);
 int _uart_puts(const char *str);
 int _uart_getchar(char *c);

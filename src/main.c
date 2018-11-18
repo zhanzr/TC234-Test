@@ -40,12 +40,13 @@
 #include "scu_eru.h"
 #include "data_flash.h"
 
-static void prvTrapYield( int tin )
+/* System Call #tin  */
+void prvTrapYield(int tin)
 {
 	switch( tin )
 	{
 	default:
-		printf("Trap6 Tin:%d\n", tin);
+		printf("Syscall Trap:%d\n", tin);
 		break;
 	}
 }
@@ -82,16 +83,14 @@ void enable_performance_cnt(void)
 	lock_wdtcon();
 }
 
-typedef struct _Hnd_arg
-{
-	void (*hnd_handler)(int);
-	int hnd_arg;
-} Hnd_arg;
-
-
-int main(void)
+int core0_main(int argc, char** argv)
 {
 	volatile bool g_regular_task_flag;
+
+	system_clk_config_200_100();
+
+	/* activate interrupt system */
+	InterruptInit();
 
 	SYSTEM_Init();
 	SYSTEM_EnaDisCache(1);
@@ -100,32 +99,35 @@ int main(void)
 	stm_init(0, SYS_TICK_HZ);
 	stm_init(1, 10*SYS_TICK_HZ);
 
-	_init_uart(BAUDRATE);
+	uart_init(BAUDRATE);
 	led_init();
 
 	config_dts();
 //	config_gpsr();
 //	config_eru();
-	config_dflash();
+//	config_dflash();
 
 	enable_performance_cnt();
 
-	printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
+	printf("%s %s\n", _NEWLIB_VERSION, __func__);
+
+	printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
 			__TRICORE_NAME__,
 			__TRICORE_CORE__,
 			SYSTEM_GetCpuClock()/1000000,
 			SYSTEM_GetSysClock()/1000000,
 			SYSTEM_GetStmClock()/1000000,
+			system_GetPllClock()/1000000,
+			system_GetIntClock()/1000000,
 			SYSTEM_IsCacheEnabled());
+
+	printf("Core\t%08X\t:%08X\n", CPU_CORE_ID, _mfcr(CPU_CORE_ID));
+	printf("CUS\t%08X\t:%08X\n", CPU_CUS_ID, _mfcr(CPU_CUS_ID));
+
 	flush_stdout();
 
-	/* Install the Syscall Handler for yield calls. */
-	extern void (*Tdisptab[MAX_TRAPS])(int tin);
-	Tdisptab[6] = prvTrapYield;
-
-	printf("\nTest data flash\n");
+	printf("\nTest PLL\n");
 	flush_stdout();
-
 
 	extern void __PMI_PSPR_BEGIN(void);
 	extern void __PMI_PSPR_SIZE(void);
@@ -227,7 +229,7 @@ int main(void)
 //			P_BMHD_3->invCrcHead);
 //	flush_stdout();
 
-	printf("CPUID\t%08X\t:%08X\n", CPU_CPU_ID, _mfcr(CPU_CPU_ID));
+//	printf("CPUID\t%08X\t:%08X\n", CPU_CPU_ID, _mfcr(CPU_CPU_ID));
 	//	printf("CCTRL\t%08X\t:%08X\n", CPU_CCTRL, _mfcr(CPU_CCTRL));
 	//	printf("CCNT\t%08X\t:%08X\n", CPU_CCNT, _mfcr(CPU_CCNT));
 	//	printf("ICNT\t%08X\t:%08X\n", CPU_ICNT, _mfcr(CPU_ICNT));
@@ -307,13 +309,13 @@ int main(void)
 	printf("TriCore_int_table\t:%08X\n", (uint32_t)TriCore_int_table);
 	flush_stdout();
 
-	extern void __interrupt_1(void);
-	printf("__interrupt_1\t:%08X\n", (uint32_t)__interrupt_1);
-	extern void ___interrupt_1(void);
-	printf("___interrupt_1\t:%08X\n", (uint32_t)___interrupt_1);
-	extern void __interrupt_2(void);
-	printf("__interrupt_2\t:%08X\n", (uint32_t)__interrupt_2);
-	flush_stdout();
+//	extern void __interrupt_1(void);
+//	printf("__interrupt_1\t:%08X\n", (uint32_t)__interrupt_1);
+//	extern void ___interrupt_1(void);
+//	printf("___interrupt_1\t:%08X\n", (uint32_t)___interrupt_1);
+//	extern void __interrupt_2(void);
+//	printf("__interrupt_2\t:%08X\n", (uint32_t)__interrupt_2);
+//	flush_stdout();
 
 	extern Hnd_arg Cdisptab[MAX_INTRS];
 	printf("Soft Interrupt vector table %08X:%u * %u = %u\n",
@@ -327,15 +329,15 @@ int main(void)
 	extern void TriCore_trap_table(void);
 	printf("TriCore_trap_table\t:%08X\n", (uint32_t)TriCore_trap_table);
 
-	extern void __trap_0(void);
-	printf("__trap_0\t:%08X\n", (uint32_t)__trap_0);
-	extern void __trap_1(void);
-	printf("__trap_1\t:%08X\n", (uint32_t)__trap_1);
-	extern void __trap_6(void);
-	printf("__trap_6\t:%08X\n", (uint32_t)__trap_6);
-	extern void ___trap_6(void);
-	printf("___trap_6\t:%08X\n", (uint32_t)___trap_6);
-	flush_stdout();
+//	extern void __trap_0(void);
+//	printf("__trap_0\t:%08X\n", (uint32_t)__trap_0);
+//	extern void __trap_1(void);
+//	printf("__trap_1\t:%08X\n", (uint32_t)__trap_1);
+//	extern void __trap_6(void);
+//	printf("__trap_6\t:%08X\n", (uint32_t)__trap_6);
+//	extern void ___trap_6(void);
+//	printf("___trap_6\t:%08X\n", (uint32_t)___trap_6);
+//	flush_stdout();
 
 	extern void (*Tdisptab[MAX_TRAPS]) (int tin);
 	printf("Soft Trap vector table %08X:%u * %u = %u\n",
@@ -385,53 +387,46 @@ int main(void)
 				led_toggle(3);
 			}
 
-			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,CacheEn:%d\n",
+			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
 					__TRICORE_NAME__,
 					__TRICORE_CORE__,
 					SYSTEM_GetCpuClock()/1000000,
 					SYSTEM_GetSysClock()/1000000,
 					SYSTEM_GetStmClock()/1000000,
+					system_GetPllClock()/1000000,
+					system_GetIntClock()/1000000,
 					SYSTEM_IsCacheEnabled());
 			flush_stdout();
 
 			start_dts_measure();
 
-			//			printf("EIFR:%08X P15_IN:%08X\n",
-			//					MODULE_SCU.EIFR.U, MODULE_P15.IN.U);
-			//			flush_stdout();
-
-			//			printf("SCU_DTSCON\t%08X\t:%08X\n", &SCU_DTSCON, SCU_DTSCON);
-			//			printf("SCU_DTSSTAT\t%08X\t:%08X\n", &SCU_DTSSTAT, SCU_DTSSTAT);
-			//			printf("SCU_DTSLIM\t%08X\t:%08X\n", &SCU_DTSLIM, SCU_DTSLIM);
-			//			flush_stdout();
-
-			//			printf("STMID:%08X\n",
-			//					MODULE_STM0.ID.U);
-
 			printf("%u\n", HAL_GetTick());
 			printf("%u\n", HAL_GetRunTimeTick());
 			flush_stdout();
 
-			//			printf("%08X %08X %08X %08X %08X %08X\n",
-			//					MODULE_STM0.TIM0.U,
-			//					MODULE_STM0.TIM1.U,
-			//					MODULE_STM0.TIM2.U,
-			//					MODULE_STM0.TIM3.U,
-			//					MODULE_STM0.TIM4.U,
-			//					MODULE_STM0.TIM5.U
-			//			);
-			//			flush_stdout();
+			printf("OSCON:%08X PCON0:%08X PCON1:%08X PCON2:%08X CCON0:%08X CCON1:%08X CCON2:%08X CCON3:%08X CCON4:%08X CCON5%08X CCON6%08X CCON9:%08X\n",
+					MODULE_SCU.OSCCON.U,
+					MODULE_SCU.PLLCON0.U,
+					MODULE_SCU.PLLCON1.U,
+					MODULE_SCU.PLLCON2.U,
+					MODULE_SCU.CCUCON0.U,
+					MODULE_SCU.CCUCON1.U,
+					MODULE_SCU.CCUCON2.U,
+					MODULE_SCU.CCUCON3.U,
+					MODULE_SCU.CCUCON4.U,
+					MODULE_SCU.CCUCON5.U,
+					MODULE_SCU.CCUCON6.U,
+					MODULE_SCU.CCUCON9.U
+			);
+			flush_stdout();
 
 			test_trig_cnt = test_trigger_gpsr(test_trig_cnt);
 
 		}
 
 		test_proc_dts();
-
-		test_proc_eru();
-
+//		test_proc_eru();
 //		test_proc_gpsr();
-
 	}
 
 	return EXIT_SUCCESS;

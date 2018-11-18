@@ -1,8 +1,6 @@
 /*! \file system_tc2x.h
  *  \brief Extended system control API for TC23x definition
  *
- *  \autor TGL
- *
  *  \version
  *
  */
@@ -14,35 +12,38 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#include <stdint.h>
 
-/*! \brief System initialisation
- *
- *  Do basic system initialisation like
- *  - PLL setup
- */
+/* external oscillator clock (20MHz) */
+# define EXTCLK		(20*1000000)
+
+typedef struct _PllInitValue_t
+{
+	uint32_t valOSCCON;
+	uint32_t valPLLCON0;
+	uint32_t valPLLCON1;	/* first step K dividers */
+	uint32_t valCCUCON0;
+	uint32_t valCCUCON1;
+	uint32_t valCCUCON2;
+	uint32_t finalK;		/* final K2DIV value */
+} PllInitValue_t;
+
+void system_clk_config_200_100(void);
+void system_clk_config_100_50(void);
+
 void SYSTEM_Init(void);
 
-/*! \brief Get external clock frequency
- *
- *  Return external clock frequency. Usually this is the system's
- *  crystal or oscillator frequency.
- *  \return External clock frequency, unit Hz
- */
-unsigned long SYSTEM_GetExtClock(void);
+uint32_t system_GetPllClock(void);
 
-/*! \brief Get CPU clock frequency
- *
- *  Return CPU clock frequency. Usually this is the core frequency.
- *  \return CPU clock frequency, unit Hz
- */
-unsigned long SYSTEM_GetCpuClock(void);
+uint32_t system_GetIntClock(void);
 
-/*! \brief Get system clock frequency
- *
- *  Return system clock frequency. Usually this is the peripheral frequency.
- *  \return System clock frequency, unit Hz
- */
-unsigned long SYSTEM_GetSysClock(void);
+uint32_t SYSTEM_GetCpuClock(void);
+
+uint32_t SYSTEM_GetSysClock(void);
+
+uint32_t SYSTEM_GetStmClock(void);
+
+uint32_t SYSTEM_GetCanClock(void);
 
 /*! \brief Globally enable interrupts
  */
@@ -99,9 +100,6 @@ void SYSTEM_DisableProtectionExt(int Sel);
 void SYSTEM_EnableSecProtection(void);
 void SYSTEM_DisableSecProtection(void);
 
-unsigned long SYSTEM_GetStmClock(void);
-
-unsigned long SYSTEM_GetCanClock(void);
 
 #ifdef __cplusplus
 }

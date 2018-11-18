@@ -178,12 +178,10 @@ static void _uart_tx_handler(int arg)
 	}
 }
 
-
 /* Externally visible functions */
 
-
 /* Initialise asynchronous interface to operate at baudrate,8,n,1 */
-void _init_uart(int baudrate)
+void uart_init(uint32_t baudrate)
 {
     _uart_init_bsp(baudrate, _uart_rx_handler, _uart_tx_handler);
 }

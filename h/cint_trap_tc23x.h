@@ -21,6 +21,13 @@ extern "C" {
 //  #define MAX_INTRS 32
 #endif
 
+/* This structure describes interrupt handlers and their arguments.  */
+typedef struct _Hnd_arg
+{
+	void (*hnd_handler)(int);
+	int hnd_arg;
+} Hnd_arg;
+
 /* The following two functions install the vector tables and initialize
    chained interrupt handlers, respectively.  There is usually no need
    to call these functions, as they are declared as "constructors" so

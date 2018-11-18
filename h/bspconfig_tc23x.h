@@ -54,7 +54,7 @@ static Ifx_P * const port_UART = (Ifx_P *)&MODULE_P14;
 
 #define UARTBASE				asclin0
 
-/* baud rate values at 100 MHz */
+/* baud rate values at SysClock 100 MHz */
 #define BAUD_9600				(48 * 1)
 #define BAUD_19200				(48 * 2)
 #define BAUD_38400				(48 * 4)

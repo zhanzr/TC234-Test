@@ -1,17 +1,14 @@
 /*====================================================================
-* Project:  Board Support Package (BSP)
-* Function: Extended system control API implementation for TC23x
-*           (based on PLS original sources)
-*           (adapted by HighTec for correct frequency up stepping)
-*
-* Copyright HighTec EDV-Systeme GmbH 1982-2016
-*====================================================================*/
+ * Project:  Board Support Package (BSP)
+ * Function: Extended system control API implementation for TC23x
+ *           (based on PLS original sources)
+ *           (adapted by HighTec for correct frequency up stepping)
+ *
+ * Copyright HighTec EDV-Systeme GmbH 1982-2016
+ *====================================================================*/
 
 #include <machine/intrinsics.h>
 #include <machine/wdtcon.h>
-
-#include "interrupts_tc23x.h"
-#include "system_tc2x.h"
 
 #include "tc_inc_path_tc23x.h"
 #include TC_INCLUDE(TCPATH/IfxScu_reg.h)
@@ -20,91 +17,26 @@
 #include TC_INCLUDE(TCPATH/IfxCpu_bf.h)
 #include TC_INCLUDE(TCPATH/IfxStm_reg.h)
 #include TC_INCLUDE(TCPATH/IfxStm_bf.h)
+#include TC_INCLUDE(TCPATH/IfxPort_reg.h)
+#include TC_INCLUDE(TCPATH/IfxQspi_reg.h)
 
-#if (RUN_ON_APPKIT == 1)
-/* Workaround for TLF35584 A-Step Bug on AppKit-TC2x4 and AppKit-TC2x7 */
-# define USE_DISABLE_EXT_WDT	1
-#else
-# define USE_DISABLE_EXT_WDT	0
-#endif /* RUN_ON_APPKIT */
-
-#if (USE_DISABLE_EXT_WDT == 1)
-# include TC_INCLUDE(TCPATH/IfxPort_reg.h)
-# include TC_INCLUDE(TCPATH/IfxQspi_reg.h)
-#endif /* USE_DISABLE_EXT_WDT */
-
-
-typedef struct _PllInitValue_t
-{
-	unsigned int valOSCCON;
-	unsigned int valPLLCON0;
-	unsigned int valPLLCON1;	/* first step K dividers */
-	unsigned int valCCUCON0;
-	unsigned int valCCUCON1;
-	unsigned int valCCUCON2;
-	unsigned int finalK;		/* final K2DIV value */
-} PllInitValue_t;
-
-static const PllInitValue_t g_PllInitValue_200_100;
-#define PLL_VALUE_200_100 ((const PllInitValue_t *)(&g_PllInitValue_200_100))
-
-static const PllInitValue_t g_PllInitValue_100_50;
-#define PLL_VALUE_100_50  ((const PllInitValue_t *)(&g_PllInitValue_100_50))
-
-
-#ifndef DEFAULT_PLL_VALUE
-# define DEFAULT_PLL_VALUE		PLL_VALUE_200_100
-#endif
-
-#ifndef EXTCLK
-# define EXTCLK		(20000000)	/* external oscillator clock (20MHz) */
-#endif
-
-
-
-#pragma section ".rodata"
-/* PLL settings for 20MHz ext. clock */
-#if (20000000 == EXTCLK)
-
-/* 200/100 MHz @ 20MHz ext. clock */
-static const PllInitValue_t g_PllInitValue_200_100 =
-{
-	/* OSCCON,	PLLCON0,	PLLCON1,	CCUCON0,	CCUCON1,	CCUCON2,    finalK */
-	0x0007001C, 0x01017600, 0x00020505, 0x12120118, 0x10012242, 0x00000002, 2
-};
-
-/* 100/50 MHz @ 20MHz ext. clock */
-static const PllInitValue_t g_PllInitValue_100_50 =
-{
-	/* OSCCON,	PLLCON0,	PLLCON1,	CCUCON0,	CCUCON1,	CCUCON2,    finalK */
-	0x0007001C, 0x01018a00, 0x00020606, 0x12120118, 0x10012241, 0x00000002, 6
-};
-#else
-#error "ERROR: UNSUPPORTED EXTERNAL CLOCK!"
-#endif /* PLL settings for 20MHz ext. clock */
-#pragma section
-
-
-static Ifx_SCU * const pSCU = (Ifx_SCU *)&MODULE_SCU;
-
-
-#if (USE_DISABLE_EXT_WDT == 1)
+#include "system_tc2x.h"
+#include "interrupts_tc23x.h"
 
 /* for serving A-step and B-step (+ newer) TLF devices: use both commands for err pin monitor */
 #define WDT_CMD_SIZE			(10 + 1)
 
+/* Workaround for TLF35584 A-Step Bug on AppKit-TC2x4 and AppKit-TC2x7 */
 static void disable_external_watchdog(void)
 {
-	int i;
-
 	/* command sequence for disabling external watchdog */
 	const unsigned short wdtdiscmd[WDT_CMD_SIZE] =
 	{
-		0x8756, 0x87de, 0x86ad, 0x8625,		/* unprotect register (PROTCFG) */
-		0x8d27,								/* disable window watchdog */
-		0x8811,								/* disable err pin monitor (A-step) */
-		0x8A01,								/* disable err pin monitor (not A-step) */
-		0x87be, 0x8668, 0x877d, 0x8795		/* protect register (PROTCFG) */
+			0x8756, 0x87de, 0x86ad, 0x8625,		/* unprotect register (PROTCFG) */
+			0x8d27,								/* disable window watchdog */
+			0x8811,								/* disable err pin monitor (A-step) */
+			0x8A01,								/* disable err pin monitor (not A-step) */
+			0x87be, 0x8668, 0x877d, 0x8795		/* protect register (PROTCFG) */
 	};
 
 	/* check that this disabling has not been already done (e.g. by the debugger) */
@@ -126,11 +58,7 @@ static void disable_external_watchdog(void)
 	/* configure port pins */
 	P14_IOCR0.B.PC2 = 0x13;			/* SLSO21 */
 	P15_IOCR0.B.PC3 = 0x13;			/* SCLK2 */
-#if (APPKIT_TC2X7 == 1)
-	P15_IOCR4.B.PC6 = 0x13;			/* MTSR2 */
-#else
 	P15_IOCR4.B.PC5 = 0x13;			/* MTSR2 */
-#endif /* APPKIT_TC2X7 */
 	P15_IOCR4.B.PC7 = 0x02;			/* MRST2B */
 
 	/* program QSPI2 parameters */
@@ -150,9 +78,9 @@ static void disable_external_watchdog(void)
 	QSPI2_GLOBALCON.B.EN = 1;		/* ... and enable the module */
 
 	/* transfer all data */
-	for (i = 0; i < WDT_CMD_SIZE; ++i)
+	for (uint32_t i = 0; i < WDT_CMD_SIZE; ++i)
 	{
-		QSPI2_DATAENTRY0.U = (unsigned int)wdtdiscmd[i];
+		QSPI2_DATAENTRY0.U = (uint32_t)wdtdiscmd[i];
 		/* wait until transfer is complete */
 		while (!QSPI2_STATUS.B.TXF)
 			;
@@ -167,20 +95,17 @@ static void disable_external_watchdog(void)
 		(void)QSPI2_RXEXIT.U;
 	}
 }
-#endif /* USE_DISABLE_EXT_WDT */
-
-#ifndef SYSTEM_DONT_SET_PLL
 
 /* STM time scaling (for avoiding overflow) */
 #define TIME_SCALE_DN		100
 #define TIME_SCALE_UP		(1000000 / TIME_SCALE_DN)
-
 /* wait for <time> micro seconds */
+
 /* beware of overflows: 100 us at (>=)43 MHz will overflow (if not scaled before multiplying) */
-static void wait(unsigned int time)
+static void simple_wait_100(void)
 {
-	unsigned int fSTM = (unsigned int)SYSTEM_GetStmClock();
-	unsigned int stmWaitCount = (fSTM / TIME_SCALE_DN) * time / TIME_SCALE_UP;
+	uint32_t fSTM = (uint32_t)SYSTEM_GetStmClock();
+	uint32_t stmWaitCount = (fSTM / TIME_SCALE_DN) * 100 / TIME_SCALE_UP;
 
 	/* prepare compare register */
 	STM0_CMP0.U = STM0_TIM0.U + stmWaitCount;
@@ -198,28 +123,26 @@ static void wait(unsigned int time)
 
 static void system_set_pll(const PllInitValue_t *pPllInitValue)
 {
-	unsigned int k;
-
 	unlock_safety_wdtcon();
 
-	pSCU->OSCCON.U = pPllInitValue->valOSCCON;
+	MODULE_SCU.OSCCON.U = pPllInitValue->valOSCCON;
 
-	while (pSCU->CCUCON1.B.LCK)
+	while (MODULE_SCU.CCUCON1.B.LCK)
 		;
-	pSCU->CCUCON1.U = pPllInitValue->valCCUCON1 | (1 << IFX_SCU_CCUCON1_UP_OFF);
+	MODULE_SCU.CCUCON1.U = pPllInitValue->valCCUCON1 | (1 << IFX_SCU_CCUCON1_UP_OFF);
 
-	while (pSCU->CCUCON2.B.LCK)
+	while (MODULE_SCU.CCUCON2.B.LCK)
 		;
-	pSCU->CCUCON2.U = pPllInitValue->valCCUCON2 | (1 << IFX_SCU_CCUCON2_UP_OFF);
+	MODULE_SCU.CCUCON2.U = pPllInitValue->valCCUCON2 | (1 << IFX_SCU_CCUCON2_UP_OFF);
 
-	pSCU->PLLCON0.U |= ((1 << IFX_SCU_PLLCON0_VCOBYP_OFF) | (1 << IFX_SCU_PLLCON0_SETFINDIS_OFF));
-	pSCU->PLLCON1.U =  pPllInitValue->valPLLCON1;				/* set Kn divider */
-	pSCU->PLLCON0.U =  pPllInitValue->valPLLCON0				/* set P,N divider */
-					| ((1 << IFX_SCU_PLLCON0_VCOBYP_OFF) | (1 << IFX_SCU_PLLCON0_CLRFINDIS_OFF));
+	MODULE_SCU.PLLCON0.U |= ((1 << IFX_SCU_PLLCON0_VCOBYP_OFF) | (1 << IFX_SCU_PLLCON0_SETFINDIS_OFF));
+	MODULE_SCU.PLLCON1.U =  pPllInitValue->valPLLCON1;				/* set Kn divider */
+	MODULE_SCU.PLLCON0.U =  pPllInitValue->valPLLCON0				/* set P,N divider */
+			| ((1 << IFX_SCU_PLLCON0_VCOBYP_OFF) | (1 << IFX_SCU_PLLCON0_CLRFINDIS_OFF));
 
-	while (pSCU->CCUCON0.B.LCK)
+	while (MODULE_SCU.CCUCON0.B.LCK)
 		;
-	pSCU->CCUCON0.U =  pPllInitValue->valCCUCON0 | (1 << IFX_SCU_CCUCON0_UP_OFF);
+	MODULE_SCU.CCUCON0.U =  pPllInitValue->valCCUCON0 | (1 << IFX_SCU_CCUCON0_UP_OFF);
 
 	lock_safety_wdtcon();
 
@@ -227,75 +150,84 @@ static void system_set_pll(const PllInitValue_t *pPllInitValue)
 	{
 #ifndef SYSTEM_PLL_HAS_NO_LOCK
 		/* wait for PLL locked */
-		while (0 == pSCU->PLLSTAT.B.VCOLOCK)
+		while (0 == MODULE_SCU.PLLSTAT.B.VCOLOCK)
 			;
 #endif
 
 		unlock_safety_wdtcon();
-		pSCU->PLLCON0.B.VCOBYP = 0;			/* disable VCO bypass */
+		MODULE_SCU.PLLCON0.B.VCOBYP = 0;			/* disable VCO bypass */
 		lock_safety_wdtcon();
 	}
 
 	/* update K dividers for stepping up to final clock */
-	k = pSCU->PLLCON1.B.K2DIV;
+	uint32_t k = MODULE_SCU.PLLCON1.B.K2DIV;
 	/* wait some time (100 us) */
-	wait(100);
+	simple_wait_100();
 	while (k > pPllInitValue->finalK)
 	{
-		Ifx_SCU_PLLCON1 pllcon1 = pSCU->PLLCON1;
+		Ifx_SCU_PLLCON1 pllcon1 = MODULE_SCU.PLLCON1;
 
 		--k;
 		/* prepare value to write */
 		pllcon1.B.K2DIV = k;
 		pllcon1.B.K3DIV = k;
 		/* wait until K2 operation is stable */
-		while (0 == pSCU->PLLSTAT.B.K2RDY)
+		while (0 == MODULE_SCU.PLLSTAT.B.K2RDY)
 			;
 		unlock_safety_wdtcon();
-		pSCU->PLLCON1 = pllcon1;
+		MODULE_SCU.PLLCON1 = pllcon1;
 		lock_safety_wdtcon();
 		/* wait some time (100 us) */
-		wait(100);
+		simple_wait_100();
 	}
 }
-#endif
 
-/*! \brief System initialisation
- *  \param pPllInitValue ... address of PLL initialisation struct
- */
-static void SYSTEM_InitExt(const PllInitValue_t *pPllInitValue)
+void system_clk_config_200_100(void)
 {
-#ifndef SYSTEM_DONT_SET_PLL
-	/* initialise PLL (only done by CPU0) */
-	if (0 == (_mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK))
-		system_set_pll(pPllInitValue);
-#endif
+	//	200/100 MHz @ 20MHz ext. clock
+	static const PllInitValue_t pll_init_200_100 =
+	{
+			.valOSCCON = 0x0007001C,
+			.valPLLCON0 = 0x01017600,
+			.valPLLCON1 = 0x00020505,
+			.valCCUCON0 = 0x12120118,
+			.valCCUCON1 = 0x10012242,
+			.valCCUCON2 = 0x00000002,
+			.finalK = 2
+	};
 
-	/* activate interrupt system */
-	InterruptInit();
+	system_set_pll(&pll_init_200_100);
+}
+
+void system_clk_config_100_50(void)
+{
+	// 100/50 MHz @ 20MHz ext. clock
+	static const PllInitValue_t pll_init_100_50 =
+	{
+			.valOSCCON = 0x0007001C,
+			.valPLLCON0 = 0x01018A00,
+			.valPLLCON1 = 0x00020606,
+			.valCCUCON0 = 0x12120118,
+			.valCCUCON1 = 0x10012241,
+			.valCCUCON2 = 0x00000002,
+			.finalK = 6
+	};
+
+	system_set_pll(&pll_init_100_50);
 }
 
 void SYSTEM_Init(void)
 {
-	SYSTEM_InitExt(DEFAULT_PLL_VALUE);
-
-#if (USE_DISABLE_EXT_WDT == 1)
 	disable_external_watchdog();
-#endif /* USE_DISABLE_EXT_WDT */
 }
 
-unsigned long SYSTEM_GetExtClock(void)
+uint32_t system_GetPllClock(void)
 {
-	return EXTCLK;
-}
+	uint32_t frequency = EXTCLK;	/* fOSC */
 
-static unsigned long system_GetPllClock(void)
-{
-	unsigned int frequency = EXTCLK;	/* fOSC */
-
-	Ifx_SCU_PLLSTAT pllstat = pSCU->PLLSTAT;
-	Ifx_SCU_PLLCON0 pllcon0 = pSCU->PLLCON0;
-	Ifx_SCU_PLLCON1 pllcon1 = pSCU->PLLCON1;
+	Ifx_SCU_PLLSTAT pllstat = MODULE_SCU.PLLSTAT;
+	Ifx_SCU_PLLCON0 pllcon0 = MODULE_SCU.PLLCON0;
+	Ifx_SCU_PLLCON1 pllcon1 = MODULE_SCU.PLLCON1;
 
 	if (0 == (pllstat.B.VCOBYST))
 	{
@@ -317,31 +249,31 @@ static unsigned long system_GetPllClock(void)
 		frequency /= (pllcon1.B.K1DIV + 1);		/* fOSC/K1 */
 	}
 
-	return (unsigned long)frequency;
+	return (uint32_t)frequency;
 }
 
-static unsigned long system_GetIntClock(void)
+uint32_t system_GetIntClock(void)
 {
-	unsigned long frequency = 0;
-	switch (pSCU->CCUCON0.B.CLKSEL)
+	uint32_t frequency = 0;
+	switch (MODULE_SCU.CCUCON0.B.CLKSEL)
 	{
-		default:
-		case 0:  /* back-up clock (typ. 100 MHz) */
-			frequency = 100000000ul;
-			break;
-		case 1:	 /* fPLL */
-			frequency = system_GetPllClock();
-			break;
+	default:
+	case 0:  /* back-up clock (typ. 100 MHz) */
+		frequency = 100000000ul;
+		break;
+	case 1:	 /* fPLL */
+		frequency = system_GetPllClock();
+		break;
 	}
 	return frequency;
 }
 
-unsigned long SYSTEM_GetCpuClock(void)
+uint32_t SYSTEM_GetCpuClock(void)
 {
-	unsigned long frequency = system_GetIntClock();
+	uint32_t frequency = system_GetIntClock();
 	/* fCPU = fSRI */
-	unsigned long divider = pSCU->CCUCON0.B.SRIDIV;
-	unsigned long cpudiv = pSCU->CCUCON6.B.CPU0DIV;
+	uint32_t divider = MODULE_SCU.CCUCON0.B.SRIDIV;
+	uint32_t cpudiv = MODULE_SCU.CCUCON6.B.CPU0DIV;
 	if (0 == divider)
 		return 0;
 	frequency /= divider;
@@ -355,51 +287,31 @@ unsigned long SYSTEM_GetCpuClock(void)
 	return frequency;
 }
 
-unsigned long SYSTEM_GetSysClock(void)
+uint32_t SYSTEM_GetSysClock(void)
 {
-	unsigned long frequency = system_GetIntClock();
-	unsigned long divider = pSCU->CCUCON0.B.SPBDIV;
+	uint32_t frequency = system_GetIntClock();
+	uint32_t divider = MODULE_SCU.CCUCON0.B.SPBDIV;
 	if (0 == divider)
 		return 0;
 	return (frequency / divider);
 }
 
-unsigned long SYSTEM_GetStmClock(void)
+uint32_t SYSTEM_GetStmClock(void)
 {
-	unsigned long frequency = system_GetIntClock();
-	unsigned long divider = pSCU->CCUCON1.B.STMDIV;
+	uint32_t frequency = system_GetIntClock();
+	uint32_t divider = MODULE_SCU.CCUCON1.B.STMDIV;
 	if (0 == divider)
 		return 0;
 	return (frequency / divider);
 }
 
-unsigned long SYSTEM_GetCanClock(void)
+uint32_t SYSTEM_GetCanClock(void)
 {
-	unsigned long frequency = system_GetIntClock();
-	unsigned long divider = pSCU->CCUCON1.B.CANDIV;
+	uint32_t frequency = system_GetIntClock();
+	uint32_t divider = MODULE_SCU.CCUCON1.B.CANDIV;
 	if (0 == divider)
 		return 0;
 	return (frequency / divider);
-}
-
-void SYSTEM_EnableInterrupts(void)
-{
-	_enable();
-}
-
-void SYSTEM_DisableInterrupts(void)
-{
-	_disable();
-}
-
-void SYSTEM_EnableProtection(void)
-{
-	lock_wdtcon();
-}
-
-void SYSTEM_DisableProtection(void)
-{
-	unlock_wdtcon();
 }
 
 void SYSTEM_EnableProtectionExt(int Sel)
@@ -428,44 +340,31 @@ void SYSTEM_DisableSecProtection(void)
 	unlock_safety_wdtcon();
 }
 
-
 int SYSTEM_Reset(void)
 {
 	unlock_safety_wdtcon();
-	pSCU->SWRSTCON.B.SWRSTREQ = 1;
+	MODULE_SCU.SWRSTCON.B.SWRSTREQ = 1;
 	while (1)
 		;
 	return 0;
 }
 
-
 int SYSTEM_IdleExt(int CoreId)
 {
 	unlock_wdtcon();
-	switch (CoreId)
-	{
-		case 0:
-			pSCU->PMCSR[0].U = 1;	/* request CPU idle mode */
-			break;
-	}
+
+	MODULE_SCU.PMCSR[0].U = 1;	/* request CPU idle mode */
+
 	lock_wdtcon();
 	return 0;
-}
-
-int SYSTEM_Idle(void)
-{
-	return SYSTEM_IdleExt(_mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK);
 }
 
 int SYSTEM_Sleep(void)
 {
 	unlock_wdtcon();
-	switch (_mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK)
-	{
-		case 0:
-			pSCU->PMCSR[0].U = 2;	/* request system sleep mode */
-			break;
-	}
+
+	MODULE_SCU.PMCSR[0].U = 2;	/* request system sleep mode */
+
 	lock_wdtcon();
 	return 0;
 }
@@ -473,7 +372,7 @@ int SYSTEM_Sleep(void)
 
 int SYSTEM_IsCacheEnabled(void)
 {
-	unsigned int ui = _mfcr(CPU_PCON0);
+	uint32_t ui = _mfcr(CPU_PCON0);
 	if (ui & 2)
 		return 0;	/* Cache is in bypass mode */
 	ui = _mfcr(CPU_PCON2);
@@ -497,14 +396,4 @@ void SYSTEM_EnaDisCache(int Enable)
 		_mtcr(CPU_DCON0, 2);
 	}
 	lock_wdtcon();
-}
-
-void SYSTEM_DbgBreak(void)
-{
-#ifdef DEBUG
-	__asm volatile ("debug");
-#else
-	while (1)
-		;
-#endif
 }

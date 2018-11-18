@@ -157,7 +157,6 @@
     <InputSection Name="wm4.ifxpmu_bf.h.28.07fc612673841a2c9a5dfa67923a6667"/>
     <InputSection Name="wm4.ifxpmu_reg.h.42.d61df6a66f288cedd84f246887854423"/>
     <InputSection Name="wm4.bspconfig_tc23x.h.34.6228359b840d5c9aae057ef461027e39"/>
-    <InputSection Name="wm4.tc_inc_path_tc23x.h.9.edf37d69033d984c657fa37b31a773ea"/>
     <InputSection Name="wm4.bspconfig_tc23x.h.55.1b7702524a7460c10e7fed1bee56771b"/>
     <InputSection Name="wm4.bspconfig_tc23x.h.20.7c8e003d2c72585883bfb3c983de4327"/>
     <InputSection Name="wm4.bspconfig_tc23x.h.10.a8408fffb29f9c9125bde176ae3d565b"/>
@@ -167,6 +166,15 @@
     <InputSection Name="wm4.cint_trap_tc23x.h.9.658be6e43250c91be74140ef37f78c82"/>
     <InputSection Name="wm4.ifxflash_bf.h.28.768faa5638310add094bc712205f110d"/>
     <InputSection Name="wm4.ifxflash_reg.h.42.ab16609b7bf4a3c69b268086a14156b3"/>
+    <InputSection Name="wm4.system_tc2x.h.9.2e27cc81301ccba916487c1aef667a3c"/>
+    <InputSection Name="wm4.tc_inc_path_tc23x.h.9.281fea5c34770120a4c8841bababb4a3"/>
+    <InputSection Name="wm4.bspconfig_tc23x.h.55.370267fee08967ee03dffb2a7e5b396c"/>
+    <InputSection Name=".startup.code"/>
+    <InputSection Name="wm4.stdlib.h.50.622023ed9abe014547a3bd67d796ebc1"/>
+    <InputSection Name="wm4.stddef.h.184.4e5d46709ab217f381b449671f32b922"/>
+    <InputSection Name=".startup.bmhd"/>
+    <InputSection Name=".traptable"/>
+    <InputSection Name="wm4.ifxcbs_reg.h.42.dd1f12f1573b11c8eac9980200ffb103"/>
   </Input>
   <Files>
     <ObjectFile Name="src\system_tc23x.o"/>
@@ -201,6 +209,11 @@
     <ObjectFile Name="src\cint_trap_tc23x.o"/>
     <ObjectFile Name="src\scu_eru.o"/>
     <ObjectFile Name="src\data_flash.o"/>
+    <ObjectFile Name="src\uart_init_poll.o"/>
+    <ObjectFile Name="src\crt0-tc23x.o"/>
+    <ObjectFile Name="src\applproc0_loop.o"/>
+    <ObjectFile Name="src\crt0.o"/>
+    <ObjectFile Name="asm\crt0-tc23x.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

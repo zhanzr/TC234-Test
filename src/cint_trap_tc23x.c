@@ -11,6 +11,8 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "bspconfig_tc23x.h"
 #include "uart_int.h"
@@ -27,15 +29,7 @@
 
 /* This variable is set to 1 after the vectabs are initialized.  */
 
-static int _init_vectab_initialized;
-
-/* This structure describes interrupt handlers and their arguments.  */
-
-typedef struct _Hnd_arg
-{
-	void (*hnd_handler)(int);
-	int hnd_arg;
-} Hnd_arg;
+static bool _init_vectab_initialized;
 
 /* This array holds the functions to be called when a trap occurs. */
 
@@ -45,8 +39,9 @@ void (*Tdisptab[MAX_TRAPS])(int tin);
 
 Hnd_arg Cdisptab[MAX_INTRS];
 
-void __int_handler(int arg);
+void default_isr(int arg);
 
+#if 0
 /* This is the default trap vector table, which consists of eight
    entries, each consisting of eight words (32 bytes).  The table
    must be put into the section ".traptab", must be aligned to a
@@ -54,35 +49,35 @@ void __int_handler(int arg);
    must be called "TriCore_trap_table", as it is referenced below
    in order to program the BTV register.  */
 
-//__asm (	".section .traptab, \"ax\", @progbits\n"
-//		".align 8\n"
-//		".global TriCore_trap_table\n"
-//		"TriCore_trap_table:\n"
-//);
-//
-//# define DEFINE_TRAP(i)									\
-//		__asm (".global __trap_" #i);						\
-//		__asm ("__trap_" #i ":");							\
-//		__asm ("svlcx");									\
-//		__asm ("movh.a %a15,hi:Tdisptab+(4*" #i ")");		\
-//		__asm ("ld.w %d4,[%a15]lo:Tdisptab+(4*" #i ")");	\
-//		__asm ("mov.a %a15, %d4");							\
-//		__asm ("mov %d4,%d15");								\
-//		__asm ("calli %a15");								\
-//		__asm ("rslcx");									\
-//		__asm ("rfe");										\
-//		__asm (".align 5")
-//
-//
-//DEFINE_TRAP(0);		/* trap class 0 (Reset) */
-//DEFINE_TRAP(1);		/* trap class 1 (Internal Protection Traps) */
-//DEFINE_TRAP(2);		/* trap class 2 (Instruction Errors) */
-//DEFINE_TRAP(3);		/* trap class 3 (Context Management) */
-//DEFINE_TRAP(4);		/* trap class 4 (System Bus and Peripheral Errors) */
-//DEFINE_TRAP(5);		/* trap class 5 (Assertion Traps) */
-//DEFINE_TRAP(6);		/* trap class 6 (System Call) */
-//DEFINE_TRAP(7);		/* trap class 7 (Non-Maskable Interrupt) */
+__asm (	".section .traptab, \"ax\", @progbits\n"
+		".align 8\n"
+		".global TriCore_trap_table\n"
+		"TriCore_trap_table:\n"
+);
 
+# define DEFINE_TRAP(i)									\
+		__asm (".global __trap_" #i);						\
+		__asm ("__trap_" #i ":");							\
+		__asm ("svlcx");									\
+		__asm ("movh.a %a15,hi:Tdisptab+(4*" #i ")");		\
+		__asm ("ld.w %d4,[%a15]lo:Tdisptab+(4*" #i ")");	\
+		__asm ("mov.a %a15, %d4");							\
+		__asm ("mov %d4,%d15");								\
+		__asm ("calli %a15");								\
+		__asm ("rslcx");									\
+		__asm ("rfe");										\
+		__asm (".align 5")
+
+
+DEFINE_TRAP(0);		/* trap class 0 (Reset) */
+DEFINE_TRAP(1);		/* trap class 1 (Internal Protection Traps) */
+DEFINE_TRAP(2);		/* trap class 2 (Instruction Errors) */
+DEFINE_TRAP(3);		/* trap class 3 (Context Management) */
+DEFINE_TRAP(4);		/* trap class 4 (System Bus and Peripheral Errors) */
+DEFINE_TRAP(5);		/* trap class 5 (Assertion Traps) */
+DEFINE_TRAP(6);		/* trap class 6 (System Call) */
+DEFINE_TRAP(7);		/* trap class 7 (Non-Maskable Interrupt) */
+#endif
 __asm (".text");
 
 /* Install TRAPHANDLER for trap TRAPNO.  */
@@ -106,8 +101,6 @@ static inline void flush_stdout_trap(void)
 
 int _install_trap_handler(int trapno, void (*traphandler)(int))
 {
-//	int CpuId = _mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK;
-
 	if ((trapno < 0) || (trapno >= MAX_TRAPS) || !_init_vectab_initialized)
 		return 0;
 
@@ -376,29 +369,6 @@ static void __class_5_trap_handler(int tin)
 		__asm volatile ("debug"); /* SOVF -- Sticky Arithmetic Overflow  */
 		break;
 	}
-}
-
-/* System Call #tin  */
-
-static void __class_6_trap_handler(int tin)
-{
-	led_toggle(3);
-
-	_out_uart('<');
-	flush_stdout_trap();
-	_out_uart('6');
-	flush_stdout_trap();
-	_out_uart('>');
-	flush_stdout_trap();
-	_out_uart('[');
-	flush_stdout_trap();
-	_out_uart('1'+tin);
-	flush_stdout_trap();
-	_out_uart(']');
-	flush_stdout_trap();
-
-	(void)tin;
-	__asm volatile ("debug"); /* System Call #tin  */
 }
 
 /* Non-maskable Interrupt  */
@@ -725,7 +695,7 @@ __asm (".text");
 
 /* The default handler for interrupts.  */
 
-void __int_handler(int arg)
+void default_isr(int arg)
 {
 	/* Just ignore this interrupt.  */
 	(void)arg;
@@ -735,8 +705,6 @@ void __int_handler(int arg)
 
 int _install_int_handler(int intno, void (*inthandler)(int), int arg)
 {
-	int CpuId = _mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK;
-
 	if ((intno < 0) || (intno >= MAX_INTRS) || !_init_vectab_initialized)
 		return 0;
 
@@ -753,21 +721,17 @@ void _init_vectab(void);
 extern int TriCore_trap_table[];
 extern int TriCore_int_table[];
 
+extern void prvTrapYield( int tin );
+
 void _init_vectab(void)
 {
-	int CpuId = _mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK;
-	register int *vptr;
-	int vecno;
-
 	if (_init_vectab_initialized)
 		return;
 
 	/* Set BTV and BIV registers.  */
 	unlock_wdtcon();
-	vptr = TriCore_trap_table;
-	__asm volatile ("mtcr $btv,%0" : : "d" (vptr));
-	vptr = TriCore_int_table;
-	__asm volatile ("mtcr $biv,%0" : : "d" (vptr));
+	_mtcr(CPU_BTV, (uint32_t)TriCore_trap_table);
+	_mtcr(CPU_BIV, (uint32_t)TriCore_int_table);
 	lock_wdtcon();
 
 	/* Initialize the trap handlers.  */
@@ -777,15 +741,15 @@ void _init_vectab(void)
 	Tdisptab[3] = __class_3_trap_handler;
 	Tdisptab[4] = __class_4_trap_handler;
 	Tdisptab[5] = __class_5_trap_handler;
-	Tdisptab[6] = __class_6_trap_handler;
+	Tdisptab[6] = prvTrapYield;
 	Tdisptab[7] = __class_7_trap_handler;
 
 	/* Initialize the interrupt handlers.  */
-	for (vecno = 0; vecno < MAX_INTRS; ++vecno)
+	for (uint16_t vecno = 0; vecno < MAX_INTRS; ++vecno)
 	{
-		Cdisptab[vecno].hnd_handler = __int_handler;
+		Cdisptab[vecno].hnd_handler = default_isr;
 		Cdisptab[vecno].hnd_arg = vecno;
 	}
 
-	_init_vectab_initialized = 1;
+	_init_vectab_initialized = true;
 }
