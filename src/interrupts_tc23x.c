@@ -16,11 +16,12 @@
 #include TC_INCLUDE(TCPATH/IfxSrc_bf.h)
 
 #include "interrupts_tc23x.h"
+#include "cint_trap_tc23x.h"
 
 extern void _init_vectab(void);
 extern int _install_int_handler(int intno, void (*handler)(int), int arg);
 
-static Ifx_SRC_SRCR_Bits * const tabSRC = (Ifx_SRC_SRCR_Bits *)&MODULE_SRC;
+Ifx_SRC_SRCR * const tabSRC = (Ifx_SRC_SRCR *)&MODULE_SRC;
 
 /*---------------------------------------------------------------------
 	Function:	InterruptInit
@@ -48,9 +49,9 @@ void InterruptInit(void)
 ---------------------------------------------------------------------*/
 void InterruptInstall(int irqNum, isrhnd_t isrProc, int prio, int arg)
 {
-	unsigned int coreId = _mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK;
+//	unsigned int coreId = _mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK;
 
-	if ((irqNum < 0) || (IRQ_ID_MAX_NUM <= irqNum))
+	if ((irqNum <= 0) || (IRQ_ID_MAX_NUM <= irqNum))
 	{
 		return;
 	}
@@ -59,8 +60,8 @@ void InterruptInstall(int irqNum, isrhnd_t isrProc, int prio, int arg)
 	_install_int_handler(prio, isrProc, arg);
 
 	/* set processor and priority values */
-	tabSRC[irqNum].TOS = coreId;
-	tabSRC[irqNum].SRPN = prio;
+	tabSRC[irqNum].B.TOS = 0;
+	tabSRC[irqNum].B.SRPN = prio;
 	/* ... and enable it */
-	tabSRC[irqNum].SRE = 1;
+	tabSRC[irqNum].B.SRE = 1;
 }

@@ -25,11 +25,16 @@ extern "C" {
 #include TC_INCLUDE(TCPATH/IfxStm_reg.h)
 #include TC_INCLUDE(TCPATH/IfxStm_bf.h)
 
-#define SYS_TICK_HZ	1000
+#include "portmacro.h"
+#include "FreeRTOSConfig.h"
 
-void stm_init(uint8_t ch, uint32_t hz);
+#include "FreeRTOS.h"
+#include "task.h"
+#include "semphr.h"
 
-const uint32_t HAL_GetTick(void);
+#define CMP1_MATCH_VAL	( configPERIPHERAL_CLOCK_HZ /  configRUN_TIME_STATS_RATE_HZ)
+
+const uint32_t GetFreeRTOSRunTimeTicks(void);
 
 #ifdef __cplusplus
 }

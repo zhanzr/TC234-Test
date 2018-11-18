@@ -692,13 +692,13 @@ static void default_isr(int arg)
 
 /* Install INTHANDLER for interrupt INTNO and remember ARG for later use.  */
 
-int _install_int_handler(int intno, void (*inthandler)(int), int arg)
+int _install_int_handler(int prio, void (*inthandler)(int), int arg)
 {
-	if ((intno < 0) || (intno >= MAX_INTRS))
+	if ((prio < 0) || (prio >= MAX_INTRS))
 		return 0;
 
-	Cdisptab[intno].hnd_handler = inthandler;
-	Cdisptab[intno].hnd_arg = arg;
+	Cdisptab[prio].hnd_handler = inthandler;
+	Cdisptab[prio].hnd_arg = arg;
 
 	return 1;
 }
@@ -711,15 +711,7 @@ extern int TriCore_trap_table[];
 extern int TriCore_int_table[];
 
 /* System Call #tin  */
-void prvTrapYield(int tin)
-{
-	switch( tin )
-	{
-	default:
-		printf("SC Trap:%d\n", tin);
-		break;
-	}
-}
+extern void prvTrapYield( int iTrapIdentification );
 
 void _init_vectab(void)
 {

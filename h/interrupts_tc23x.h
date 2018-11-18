@@ -8,6 +8,8 @@
 #ifndef __INTERRUPTS_H__
 #define __INTERRUPTS_H__
 
+#include <stdint.h>
+
 /* Interrupt SRC IDs */
 /* taken from Table 16-4 (TC23x/TC22x UM v1.0) */
 #define SRC_ID_CPU0SBSRC		0	/* CPU 0 Software Breakpoint Service Request */
@@ -226,9 +228,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 //User Priority Definition
-#define XMIT_INTERRUPT			3
-#define RECV_INTERRUPT			4
-
 #define STM_CMP0_ISR_PRIO	10
 #define STM_CMP1_ISR_PRIO	11
 #define GPSR0_ISR_PRIO	12
@@ -241,6 +240,9 @@ extern "C" {
 #define ERS1_ISR_PRIO	18
 #define ERS2_ISR_PRIO	19
 #define ERS3_ISR_PRIO	20
+
+#define XMIT_INTERRUPT			21
+#define RECV_INTERRUPT			22
 
 /* type of an Interrupt Service Routine (ISR) */
 typedef void (*isrhnd_t)(int arg);
