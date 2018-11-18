@@ -214,7 +214,6 @@ void test_proc_dflash(void)
 		//	printf("M2CNT\t%08X\t:%08X\n", CPU_M2CNT, _mfcr(CPU_M2CNT));
 		//	printf("M3CNT\t%08X\t:%08X\n", CPU_M3CNT, _mfcr(CPU_M3CNT));
 
-
 	extern void __USTACK_BEGIN(void);
 	printf("__USTACK_BEGIN\t:%08X\n", (uint32_t)__USTACK_BEGIN);
 	extern void __USTACK(void);

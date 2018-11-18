@@ -1,3 +1,11 @@
 TC234 Demo.
 
-SCU Colck config test.
+FreeRTOS Demo for TC234.
+
+FreeRTOS Example 19.
+
+Content:
+
+        Demo for Interrupt , Trap , UStack, IStack, Heap, CSA, Startup and so on.
+
+

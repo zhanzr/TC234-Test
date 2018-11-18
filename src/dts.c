@@ -9,7 +9,17 @@
 
 #include "uart_int.h"
 
+#include "FreeRTOS.h"
+#include "task.h"
+#include "croutine.h"
+#include "queue.h"
+#include "semphr.h"
+#include "timers.h"
+#include "event_groups.h"
+
 static volatile bool g_dts_flag;
+
+extern TaskHandle_t g_info_task_handler;
 
 bool IfxDts_isReady(void)
 {
@@ -18,7 +28,8 @@ bool IfxDts_isReady(void)
 
 void dts_isr(uint32_t para)
 {
-	g_dts_flag = true;
+//	g_dts_flag = true;
+	xTaskNotifyFromISR( g_info_task_handler, 3, eSetValueWithOverwrite, NULL);
 }
 
 void config_dts(void)

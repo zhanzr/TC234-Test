@@ -106,7 +106,7 @@
 /* IO Level 0, MPU Register Set 1 and Call Depth Counting disabled. */
 #define portINITIAL_UNPRIVILEGED_PROGRAM_STATUS_WORD	( 0x000010FFUL )
 /* The lower 20 bits identify the CSA address. */
-#define portINITIAL_PCXI_UPPER_CONTEXT_WORD				( 0x00C00000UL )
+#define portINITIAL_PCXI_UPPER_CONTEXT_WORD				( 0x00300000UL ) /* The lower 20 bits identify the CSA address. */
 /* MPU Disable. */
 #define portINITIAL_SYSCON								( 0x00000000UL )
 
@@ -331,7 +331,7 @@ static void prvSystemTickHandler( int iArg )
 	int32_t lYieldRequired;
 
 	/* Clear the interrupt source. */
-	MODULE_STM0.ISCR.B.CMP0IRR = 0;
+	MODULE_STM0.ISCR.B.CMP0IRR = 1;
 
 	/* Reload the Compare Match register for X ticks into the future.
 

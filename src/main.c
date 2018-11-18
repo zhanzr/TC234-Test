@@ -3,18 +3,22 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <stdint.h>
 #include <stdbool.h>
-#include <assert.h>
-#include <math.h>
-#include <limits.h>
+#include <stdint.h>
+
+/* Scheduler includes. */
+#include "FreeRTOS.h"
+#include "task.h"
+#include "croutine.h"
+#include "queue.h"
+#include "semphr.h"
+#include "timers.h"
+#include "event_groups.h"
 
 #include <machine/intrinsics.h>
 
 #include "bspconfig_tc23x.h"
 
-#include TC_INCLUDE(TCPATH/IfxStm_reg.h)
-#include TC_INCLUDE(TCPATH/IfxStm_bf.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_bf.h)
 #include TC_INCLUDE(TCPATH/IfxEth_reg.h)
@@ -41,6 +45,29 @@
 
 #include "partest.h"
 
+#define MESSAGE_Q_NUM   2
+QueueHandle_t Message_Queue;
+
+SemaphoreHandle_t BinarySemaphore;
+
+SemaphoreHandle_t CountSemaphore;
+
+SemaphoreHandle_t MutexSemaphore;
+
+TimerHandle_t 	AutoReloadTimer_Handle;
+TimerHandle_t	OneShotTimer_Handle;
+
+EventGroupHandle_t EventGroupHandler;
+#define EVENTBIT_0	(1<<0)
+#define EVENTBIT_1	(1<<1)
+#define EVENTBIT_2	(1<<2)
+#define EVENTBIT_ALL	(EVENTBIT_0|EVENTBIT_1|EVENTBIT_2)
+/*----------------------------------------------------------*/
+
+/* Constants for the ComTest tasks. */
+#define mainCOM_TEST_BAUD_RATE		( ( uint32_t ) BAUDRATE )
+
+#define mainCOM_TEST_LED			( 4 )
 /* Set mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY to 1 to create a simple demo.
 Set mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY to 0 to create a much more
 comprehensive test application.  See the comments at the top of this file, and
@@ -52,6 +79,20 @@ information. */
 
 static void prvSetupHardware( void );
 
+/*-----------------------------------------------------------*/
+
+TaskHandle_t StartTask_Handler;
+void start_task(void *pvParameters);
+
+TaskHandle_t g_task0_handler;
+void led0_task(void *pvParameters);
+
+TaskHandle_t g_task1_handler;
+void led1_task(void *pvParameters);
+
+TaskHandle_t g_info_task_handler;
+void print_task(void *pvParameters);
+
 int core0_main(int argc, char** argv)
 {
 	volatile bool g_regular_task_flag;
@@ -60,11 +101,7 @@ int core0_main(int argc, char** argv)
 
 //	SYSTEM_EnaDisCache(1);
 
-	/* initialise STM CMP 0 at configTICK_RATE_HZ rate */
-//	prvSetupTimerInterrupt();
-//	ConfigureTimeForRunTimeStats();
-
-	uart_init(BAUDRATE);
+	uart_init(mainCOM_TEST_BAUD_RATE);
 
 	config_dts();
 //	config_gpsr();
@@ -85,17 +122,30 @@ int core0_main(int argc, char** argv)
 			SYSTEM_IsCacheEnabled());
 	flush_stdout();
 
-	printf("%u %u %u\n", CMP1_MATCH_VAL, configPERIPHERAL_CLOCK_HZ, configRUN_TIME_STATS_RATE_HZ);
-	flush_stdout();
-	flush_stdout();
-
-	_syscall(3);
-	_syscall(4);
 	_syscall(255);
 
 	g_regular_task_flag = true;
 
 	uint8_t test_trig_cnt = 0;
+	/* The following function will only create more tasks and timers if
+	mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY is set to 0 (at the top of this
+	file).  See the comments at the top of this file for more information. */
+	//	prvOptionallyCreateComprehensveTestApplication();
+
+	xTaskCreate((TaskFunction_t )start_task,
+			(const char*    )"start_task",
+			(uint16_t       )512,
+			(void*          )NULL,
+			(UBaseType_t    )tskIDLE_PRIORITY + 1,
+			(TaskHandle_t*  )&StartTask_Handler);
+
+	/* Now all the tasks have been started - start the scheduler. */
+	vTaskStartScheduler();
+
+	/* If all is well then the following line will never be reached.  If
+	execution does reach here, then it is highly probably that the heap size
+	is too small for the idle and/or timer tasks to be created within
+	vTaskStartScheduler(). */
 	while(1)
 	{
 #define	DELAY_TICK	(10*configTICK_RATE_HZ)
@@ -104,34 +154,9 @@ int core0_main(int argc, char** argv)
 			g_regular_task_flag = true;
 		}
 
-		uint32_t test_trigger_cnt = GetFreeRTOSRunTimeTicks()/(DELAY_TICK);
-
 		if(g_regular_task_flag)
 		{
 			g_regular_task_flag = false;
-
-			if(0==test_trigger_cnt%4)
-			{
-				vParTestSetLED(0, 1);
-				vParTestSetLED(1, 0);
-				vParTestSetLED(2, 0);
-			}
-			else if(1==test_trigger_cnt%4)
-			{
-				vParTestSetLED(0, 1);
-				vParTestSetLED(1, 1);
-				vParTestSetLED(2, 0);
-			}
-			else if(2==test_trigger_cnt%4)
-			{
-				vParTestSetLED(0, 0);
-				vParTestSetLED(1, 0);
-				vParTestSetLED(2, 0);
-			}
-			else
-			{
-				vParTestToggleLED(3);
-			}
 
 			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
 					__TRICORE_NAME__,
@@ -164,8 +189,6 @@ int core0_main(int argc, char** argv)
 //					MODULE_SCU.CCUCON9.U
 //			);
 //			flush_stdout();
-
-			test_trig_cnt = test_trigger_gpsr(test_trig_cnt);
 		}
 
 		test_proc_dts();
@@ -176,6 +199,353 @@ int core0_main(int argc, char** argv)
 	return EXIT_SUCCESS;
 }
 
+
+/*-----------------------------------------------------------*/
+void AutoReloadCallback(TimerHandle_t xTimer)
+{
+	if(NULL != OneShotTimer_Handle)
+	{
+		xTimerStart(OneShotTimer_Handle,0);
+	}
+
+	if(EventGroupHandler!=NULL)
+	{
+		xEventGroupSetBits(EventGroupHandler,EVENTBIT_1);
+	}
+
+	//	xTaskNotify( g_task0_handler, 1, eSetValueWithOverwrite);
+	//	xTaskNotify( g_task1_handler, 2, eSetValueWithOverwrite);
+//	xTaskNotify( g_info_task_handler, 3, eSetValueWithOverwrite);
+	start_dts_measure();
+	vParTestToggleLED(2);
+}
+
+void OneShotCallback(TimerHandle_t xTimer)
+{
+	char info_buf[256];
+
+	vParTestToggleLED(0);
+	vParTestToggleLED(1);
+
+	if(EventGroupHandler!=NULL)
+	{
+		xEventGroupSetBits(EventGroupHandler,EVENTBIT_0);
+	}
+
+	if(NULL != BinarySemaphore)
+	{
+		if(pdTRUE == xSemaphoreTake(BinarySemaphore, portMAX_DELAY))
+		{
+			vTaskList(info_buf);
+			if(NULL != MutexSemaphore)
+			{
+				if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
+				{
+					//					printf("%s,TaskList Len:%d\r\n",
+					//							pcTaskGetName(NULL),
+					//							strlen(info_buf));
+					//					printf("%s\r\n",info_buf);
+
+					xSemaphoreGive(MutexSemaphore);
+				}
+			}
+
+			xSemaphoreGive(BinarySemaphore);
+		}
+	}
+}
+
+void start_task(void *pvParameters)
+{
+	Message_Queue = xQueueCreate(MESSAGE_Q_NUM, sizeof(uint32_t));
+
+	CountSemaphore = xSemaphoreCreateCounting(2, 2);
+
+	MutexSemaphore = xSemaphoreCreateMutex();
+
+	AutoReloadTimer_Handle=xTimerCreate((const char*		)"AT",
+			(TickType_t			)1000 / portTICK_PERIOD_MS,
+			(UBaseType_t		)pdTRUE,
+			(void*				)1,
+			(TimerCallbackFunction_t)AutoReloadCallback);
+
+	OneShotTimer_Handle=xTimerCreate((const char*			)"OT",
+			(TickType_t			)500 / portTICK_PERIOD_MS,
+			(UBaseType_t			)pdFALSE,
+			(void*					)2,
+			(TimerCallbackFunction_t)OneShotCallback);
+
+	EventGroupHandler = xEventGroupCreate();
+
+	if(NULL != AutoReloadTimer_Handle)
+	{
+		xTimerStart(AutoReloadTimer_Handle, 0);
+	}
+
+	xTaskCreate((TaskFunction_t )led0_task,
+			(const char*    )"led0_task",
+			(uint16_t       )768,
+			(void*          )NULL,
+			(UBaseType_t    )tskIDLE_PRIORITY + 2,
+			(TaskHandle_t*  )&g_task0_handler);
+
+	xTaskCreate((TaskFunction_t )led1_task,
+			(const char*    )"led1_task",
+			(uint16_t       )768,
+			(void*          )NULL,
+			(UBaseType_t    )tskIDLE_PRIORITY + 2,
+			(TaskHandle_t*  )&g_task1_handler);
+
+	xTaskCreate((TaskFunction_t )print_task,
+			(const char*    )"print_task",
+			(uint16_t       )2048,
+			(void*          )NULL,
+			(UBaseType_t    )tskIDLE_PRIORITY + 2,
+			(TaskHandle_t*  )&g_info_task_handler);
+	vTaskDelete(StartTask_Handler);
+}
+
+void led0_task(void *pvParameters)
+{
+	char info_buf[512];
+	EventBits_t EventValue;
+
+	while(1)
+	{
+		//    	vParTestToggleLED(0);
+		//		vTaskDelay(4000 / portTICK_PERIOD_MS);
+		if(EventGroupHandler!=NULL)
+		{
+			EventValue = xEventGroupGetBits(EventGroupHandler);
+			if(NULL != MutexSemaphore)
+			{
+				if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
+				{
+					//					printf("<%s,ev:%08X\n",
+					//							pcTaskGetName(NULL),
+					//							(uint32_t)EventValue);
+					xSemaphoreGive(MutexSemaphore);
+				}
+			}
+
+			EventValue = xEventGroupWaitBits((EventGroupHandle_t	)EventGroupHandler,
+					(EventBits_t			)EVENTBIT_0,
+					(BaseType_t			)pdTRUE,
+					(BaseType_t			)pdTRUE,
+					(TickType_t			)portMAX_DELAY);
+
+			EventValue = xEventGroupGetBits(EventGroupHandler);
+			if(NULL != MutexSemaphore)
+			{
+				if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
+				{
+					//					printf(">%s,ev:%08X\n",
+					//							pcTaskGetName(NULL),
+					//							(uint32_t)EventValue);
+					xSemaphoreGive(MutexSemaphore);
+				}
+			}
+		}
+
+		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
+				portMAX_DELAY );/* Block indefinitely. */
+
+		vTaskList(info_buf);
+		if(NULL != MutexSemaphore)
+		{
+			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
+			{
+				printf("%s,TaskList Len:%d, %08X\r\n",
+						pcTaskGetName(NULL),
+						strlen(info_buf),
+						NotifyValue);
+				printf("%s\r\n",info_buf);
+
+				xSemaphoreGive(MutexSemaphore);
+			}
+		}
+	}
+}
+
+void led1_task(void *pvParameters)
+{
+	char info_buf[512];
+	EventBits_t EventValue;
+
+	while(1)
+	{
+		//    	vParTestToggleLED(1);
+		//		vTaskDelay(4000 / portTICK_PERIOD_MS);
+		if(EventGroupHandler!=NULL)
+		{
+			EventValue = xEventGroupGetBits(EventGroupHandler);
+			if(NULL != MutexSemaphore)
+			{
+				if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
+				{
+					//					printf("<%s,ev:%08X\n",
+					//							pcTaskGetName(NULL),
+					//							(uint32_t)EventValue);
+					xSemaphoreGive(MutexSemaphore);
+				}
+			}
+
+			EventValue = xEventGroupWaitBits((EventGroupHandle_t	)EventGroupHandler,
+					(EventBits_t			)EVENTBIT_1,
+					(BaseType_t			)pdTRUE,
+					(BaseType_t			)pdTRUE,
+					(TickType_t			)portMAX_DELAY);
+
+			EventValue = xEventGroupGetBits(EventGroupHandler);
+			if(NULL != MutexSemaphore)
+			{
+				if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
+				{
+					//					printf(">%s,ev:%08X\n",
+					//							pcTaskGetName(NULL),
+					//							(uint32_t)EventValue);
+					xSemaphoreGive(MutexSemaphore);
+				}
+			}
+		}
+
+		if(NULL != Message_Queue)
+		{
+			uint32_t tmpTicks = xTaskGetTickCount();
+			xQueueSend(Message_Queue, &tmpTicks, 0);
+		}
+
+		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
+				portMAX_DELAY );/* Block indefinitely. */
+
+		vTaskList(info_buf);
+		if(NULL != MutexSemaphore)
+		{
+			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
+			{
+				printf("%s,TaskList Len:%d, %08X\r\n",
+						pcTaskGetName(NULL),
+						strlen(info_buf),
+						NotifyValue);
+				printf("%s\r\n",info_buf);
+
+				xSemaphoreGive(MutexSemaphore);
+			}
+		}
+
+
+	}
+}
+
+void print_task(void *pvParameters)
+{
+	char info_buf[512];
+
+	while(1)
+	{
+		//		vTaskDelay(4000 / portTICK_PERIOD_MS);
+		//		if(NULL != Message_Queue)
+		//		{
+		//			uint32_t tmpU32;
+		//			if(xQueueReceive(Message_Queue, &tmpU32, portMAX_DELAY))
+		//			{
+		//				mutex_printf("%08X\n", (uint32_t)&Message_Queue);
+		//				mutex_printf("CPU:%u Hz %u %u\n",
+		//						get_cpu_frequency(),
+		//						xTaskGetTickCount(),
+		//						tmpU32
+		//				);
+		//			}
+		//		}
+		//		else
+		//		{
+		//			mutex_printf("%08X\n", (uint32_t)&Message_Queue);
+		//		    vTaskDelay(1000 / portTICK_PERIOD_MS);
+		//		}
+
+		printf("%s %s\n", _NEWLIB_VERSION, __func__);
+
+		printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
+				__TRICORE_NAME__,
+				__TRICORE_CORE__,
+				SYSTEM_GetCpuClock()/1000000,
+				SYSTEM_GetSysClock()/1000000,
+				SYSTEM_GetStmClock()/1000000,
+				system_GetPllClock()/1000000,
+				system_GetIntClock()/1000000,
+				SYSTEM_IsCacheEnabled());
+		flush_stdout();
+
+		uint32_t NotifyValue = ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
+				portMAX_DELAY );/* Block indefinitely. */
+		printf("DTS Triggered %.3f P15.4:%u\n",
+				read_dts_celsius(),
+				MODULE_P15.IN.B.P4);
+		flush_stdout();
+
+		vTaskList(info_buf);
+		if(NULL != MutexSemaphore)
+		{
+			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
+			{
+				printf("%s,TaskList Len:%d, %08X\r\n",
+						pcTaskGetName(NULL),
+						strlen(info_buf),
+						NotifyValue);
+				printf("%s\r\n",info_buf);
+
+				vTaskGetRunTimeStats(info_buf);
+				printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
+				printf("%s\r\n",info_buf);
+
+				//				uint8_t* buffer;
+				//				uint32_t tmpA, tmpB, tmpC, tmpD;
+				//				tmpA = xPortGetFreeHeapSize();
+				//				buffer = pvPortMalloc(1024);
+				//				tmpB = xPortGetFreeHeapSize();
+				//				if(buffer!=NULL)
+				//				{
+				//					vPortFree(buffer);
+				//					tmpC = xPortGetFreeHeapSize();
+				//					buffer = NULL;
+				//				}
+				//				printf("FreeMem3:\t %u %u %u\n", tmpA, tmpB, tmpC);
+				printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
+						__TRICORE_NAME__,
+						__TRICORE_CORE__,
+						SYSTEM_GetCpuClock()/1000000,
+						SYSTEM_GetSysClock()/1000000,
+						SYSTEM_GetStmClock()/1000000,
+						system_GetPllClock()/1000000,
+						system_GetIntClock()/1000000,
+						SYSTEM_IsCacheEnabled());
+				flush_stdout();
+
+				xSemaphoreGive(MutexSemaphore);
+			}
+		}
+
+		//        if(NULL != CountSemaphore)
+		//        {
+		//        	if(pdTRUE == xSemaphoreTake(CountSemaphore, portMAX_DELAY))
+		//        	{
+		//        		vTaskList(info_buf);
+		//        		printf("TaskList Len:%d\r\n", strlen(info_buf));
+		//        		printf("%s\r\n",info_buf);
+		//
+		//        		vTaskGetRunTimeStats(info_buf);
+		//        		printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
+		//        		printf("%s\r\n",info_buf);
+		//
+		//        		uint32_t tmp_sema_cnt = uxSemaphoreGetCount(CountSemaphore);
+		//        		printf("SemaCnt %08X: %d\n", (uint32_t)&CountSemaphore, tmp_sema_cnt);
+		//                xSemaphoreGive(CountSemaphore);
+		//                tmp_sema_cnt = uxSemaphoreGetCount(CountSemaphore);
+		//        		printf("SemaCnt %08X: %d\n", (uint32_t)&CountSemaphore, tmp_sema_cnt);
+		//        	}
+		//        }
+	}
+}
 
 static void prvSetupHardware( void )
 {

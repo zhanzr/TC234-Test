@@ -69,10 +69,10 @@
       <DeepOutputSection Description="PCP data section" Name=".pcpdata" RuntimeAddressVMA="#//@LocalAliases/@Alias.0"/>
     </PCP>
     <MemoryReservation>
-      <Reservation Description="Section for ustack" Name=".ustack" Size="32" Alignment="8" Region="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" Unit="KB" Grows="downwards"/>
-      <Reservation Description="Section for istack" Name=".istack" Size="4" Alignment="8" Region="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" Unit="KB" Grows="downwards"/>
+      <Reservation Description="Section for ustack" Name=".ustack" Size="24" Alignment="8" Region="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" Unit="KB" Grows="downwards"/>
+      <Reservation Description="Section for istack" Name=".istack" Size="8" Alignment="8" Region="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" Unit="KB" Grows="downwards"/>
       <Reservation Description="Section for heap" Name=".heap" Size="8" Alignment="8" Region="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" Unit="KB"/>
-      <Reservation Description="Section for CSA" Name=".csa" Size="16" Alignment="64" Region="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" Unit="KB"/>
+      <Reservation Description="Section for CSA" Name=".csa" Size="32" Alignment="64" Region="memorydescription:Region TC23xx.mdm#//@Memory.2/@Region.0" Unit="KB"/>
     </MemoryReservation>
     <SpecialSections>
       <ClearTable Description="Section for clear table" Name=".clear_sec" Region="#//@LocalAliases/@Alias.0"/>
@@ -275,12 +275,13 @@
     <InputSection Name="wm4.assert.h.11.7043852a511d37ae606afa012e67e471"/>
     <InputSection Name="wm4.portmacro.h.113.3dca38a026639d056545f32b8ee9704f"/>
     <InputSection Name="wm4.interrupts_tc23x.h.9.f54beff0bd677f41e894394c431693e3"/>
-    <InputSection Name="wm4.FreeRTOSConfig.h.71.0832b9a9b98e7247f07835289af532c1"/>
     <InputSection Name="wm4.FreeRTOSConfig.h.71.48f7dbd91269ab5d95e7de6cfad2ff5a"/>
     <InputSection Name="wm4.interrupts_tc23x.h.9.d00bd7939c506c230f16147d0ca4e047"/>
     <InputSection Name="wm4.portmacro.h.113.2102b90d4d3a3a9da6815675025b6f44"/>
     <InputSection Name="wm4.interrupts_tc23x.h.15.e764addd0bb2b4fdbe0d7862e17a92e9"/>
     <InputSection Name="wm4.interrupts_tc23x.h.9.4203790216fd71fea656e2d7857e14b6"/>
+    <InputSection Name="wm4.croutine.h.246.9d5543f1c91c5e9bede3e818a7019f48"/>
+    <InputSection Name="wm4.0.fbb63b6ef0ba033c2329023580993118"/>
   </Input>
   <Files>
     <ObjectFile Name="src\system_tc23x.o"/>
@@ -322,14 +323,14 @@
     <ObjectFile Name="asm\crt0-tc23x.o"/>
     <ObjectFile Name="src\FreeRTOS_Source\event_groups.o"/>
     <ObjectFile Name="src\FreeRTOS_Source\list.o"/>
-    <ObjectFile Name="src\FreeRTOS_Source\portable\GCC\TriCore_1782\port.o"/>
-    <ObjectFile Name="src\FreeRTOS_Source\portable\GCC\TriCore_1782\porttrap.o"/>
     <ObjectFile Name="src\FreeRTOS_Source\portable\MemMang\heap_2.o"/>
     <ObjectFile Name="src\FreeRTOS_Source\portable\MemMang\heap_4.o"/>
     <ObjectFile Name="src\FreeRTOS_Source\queue.o"/>
     <ObjectFile Name="src\FreeRTOS_Source\tasks.o"/>
     <ObjectFile Name="src\FreeRTOS_Source\timers.o"/>
     <ObjectFile Name="src\ParTest.o"/>
+    <ObjectFile Name="src\FreeRTOS_Source\portable\GCC\TC234\port.o"/>
+    <ObjectFile Name="src\FreeRTOS_Source\portable\GCC\TC234\porttrap.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

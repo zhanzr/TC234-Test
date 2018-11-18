@@ -119,7 +119,7 @@ static void __class_0_trap_handler(int tin)
 	flush_stdout_trap();
 	_out_uart('[');
 	flush_stdout_trap();
-	_out_uart('1'+tin);
+	_out_uart('0'+tin);
 	flush_stdout_trap();
 	_out_uart(']');
 	flush_stdout_trap();
@@ -127,11 +127,15 @@ static void __class_0_trap_handler(int tin)
 	switch (tin)
 	{
 	case 1:
-		__asm volatile ("debug"); /* VAF -- Virtual Address Fill  */
+		_debug(); /* VAF -- Virtual Address Fill  */
 		break;
 
 	case 2:
-		__asm volatile ("debug"); /* VAP -- Virtual Address Protection  */
+		_debug(); /* VAP -- Virtual Address Protection  */
+		break;
+
+	default:
+		_debug();
 		break;
 	}
 }
@@ -150,7 +154,7 @@ static void __class_1_trap_handler(int tin)
 	flush_stdout_trap();
 	_out_uart('[');
 	flush_stdout_trap();
-	_out_uart('1'+tin);
+	_out_uart('0'+tin);
 	flush_stdout_trap();
 	_out_uart(']');
 	flush_stdout_trap();
@@ -158,31 +162,35 @@ static void __class_1_trap_handler(int tin)
 	switch (tin)
 	{
 	case 1:
-		__asm volatile ("debug"); /* PRIV -- Privileged Instruction  */
+		_debug(); /* PRIV -- Privileged Instruction  */
 		break;
 
 	case 2:
-		__asm volatile ("debug"); /* MPR -- MemProt: Read Access  */
+		_debug(); /* MPR -- MemProt: Read Access  */
 		break;
 
 	case 3:
-		__asm volatile ("debug"); /* MPW -- MemProt: Write Access  */
+		_debug(); /* MPW -- MemProt: Write Access  */
 		break;
 
 	case 4:
-		__asm volatile ("debug"); /* MPX -- MemProt: Execution Access  */
+		_debug(); /* MPX -- MemProt: Execution Access  */
 		break;
 
 	case 5:
-		__asm volatile ("debug"); /* MPP -- MemProt: Peripheral Access  */
+		_debug(); /* MPP -- MemProt: Peripheral Access  */
 		break;
 
 	case 6:
-		__asm volatile ("debug"); /* MPN -- MemProt: Null Address  */
+		_debug(); /* MPN -- MemProt: Null Address  */
 		break;
 
 	case 7:
-		__asm volatile ("debug"); /* GRPW -- Global Register Write Prot  */
+		_debug(); /* GRPW -- Global Register Write Prot  */
+		break;
+
+	default:
+		_debug();
 		break;
 	}
 }
@@ -201,7 +209,7 @@ static void __class_2_trap_handler(int tin)
 	flush_stdout_trap();
 	_out_uart('[');
 	flush_stdout_trap();
-	_out_uart('1'+tin);
+	_out_uart('0'+tin);
 	flush_stdout_trap();
 	_out_uart(']');
 	flush_stdout_trap();
@@ -209,23 +217,27 @@ static void __class_2_trap_handler(int tin)
 	switch (tin)
 	{
 	case 1:
-		__asm volatile ("debug"); /* IOPC -- Illegal Opcode  */
+		_debug(); /* IOPC -- Illegal Opcode  */
 		break;
 
 	case 2:
-		__asm volatile ("debug"); /* UOPC -- Unimplemented Opcode  */
+		_debug(); /* UOPC -- Unimplemented Opcode  */
 		break;
 
 	case 3:
-		__asm volatile ("debug"); /* OPD -- Invalid Operand Specification  */
+		_debug(); /* OPD -- Invalid Operand Specification  */
 		break;
 
 	case 4:
-		__asm volatile ("debug"); /* ALN -- Data Address Alignment  */
+		_debug(); /* ALN -- Data Address Alignment  */
 		break;
 
 	case 5:
-		__asm volatile ("debug"); /* MEM -- Invalid Local Memory Address  */
+		_debug(); /* MEM -- Invalid Local Memory Address  */
+		break;
+
+	default:
+		_debug();
 		break;
 	}
 }
@@ -234,49 +246,45 @@ static void __class_2_trap_handler(int tin)
 
 static void __class_3_trap_handler(int tin)
 {
-	led_toggle(2);
-
-	_out_uart('<');
-	flush_stdout_trap();
 	_out_uart('3');
 	flush_stdout_trap();
-	_out_uart('>');
+	_out_uart('_');
 	flush_stdout_trap();
-	_out_uart('[');
-	flush_stdout_trap();
-	_out_uart('1'+tin);
-	flush_stdout_trap();
-	_out_uart(']');
+	_out_uart('0'+tin);
 	flush_stdout_trap();
 
 	switch (tin)
 	{
 	case 1:
-		__asm volatile ("debug"); /* FCD -- Free Context List Depletion  */
+		_debug(); /* FCD -- Free Context List Depletion  */
 		break;
 
 	case 2:
-		__asm volatile ("debug"); /* CDO -- Call Depth Overflow  */
+		_debug(); /* CDO -- Call Depth Overflow  */
 		break;
 
 	case 3:
-		__asm volatile ("debug"); /* CDU -- Call Depth Underflow  */
+		_debug(); /* CDU -- Call Depth Underflow  */
 		break;
 
 	case 4:
-		__asm volatile ("debug"); /* FCU -- Free Context List Underflow  */
+		_debug(); /* FCU -- Free Context List Underflow  */
 		break;
 
 	case 5:
-		__asm volatile ("debug"); /* CSU -- Call Stack Underflow  */
+		_debug(); /* CSU -- Call Stack Underflow  */
 		break;
 
 	case 6:
-		__asm volatile ("debug"); /* CTYP -- Context Type Error  */
+		_debug(); /* CTYP -- Context Type Error  */
 		break;
 
 	case 7:
-		__asm volatile ("debug"); /* NEST -- Nesting Error (RFE)  */
+		_debug(); /* NEST -- Nesting Error (RFE)  */
+		break;
+
+	default:
+		_debug();
 		break;
 	}
 }
@@ -295,7 +303,7 @@ static void __class_4_trap_handler(int tin)
 	flush_stdout_trap();
 	_out_uart('[');
 	flush_stdout_trap();
-	_out_uart('1'+tin);
+	_out_uart('0'+tin);
 	flush_stdout_trap();
 	_out_uart(']');
 	flush_stdout_trap();
@@ -303,31 +311,35 @@ static void __class_4_trap_handler(int tin)
 	switch (tin)
 	{
 	case 1:
-		__asm volatile ("debug"); /* PSE -- Program Fetch Synchronous Error  */
+		_debug(); /* PSE -- Program Fetch Synchronous Error  */
 		break;
 
 	case 2:
-		__asm volatile ("debug"); /* DSE -- Data Access Synchronous Error  */
+		_debug(); /* DSE -- Data Access Synchronous Error  */
 		break;
 
 	case 3:
-		__asm volatile ("debug"); /* DAE -- Data Access Asynchronous Error  */
+		_debug(); /* DAE -- Data Access Asynchronous Error  */
 		break;
 
 	case 4:
-		__asm volatile ("debug"); /* CAO -- Coprocessor Trap Asynchronous Error  */
+		_debug(); /* CAO -- Coprocessor Trap Asynchronous Error  */
 		break;
 
 	case 5:
-		__asm volatile ("debug"); /* PIE -- Program Memory Integrity Error  */
+		_debug(); /* PIE -- Program Memory Integrity Error  */
 		break;
 
 	case 6:
-		__asm volatile ("debug"); /* DIE -- Data Memory Integrity Error  */
+		_debug(); /* DIE -- Data Memory Integrity Error  */
 		break;
 
 	case 7:
-		__asm volatile ("debug"); /* TAE -- Temporal Asynchronous Error  */
+		_debug(); /* TAE -- Temporal Asynchronous Error  */
+		break;
+
+	default:
+		_debug();
 		break;
 	}
 }
@@ -346,7 +358,7 @@ static void __class_5_trap_handler(int tin)
 	flush_stdout_trap();
 	_out_uart('[');
 	flush_stdout_trap();
-	_out_uart('1'+tin);
+	_out_uart('0'+tin);
 	flush_stdout_trap();
 	_out_uart(']');
 	flush_stdout_trap();
@@ -354,11 +366,15 @@ static void __class_5_trap_handler(int tin)
 	switch (tin)
 	{
 	case 1:
-		__asm volatile ("debug"); /* OVF -- Arithmetic Overflow  */
+		_debug(); /* OVF -- Arithmetic Overflow  */
 		break;
 
 	case 2:
-		__asm volatile ("debug"); /* SOVF -- Sticky Arithmetic Overflow  */
+		_debug(); /* SOVF -- Sticky Arithmetic Overflow  */
+		break;
+
+	default:
+		_debug();
 		break;
 	}
 }
@@ -377,13 +393,13 @@ static void __class_7_trap_handler(int tin)
 	flush_stdout_trap();
 	_out_uart('[');
 	flush_stdout_trap();
-	_out_uart('1'+tin);
+	_out_uart('0'+tin);
 	flush_stdout_trap();
 	_out_uart(']');
 	flush_stdout_trap();
 
 	(void)tin;
-	__asm volatile ("debug"); /* NMI -- Non-maskable Interrupt  */
+	_debug(); /* NMI -- Non-maskable Interrupt  */
 }
 
 #if 0

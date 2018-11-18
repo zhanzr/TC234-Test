@@ -9,7 +9,7 @@ const uint32_t GetFreeRTOSRunTimeTicks(void)
 
 void prvStatTickHandler(uint32_t reload_value)
 {
-	MODULE_STM0.ISCR.B.CMP1IRR = 0;
+	MODULE_STM0.ISCR.B.CMP1IRR = 1;
 	MODULE_STM0.CMP[1].U += (uint32_t)reload_value;
 
 	++FreeRTOSRunTimeTicks;
