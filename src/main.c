@@ -122,7 +122,16 @@ int core0_main(int argc, char** argv)
 			SYSTEM_IsCacheEnabled());
 	flush_stdout();
 
-	_syscall(255);
+	extern void stm_wait(uint32_t us);
+	for(uint8_t i=1; i!=10; ++i)
+	{
+		for(uint32_t j=0; j<1000; ++j)
+		{
+			stm_wait(1000);
+		}
+		printf("%s STM Delay Test %u\n", _NEWLIB_VERSION, i);
+	}
+	_syscall(200);
 
 	g_regular_task_flag = true;
 
@@ -464,6 +473,12 @@ void print_task(void *pvParameters)
 		//		}
 
 		printf("%s %s\n", _NEWLIB_VERSION, __func__);
+
+		float fA = 1.1;
+		float fB = 3.3;
+		float f_res = Ifx_Add_F(fA, fB);
+		printf("%f + %f = %f\n", fA, fB, f_res);
+		flush_stdout();
 
 		printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
 				__TRICORE_NAME__,

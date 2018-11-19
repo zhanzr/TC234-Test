@@ -114,7 +114,7 @@ extern "C" {
 #define portFLOAT		float
 #define portDOUBLE		double
 #define portLONG		long
-#define portSHORT		short
+#define portSHORT		int16_t
 #define portSTACK_TYPE	uint32_t
 #define portBASE_TYPE	long
 
@@ -124,7 +124,7 @@ typedef unsigned long UBaseType_t;
 
 #if( configUSE_16_BIT_TICKS == 1 )
 typedef uint16_t TickType_t;
-#define portMAX_DELAY ( TickType_t ) 0xffff
+#define portMAX_DELAY ( TickType_t ) UINT16_MAX
 #else
 typedef uint32_t TickType_t;
 #define portMAX_DELAY ((TickType_t )UINT32_MAX)

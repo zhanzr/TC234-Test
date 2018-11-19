@@ -282,6 +282,7 @@
     <InputSection Name="wm4.interrupts_tc23x.h.9.4203790216fd71fea656e2d7857e14b6"/>
     <InputSection Name="wm4.croutine.h.246.9d5543f1c91c5e9bede3e818a7019f48"/>
     <InputSection Name="wm4.0.fbb63b6ef0ba033c2329023580993118"/>
+    <InputSection Name="wm4.portmacro.h.113.055711d7afb6baf80bc58d47e0893575"/>
   </Input>
   <Files>
     <ObjectFile Name="src\system_tc23x.o"/>

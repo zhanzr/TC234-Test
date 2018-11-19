@@ -97,3 +97,11 @@ Ifx_Add_F:
 //	addi	inputB, inputB, 5243
 	add.f result, inputA, inputB
     ret
+
+Ifx_CRC32:
+//	crc32 result, inputA
+	ret
+
+Ifx_WAIT:
+	wait
+	ret

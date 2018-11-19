@@ -20,25 +20,14 @@
 #include TC_INCLUDE(TCPATH/IfxPort_reg.h)
 #include TC_INCLUDE(TCPATH/IfxQspi_reg.h)
 
+#include "bspconfig_tc23x.h"
 #include "system_tc2x.h"
 #include "interrupts_tc23x.h"
 
 /* for serving A-step and B-step (+ newer) TLF devices: use both commands for err pin monitor */
-#define WDT_CMD_SIZE			(10 + 1)
-
 /* Workaround for TLF35584 A-Step Bug on AppKit-TC2x4 and AppKit-TC2x7 */
 static void disable_external_watchdog(void)
 {
-	/* command sequence for disabling external watchdog */
-	const unsigned short wdtdiscmd[WDT_CMD_SIZE] =
-	{
-			0x8756, 0x87de, 0x86ad, 0x8625,		/* unprotect register (PROTCFG) */
-			0x8d27,								/* disable window watchdog */
-			0x8811,								/* disable err pin monitor (A-step) */
-			0x8A01,								/* disable err pin monitor (not A-step) */
-			0x87be, 0x8668, 0x877d, 0x8795		/* protect register (PROTCFG) */
-	};
-
 	/* check that this disabling has not been already done (e.g. by the debugger) */
 	if (QSPI2_GLOBALCON.B.EN)
 	{
@@ -56,10 +45,10 @@ static void disable_external_watchdog(void)
 	lock_wdtcon();					/* re-enable ENDINIT protection */
 
 	/* configure port pins */
-	P14_IOCR0.B.PC2 = 0x13;			/* SLSO21 */
-	P15_IOCR0.B.PC3 = 0x13;			/* SCLK2 */
-	P15_IOCR4.B.PC5 = 0x13;			/* MTSR2 */
-	P15_IOCR4.B.PC7 = 0x02;			/* MRST2B */
+	P14_IOCR0.B.PC2 = OUT_PPALT3;			/* SLSO21 */
+	P15_IOCR0.B.PC3 = OUT_PPALT3;			/* SCLK2 */
+	P15_IOCR4.B.PC5 = OUT_PPALT3;			/* MTSR2 */
+	P15_IOCR4.B.PC7 = IN_PULLUP;			/* MRST2B */
 
 	/* program QSPI2 parameters */
 	QSPI2_GLOBALCON.U = 0x00003C04;	/* EXPECT=15,SI=0, TQ=4 */
@@ -77,15 +66,24 @@ static void disable_external_watchdog(void)
 
 	QSPI2_GLOBALCON.B.EN = 1;		/* ... and enable the module */
 
+	/* command sequence for disabling external watchdog */
+	const uint16_t wdtdiscmd[] =
+	{
+			0x8756, 0x87de, 0x86ad, 0x8625,		/* unprotect register (PROTCFG) */
+			0x8d27,								/* disable window watchdog */
+			0x8811,								/* disable err pin monitor (A-step) */
+			0x8A01,								/* disable err pin monitor (not A-step) */
+			0x87be, 0x8668, 0x877d, 0x8795		/* protect register (PROTCFG) */
+	};
 	/* transfer all data */
-	for (uint32_t i = 0; i < WDT_CMD_SIZE; ++i)
+	for (uint8_t i = 0; i < sizeof(wdtdiscmd)/sizeof(wdtdiscmd[0]); ++i)
 	{
 		QSPI2_DATAENTRY0.U = (uint32_t)wdtdiscmd[i];
 		/* wait until transfer is complete */
 		while (!QSPI2_STATUS.B.TXF)
 			;
 		/* clear TX flag */
-		QSPI2_FLAGSCLEAR.U = 1 << 9;
+		QSPI2_FLAGSCLEAR.B.TXC = 1;
 		/* wait for receive is finished */
 		while (!QSPI2_STATUS.B.RXF)
 			;
@@ -102,22 +100,24 @@ static void disable_external_watchdog(void)
 /* wait for <time> micro seconds */
 
 /* beware of overflows: 100 us at (>=)43 MHz will overflow (if not scaled before multiplying) */
-static void simple_wait_100(void)
+void stm_wait(uint32_t us)
 {
 	uint32_t fSTM = (uint32_t)SYSTEM_GetStmClock();
-	uint32_t stmWaitCount = (fSTM / TIME_SCALE_DN) * 100 / TIME_SCALE_UP;
+	uint32_t stmWaitCount = (fSTM / TIME_SCALE_DN) * us / TIME_SCALE_UP;
 
 	/* prepare compare register */
 	STM0_CMP0.U = STM0_TIM0.U + stmWaitCount;
-	STM0_CMCON.U = 31;
+	STM0_CMCON.B.MSIZE0 = 31;
 	/* Attention: keep this order, otherwise first match will trigger too soon */
 	/* reset interrupt flag */
-	STM0_ISCR.U = (IFX_STM_ISCR_CMP0IRR_MSK << IFX_STM_ISCR_CMP0IRR_OFF);
+	STM0_ISCR.B.CMP0IRR = 1;
 	/* enable compare match */
 	STM0_ICR.B.CMP0EN = 1;
 	/* wait for compare match */
 	while (0 == STM0_ICR.B.CMP0IR)
+	{
 		;
+	}
 	STM0_ICR.B.CMP0EN = 0;
 }
 
@@ -162,7 +162,7 @@ static void system_set_pll(const PllInitValue_t *pPllInitValue)
 	/* update K dividers for stepping up to final clock */
 	uint32_t k = MODULE_SCU.PLLCON1.B.K2DIV;
 	/* wait some time (100 us) */
-	simple_wait_100();
+	stm_wait(100);
 	while (k > pPllInitValue->finalK)
 	{
 		Ifx_SCU_PLLCON1 pllcon1 = MODULE_SCU.PLLCON1;
@@ -178,7 +178,7 @@ static void system_set_pll(const PllInitValue_t *pPllInitValue)
 		MODULE_SCU.PLLCON1 = pllcon1;
 		lock_safety_wdtcon();
 		/* wait some time (100 us) */
-		simple_wait_100();
+		stm_wait(100);
 	}
 }
 
