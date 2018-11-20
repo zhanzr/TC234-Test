@@ -46,6 +46,11 @@
     .global Ifx_Add_F
     .global Ifx_Add_H
 
+    .global Ifx_CRC32
+    .global Ifx_WAIT
+
+    .global Ifx_TestLED
+
 //Code Segment Declaration
  //    .section .text.dsplib, "ax"
 #define     inputA       %d4
@@ -105,3 +110,63 @@ Ifx_CRC32:
 Ifx_WAIT:
 	wait
 	ret
+
+	.code32
+
+P13_IOCR0 = 0xF003B310
+P13_OMR = 0xF003B304
+
+Ifx_TestLED:
+//Init LED, P13.0->P13.3
+	movh.a	%a2,hi:P13_IOCR0
+	lea	%a2,[%a2]lo:P13_IOCR0
+	movh %d4, hi:0xC0C0C0C0
+	addi %d4, %d4, lo:0xC0C0C0C0
+	st.w	[%a2], %d4
+
+	movh.a	%a2,hi:P13_OMR
+	lea	%a2,[%a2]lo:P13_OMR
+
+	movh %d4, hi:20
+	addi %d4, %d4, lo:20
+	mov.a %a4, %d4
+forever_loop:
+	ld.w %d5,[%a2]
+	movh %d4, hi:0x00010001
+	addi %d4, %d4, lo:0x00010001
+	or %d4, %d4, %d5
+	st.w	[%a2], %d4
+	fcall test_delay
+
+	ld.w %d5,[%a2]
+	movh %d4, hi:0x00020002
+	addi %d4, %d4, lo:0x00020002
+	or %d4, %d4, %d5
+	st.w	[%a2], %d4
+	fcall test_delay
+
+	ld.w %d5,[%a2]
+	movh %d4, hi:0x00040004
+	addi %d4, %d4, lo:0x00040004
+	or %d4, %d4, %d5
+	st.w	[%a2], %d4
+	fcall test_delay
+
+	ld.w %d5,[%a2]
+	movh %d4, hi:0x00080008
+	addi %d4, %d4, lo:0x00080008
+	or %d4, %d4, %d5
+	st.w	[%a2], %d4
+	fcall test_delay
+
+	loop %a4, forever_loop
+	ret
+
+test_delay:
+	movh %d6, hi:12000000
+	addi %d6, %d6, lo:12000000
+	mov.a %a3, %d6
+label_loop:
+	nop
+	loop %a3, label_loop
+	fret

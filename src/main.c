@@ -111,23 +111,36 @@ int core0_main(int argc, char** argv)
 
 	printf("%s %s\n", _NEWLIB_VERSION, __func__);
 
-	printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
+	printf("%08X %08X %08X %08X\n",
+			&MODULE_P13.IOCR0.U,
+			MODULE_P13.IOCR0.U,
+			&MODULE_P13.OMR.U,
+			MODULE_P13.OMR.U);
+
+	printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,CE:%d\n",
 			__TRICORE_NAME__,
 			__TRICORE_CORE__,
 			SYSTEM_GetCpuClock()/1000000,
 			SYSTEM_GetSysClock()/1000000,
 			SYSTEM_GetStmClock()/1000000,
 			system_GetPllClock()/1000000,
-			system_GetIntClock()/1000000,
 			SYSTEM_IsCacheEnabled());
 	flush_stdout();
+
+	Ifx_TestLED();
+
+	printf("%08X %08X %08X %08X\n",
+			&MODULE_P13.IOCR0.U,
+			MODULE_P13.IOCR0.U,
+			&MODULE_P13.OMR.U,
+			MODULE_P13.OMR.U);
 
 	extern void stm_wait(uint32_t us);
 	for(uint8_t i=1; i!=10; ++i)
 	{
 		for(uint32_t j=0; j<1000; ++j)
 		{
-			stm_wait(1000);
+			stm_wait(500);
 		}
 		printf("%s STM Delay Test %u\n", _NEWLIB_VERSION, i);
 	}
@@ -489,6 +502,11 @@ void print_task(void *pvParameters)
 				system_GetPllClock()/1000000,
 				system_GetIntClock()/1000000,
 				SYSTEM_IsCacheEnabled());
+		printf("%08X %08X %08X %08X\n",
+				&MODULE_P13.IOCR0.U,
+				MODULE_P13.IOCR0.U,
+				&MODULE_P13.OMR.U,
+				MODULE_P13.OMR.U);
 		flush_stdout();
 
 		uint32_t NotifyValue = ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */

@@ -414,4 +414,6 @@ uint32_t Ifx_XOR_LT_U(uint32_t A, uint32_t B, uint32_t C);
 
 void Ifx_Enable(void);
 
+void Ifx_TestLED(void);
+
 #endif /* ASM_PROTOTYPE_H_ */

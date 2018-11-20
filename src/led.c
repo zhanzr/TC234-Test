@@ -92,7 +92,6 @@ void led_toggle(uint8_t n)
 void led_init(void)
 {
 	/* initialise all LEDs (P13.0 .. P13.3) */
-	/* OUT_PPGPIO */
 	PORT_LED.IOCR0.B.PC0 = OUT_ODGPIO;
 	PORT_LED.IOCR0.B.PC1 = OUT_ODGPIO;
 	PORT_LED.IOCR0.B.PC2 = OUT_ODGPIO;
