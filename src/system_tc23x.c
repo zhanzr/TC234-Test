@@ -37,11 +37,21 @@ static void disable_external_watchdog(void)
 
 	/* initialise QSPI2 interface */
 	unlock_wdtcon();				/* remove ENDINIT protection */
-	QSPI2_CLC.U = 0x8;				/* activate module, disable sleep mode */
-	(void)QSPI2_CLC.U;				/* read back to get effective */
+	/* activate module, disable sleep mode */
+	QSPI2_CLC.B.EDIS = 1;
+	QSPI2_CLC.B.DISR = 0;
+	QSPI2_CLC.B.DISS = 0;
+	_dsync();
+	_isync();
+
 	P15_PDR0.U = 0x00000000;		/* fast speed (all pins) */
 	P14_PDR0.U = 0x00000000;		/* fast speed (all pins) */
-	QSPI2_PISEL.U = 1;				/* MRIS=1 ==> use MRST2B pin */
+
+	QSPI2_PISEL.B.SCIS = 0;
+	QSPI2_PISEL.B.SLSIS = 0;
+	QSPI2_PISEL.B.SRIS = 0;
+	/* MRIS=1 ==> use MRST2B pin */
+	QSPI2_PISEL.B.MRIS = 1;
 	lock_wdtcon();					/* re-enable ENDINIT protection */
 
 	/* configure port pins */
@@ -51,18 +61,60 @@ static void disable_external_watchdog(void)
 	P15_IOCR4.B.PC7 = IN_PULLUP;			/* MRST2B */
 
 	/* program QSPI2 parameters */
-	QSPI2_GLOBALCON.U = 0x00003C04;	/* EXPECT=15,SI=0, TQ=4 */
-	QSPI2_GLOBALCON1.U = 0x14000000;/* RXFM=1,TXFM=1 (Single Move Mode for RX/TX) */
-	QSPI2_SSOC.U = 0x00020000;		/* enable SLSO21, low active */
-	QSPI2_ECON1.U = 0x501;			/* Q=1,A=0,B=1,C=1 */
+	QSPI2_GLOBALCON.B.AREN = 0;
+	QSPI2_GLOBALCON.B.DEL0 = 0;
+	QSPI2_GLOBALCON.B.EN = 0;
+	QSPI2_GLOBALCON.B.EXPECT = 15;
+	QSPI2_GLOBALCON.B.LB = 0;
+	QSPI2_GLOBALCON.B.MS = 0;
+	QSPI2_GLOBALCON.B.RESETS = 0;
+	QSPI2_GLOBALCON.B.SI = 0;
+	QSPI2_GLOBALCON.B.SRF = 0;
+	QSPI2_GLOBALCON.B.STIP = 0;
+	QSPI2_GLOBALCON.B.STROBE = 0;
+	QSPI2_GLOBALCON.B.TQ = 4;
+
+	QSPI2_GLOBALCON1.B.RXFM = 1;
+	QSPI2_GLOBALCON1.B.TXFM = 1;
+	QSPI2_GLOBALCON1.B.RXFIFOINT = 0;
+	QSPI2_GLOBALCON1.B.TXFIFOINT = 0;
+	QSPI2_GLOBALCON1.B.ERRORENS = 0;
+	QSPI2_GLOBALCON1.B.PT1 = 0;
+	QSPI2_GLOBALCON1.B.PT1EN = 0;
+	QSPI2_GLOBALCON1.B.PT2 = 0;
+	QSPI2_GLOBALCON1.B.PT2EN = 0;
+	QSPI2_GLOBALCON1.B.TXEN = 0;
+	QSPI2_GLOBALCON1.B.RXEN = 0;
+	QSPI2_GLOBALCON1.B.USREN = 0;
+
+	/* enable SLSO21, low active */
+	QSPI2_SSOC.B.OEN = 2;
+	QSPI2_SSOC.B.AOL = 0;
+
+	/* Q=1,A=0,B=1,C=1 */
+	QSPI2_ECON1.B.A = 0;
+	QSPI2_ECON1.B.B = 1;
+	QSPI2_ECON1.B.C = 1;
+	QSPI2_ECON1.B.Q = 1;
+	QSPI2_ECON1.B.BE = 0;
+	QSPI2_ECON1.B.CPH = 0;
+	QSPI2_ECON1.B.CPOL = 0;
+	QSPI2_ECON1.B.PAREN = 0;
 
 	do
 	{
-		QSPI2_FLAGSCLEAR.U = 0xFFF;	/* PT2F,PT1F,RXF,TXF,ERRORFLAGS */
+		/* PT2F,PT1F,RXF,TXF,ERRORFLAGS */
+		QSPI2_FLAGSCLEAR.B.ERRORCLEARS = 0x1F;
+		QSPI2_FLAGSCLEAR.B.PT1C = 1;
+		QSPI2_FLAGSCLEAR.B.PT2C = 1;
+		QSPI2_FLAGSCLEAR.B.RXC = 1;
+		QSPI2_FLAGSCLEAR.B.TXC = 1;
+		QSPI2_FLAGSCLEAR.B.USRC = 1;
 	} while (QSPI2_STATUS.U & 0xFFF);
 
 	/* prepare data transfer format */
-	QSPI2_BACONENTRY.U = 0x17A10001;	/* CS=1,DL=15,MSB=1,TRAIL=1,LAST=1 */
+	/* CS=1,DL=15,MSB=1,TRAIL=1,LAST=1 */
+	QSPI2_BACONENTRY.B.E = 0x17A10001;
 
 	QSPI2_GLOBALCON.B.EN = 1;		/* ... and enable the module */
 
@@ -78,7 +130,7 @@ static void disable_external_watchdog(void)
 	/* transfer all data */
 	for (uint8_t i = 0; i < sizeof(wdtdiscmd)/sizeof(wdtdiscmd[0]); ++i)
 	{
-		QSPI2_DATAENTRY0.U = (uint32_t)wdtdiscmd[i];
+		QSPI2_DATAENTRY0.B.E = (uint32_t)wdtdiscmd[i];
 		/* wait until transfer is complete */
 		while (!QSPI2_STATUS.B.TXF)
 			;
@@ -88,7 +140,7 @@ static void disable_external_watchdog(void)
 		while (!QSPI2_STATUS.B.RXF)
 			;
 		/* clear RX flag */
-		QSPI2_FLAGSCLEAR.U = 1 << 10;
+		QSPI2_FLAGSCLEAR.B.RXC = 1;
 		/* read and discard value */
 		(void)QSPI2_RXEXIT.U;
 	}

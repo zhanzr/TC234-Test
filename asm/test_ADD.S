@@ -117,6 +117,8 @@ P13_IOCR0 = 0xF003B310
 P13_OMR = 0xF003B304
 
 Ifx_TestLED:
+	mov.a %a4, inputA
+
 //Init LED, P13.0->P13.3
 	movh.a	%a2,hi:P13_IOCR0
 	lea	%a2,[%a2]lo:P13_IOCR0
@@ -127,9 +129,6 @@ Ifx_TestLED:
 	movh.a	%a2,hi:P13_OMR
 	lea	%a2,[%a2]lo:P13_OMR
 
-	movh %d4, hi:20
-	addi %d4, %d4, lo:20
-	mov.a %a4, %d4
 forever_loop:
 	ld.w %d5,[%a2]
 	movh %d4, hi:0x00010001

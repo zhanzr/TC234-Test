@@ -41,7 +41,7 @@
 								<inputType id="com.rt.hightec.buildsystem.tricore.new.compiler.c.input.cpcp.655712165" name="Compiler Input (CPCP)" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c.input.cpcp"/>
 							</tool>
 							<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155" name="TriCore C Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c">
-								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.symbols.defined.223010303" name="Defined symbols (-D)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.symbols.defined" valueType="definedSymbols"/>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.symbols.defined.223010303" name="Defined symbols (-D)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.symbols.defined"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths.1959146808" name="Include Paths" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.general.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;../h&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/Common_Demo_Source/include}&quot;"/>
@@ -49,7 +49,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/FreeRTOS_Source/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
-								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization.111267155" name="Optimization Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.code.optimization.none" valueType="enumerated"/>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization.111267155" name="Optimization Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.code.optimization.normal" valueType="enumerated"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.830677023" name="Debug Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.3" valueType="enumerated"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.language.standard.1156215739" name="C Standard (-std)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.language.standard" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.language.standard.gnu99" valueType="enumerated"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.FShortDouble.6464758" name="Treat double as float (-fshort-double)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.FShortDouble" value="false" valueType="boolean"/>

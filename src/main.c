@@ -29,6 +29,8 @@
 #include TC_INCLUDE(TCPATH/IfxInt_bf.h)
 #include TC_INCLUDE(TCPATH/IfxSrc_reg.h)
 #include TC_INCLUDE(TCPATH/IfxSrc_bf.h)
+#include TC_INCLUDE(TCPATH/IfxQspi_reg.h)
+#include TC_INCLUDE(TCPATH/IfxQspi_bf.h)
 
 #include "core_tc23x.h"
 #include "system_tc2x.h"
@@ -95,8 +97,6 @@ void print_task(void *pvParameters);
 
 int core0_main(int argc, char** argv)
 {
-	volatile bool g_regular_task_flag;
-
 	prvSetupHardware();
 
 //	SYSTEM_EnaDisCache(1);
@@ -127,28 +127,19 @@ int core0_main(int argc, char** argv)
 			SYSTEM_IsCacheEnabled());
 	flush_stdout();
 
-	Ifx_TestLED();
-
-	printf("%08X %08X %08X %08X\n",
-			&MODULE_P13.IOCR0.U,
-			MODULE_P13.IOCR0.U,
-			&MODULE_P13.OMR.U,
-			MODULE_P13.OMR.U);
+	Ifx_TestLED(3);
 
 	extern void stm_wait(uint32_t us);
-	for(uint8_t i=1; i!=10; ++i)
+	for(uint8_t i=0; i<4; ++i)
 	{
 		for(uint32_t j=0; j<1000; ++j)
 		{
 			stm_wait(500);
 		}
-		printf("%s STM Delay Test %u\n", _NEWLIB_VERSION, i);
+		printf("%s STM Test Delay %u\n", _NEWLIB_VERSION, i);
 	}
 	_syscall(200);
 
-	g_regular_task_flag = true;
-
-	uint8_t test_trig_cnt = 0;
 	/* The following function will only create more tasks and timers if
 	mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY is set to 0 (at the top of this
 	file).  See the comments at the top of this file for more information. */
@@ -170,52 +161,7 @@ int core0_main(int argc, char** argv)
 	vTaskStartScheduler(). */
 	while(1)
 	{
-#define	DELAY_TICK	(10*configTICK_RATE_HZ)
-		if(0==GetFreeRTOSRunTimeTicks()%(DELAY_TICK))
-		{
-			g_regular_task_flag = true;
-		}
-
-		if(g_regular_task_flag)
-		{
-			g_regular_task_flag = false;
-
-			printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
-					__TRICORE_NAME__,
-					__TRICORE_CORE__,
-					SYSTEM_GetCpuClock()/1000000,
-					SYSTEM_GetSysClock()/1000000,
-					SYSTEM_GetStmClock()/1000000,
-					system_GetPllClock()/1000000,
-					system_GetIntClock()/1000000,
-					SYSTEM_IsCacheEnabled());
-			flush_stdout();
-
-			start_dts_measure();
-
-			printf("%u\n", GetFreeRTOSRunTimeTicks());
-			flush_stdout();
-
-//			printf("OSCON:%08X PCON0:%08X PCON1:%08X PCON2:%08X CCON0:%08X CCON1:%08X CCON2:%08X CCON3:%08X CCON4:%08X CCON5%08X CCON6%08X CCON9:%08X\n",
-//					MODULE_SCU.OSCCON.U,
-//					MODULE_SCU.PLLCON0.U,
-//					MODULE_SCU.PLLCON1.U,
-//					MODULE_SCU.PLLCON2.U,
-//					MODULE_SCU.CCUCON0.U,
-//					MODULE_SCU.CCUCON1.U,
-//					MODULE_SCU.CCUCON2.U,
-//					MODULE_SCU.CCUCON3.U,
-//					MODULE_SCU.CCUCON4.U,
-//					MODULE_SCU.CCUCON5.U,
-//					MODULE_SCU.CCUCON6.U,
-//					MODULE_SCU.CCUCON9.U
-//			);
-//			flush_stdout();
-		}
-
-		test_proc_dts();
-//		test_proc_eru();
-//		test_proc_gpsr();
+		_nop();
 	}
 
 	return EXIT_SUCCESS;
