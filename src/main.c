@@ -95,19 +95,87 @@ void led1_task(void *pvParameters);
 TaskHandle_t g_info_task_handler;
 void print_task(void *pvParameters);
 
+void test_tlf35584(void)
+{
+	tlf35584_cmd_t tmp_tlf_cmd;
+	tlf35584_cmd_t res_tlf_cmd;
+
+	for(uint8_t i=0; i<0x34; ++i)
+	{
+		tmp_tlf_cmd.B.cmd = 0;
+		tmp_tlf_cmd.B.addr = i;
+		tmp_tlf_cmd.B.data = 0;
+		tmp_tlf_cmd.B.parity = 0;
+		pack32 z_parity;
+		z_parity.u32 = Ifx_PARITY((uint32_t)tmp_tlf_cmd.U);
+		tmp_tlf_cmd.B.parity = z_parity.u8[0] ^ z_parity.u8[1];
+
+		QSPI2_DATAENTRY0.B.E = (uint32_t)tmp_tlf_cmd.U;
+		/* wait until transfer is complete */
+		while (!QSPI2_STATUS.B.TXF)
+			;
+		/* clear TX flag */
+		QSPI2_FLAGSCLEAR.B.TXC = 1;
+		/* wait for receive is finished */
+		while (!QSPI2_STATUS.B.RXF)
+			;
+		/* clear RX flag */
+		QSPI2_FLAGSCLEAR.B.RXC = 1;
+
+		//read
+		res_tlf_cmd.U = QSPI2_RXEXIT.U;
+		printf("%04X [%02X]=%02X\n",
+				res_tlf_cmd.U,
+				tmp_tlf_cmd.B.addr,
+				res_tlf_cmd.B.data
+		);
+		flush_stdout();
+	}
+
+	{
+		tmp_tlf_cmd.B.cmd = 0;
+		tmp_tlf_cmd.B.addr = 0x3f;
+		tmp_tlf_cmd.B.data = 0;
+		tmp_tlf_cmd.B.parity = 0;
+		pack32 z_parity;
+		z_parity.u32 = Ifx_PARITY((uint32_t)tmp_tlf_cmd.U);
+		tmp_tlf_cmd.B.parity = z_parity.u8[0] ^ z_parity.u8[1];
+
+		QSPI2_DATAENTRY0.B.E = (uint32_t)tmp_tlf_cmd.U;
+		/* wait until transfer is complete */
+		while (!QSPI2_STATUS.B.TXF)
+			;
+		/* clear TX flag */
+		QSPI2_FLAGSCLEAR.B.TXC = 1;
+		/* wait for receive is finished */
+		while (!QSPI2_STATUS.B.RXF)
+			;
+		/* clear RX flag */
+		QSPI2_FLAGSCLEAR.B.RXC = 1;
+		//read
+		res_tlf_cmd.U = QSPI2_RXEXIT.U;
+		printf("%04X [%02X]=%02X\n",
+				res_tlf_cmd.U,
+				tmp_tlf_cmd.B.addr,
+				res_tlf_cmd.B.data
+		);
+		flush_stdout();
+	}
+}
+
 int core0_main(int argc, char** argv)
 {
 	prvSetupHardware();
 
-//	SYSTEM_EnaDisCache(1);
+	//	SYSTEM_EnaDisCache(1);
 
 	uart_init(mainCOM_TEST_BAUD_RATE);
 
 	config_dts();
-//	config_gpsr();
-//	config_eru();
-//	config_dflash();
-//	enable_performance_cnt();
+	//	config_gpsr();
+	//	config_eru();
+	//	config_dflash();
+	//	enable_performance_cnt();
 
 	printf("%s %s\n", _NEWLIB_VERSION, __func__);
 
@@ -139,6 +207,8 @@ int core0_main(int argc, char** argv)
 		printf("%s STM Test Delay %u\n", _NEWLIB_VERSION, i);
 	}
 	_syscall(200);
+
+	test_tlf35584();
 
 	/* The following function will only create more tasks and timers if
 	mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY is set to 0 (at the top of this
@@ -183,7 +253,7 @@ void AutoReloadCallback(TimerHandle_t xTimer)
 
 	//	xTaskNotify( g_task0_handler, 1, eSetValueWithOverwrite);
 	//	xTaskNotify( g_task1_handler, 2, eSetValueWithOverwrite);
-//	xTaskNotify( g_info_task_handler, 3, eSetValueWithOverwrite);
+	//	xTaskNotify( g_info_task_handler, 3, eSetValueWithOverwrite);
 	start_dts_measure();
 	vParTestToggleLED(2);
 }
@@ -438,6 +508,8 @@ void print_task(void *pvParameters)
 		float f_res = Ifx_Add_F(fA, fB);
 		printf("%f + %f = %f\n", fA, fB, f_res);
 		flush_stdout();
+
+		test_tlf35584();
 
 		printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
 				__TRICORE_NAME__,

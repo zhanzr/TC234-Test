@@ -108,9 +108,12 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.2139967422" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1497648632" name="test_P_R.S" rcbsApplicability="disable" resourcePath="asm/test_P_R.S" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.367595601">
+						<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.367595601" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.694596367"/>
+					</fileInfo>
 					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1125921551" name="generate_template.py" rcbsApplicability="disable" resourcePath="asm/generate_template.py" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry excluding="test_S_2.S|test_G_I.S|test_B_C.S|generate_template.py|test_ABSS.S|test_D.S|test_S_1.S|test_P_R.S|test_M_3_N.S|test_AND.S|test_O.S|test_ABSDIF.S|test_J.S|test_ADD.A.S|test_L.S|test_E_F.S|test_ADDS.S|test_T_U_X.S|test_M_2.S|test_ABSDIFS.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
+						<entry excluding="test_S_2.S|test_G_I.S|test_B_C.S|generate_template.py|test_ABSS.S|test_D.S|test_S_1.S|test_M_3_N.S|test_AND.S|test_O.S|test_ABSDIF.S|test_J.S|test_ADD.A.S|test_L.S|test_E_F.S|test_ADDS.S|test_T_U_X.S|test_M_2.S|test_ABSDIFS.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
 						<entry excluding="FreeRTOS_Source/portable/MemMang/heap_2.c|FreeRTOS_Source/portable/GCC/TriCore_1782/porttrap.c|crt0.S|uart_init_poll.c|applproc0_loop.c|crt0-tc23x.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>

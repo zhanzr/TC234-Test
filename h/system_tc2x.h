@@ -28,6 +28,21 @@ typedef struct _PllInitValue_t
 	uint32_t finalK;		/* final K2DIV value */
 } PllInitValue_t;
 
+//TLF35584 definition
+typedef struct _tlf35584_cmd_b_t
+{
+	uint16_t parity:1;
+	uint16_t data:8;
+	uint16_t addr:6;
+	uint16_t cmd:1;
+}tlf35584_cmd_b_t;
+
+typedef union _tlf35584_cmd_t
+{
+	uint16_t U;
+	tlf35584_cmd_b_t B;
+}tlf35584_cmd_t;
+
 void system_clk_config_200_100(void);
 void system_clk_config_100_50(void);
 

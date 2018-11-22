@@ -281,6 +281,7 @@
     <InputSection Name="wm4.ifxqspi_bf.h.28.4baca2ab84348b62f92a5fe184d1f7db"/>
     <InputSection Name="wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8"/>
     <InputSection Name="wm4.asm_prototype.h.9.44dc5ea9028f9327527fcb9a41f0dc02"/>
+    <InputSection Name="wm4.asm_prototype.h.44.b8add633cbb005089a124a3621c7279a"/>
   </Input>
   <Files>
     <ObjectFile Name="src\system_tc23x.o"/>

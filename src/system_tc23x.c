@@ -23,6 +23,7 @@
 #include "bspconfig_tc23x.h"
 #include "system_tc2x.h"
 #include "interrupts_tc23x.h"
+#include "asm_prototype.h"
 
 /* for serving A-step and B-step (+ newer) TLF devices: use both commands for err pin monitor */
 /* Workaround for TLF35584 A-Step Bug on AppKit-TC2x4 and AppKit-TC2x7 */
@@ -119,18 +120,102 @@ static void disable_external_watchdog(void)
 	QSPI2_GLOBALCON.B.EN = 1;		/* ... and enable the module */
 
 	/* command sequence for disabling external watchdog */
-	const uint16_t wdtdiscmd[] =
+	//	const uint16_t wdtdiscmd[] =
+	//	{
+	//			0x8756, 0x87de, 0x86ad, 0x8625,		/* unprotect register (PROTCFG) */
+	//			0x8d27,								/* disable window watchdog */
+	//			0x8811,								/* disable err pin monitor (A-step) */
+	//			0x8A01,								/* disable err pin monitor (not A-step) */
+	//			0x87be, 0x8668, 0x877d, 0x8795		/* protect register (PROTCFG) */
+	//	};
+	tlf35584_cmd_t wdtdiscmd[]=
 	{
-			0x8756, 0x87de, 0x86ad, 0x8625,		/* unprotect register (PROTCFG) */
-			0x8d27,								/* disable window watchdog */
-			0x8811,								/* disable err pin monitor (A-step) */
-			0x8A01,								/* disable err pin monitor (not A-step) */
-			0x87be, 0x8668, 0x877d, 0x8795		/* protect register (PROTCFG) */
+			{.B={
+					.cmd = 1,
+					.addr = 3,
+					.data = 0xAB,
+					.parity = 0
+			}},
+
+			{.B={
+					.cmd = 1,
+					.addr = 3,
+					.data = 0xEF,
+					.parity = 0
+			}},
+
+			{.B={
+					.cmd = 1,
+					.addr = 3,
+					.data = 0x56,
+					.parity = 0
+			}},
+
+			{.B={
+					.cmd = 1,
+					.addr = 3,
+					.data = 0x12,
+					.parity = 0
+			}},
+
+			{.B={
+					.cmd = 1,
+					.addr = 6,
+					.data = 0x93,
+					.parity = 0
+			}},
+
+			{.B={
+					.cmd = 1,
+					.addr = 4,
+					.data = 0x08,
+					.parity = 0
+			}},
+
+			{.B={
+					.cmd = 1,
+					.addr = 5,
+					.data = 0x00,
+					.parity = 0
+			}},
+
+			{.B={
+					.cmd = 1,
+					.addr = 3,
+					.data = 0xDF,
+					.parity = 0
+			}},
+
+			{.B={
+					.cmd = 1,
+					.addr = 3,
+					.data = 0x34,
+					.parity = 0
+			}},
+
+			{.B={
+					.cmd = 1,
+					.addr = 3,
+					.data = 0xBE,
+					.parity = 0
+			}},
+
+			{.B={
+					.cmd = 1,
+					.addr = 3,
+					.data = 0xCA,
+					.parity = 0
+			}},
 	};
+
 	/* transfer all data */
 	for (uint8_t i = 0; i < sizeof(wdtdiscmd)/sizeof(wdtdiscmd[0]); ++i)
 	{
-		QSPI2_DATAENTRY0.B.E = (uint32_t)wdtdiscmd[i];
+		pack32 z_parity;
+		z_parity.u32 = Ifx_PARITY((uint32_t)wdtdiscmd[i].U);
+		wdtdiscmd[i].B.parity = z_parity.u8[0] ^ z_parity.u8[1];
+
+		QSPI2_DATAENTRY0.B.E = (uint32_t)wdtdiscmd[i].U;
 		/* wait until transfer is complete */
 		while (!QSPI2_STATUS.B.TXF)
 			;
