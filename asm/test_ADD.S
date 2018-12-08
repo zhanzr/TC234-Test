@@ -104,7 +104,7 @@ Ifx_Add_F:
     ret
 
 Ifx_CRC32:
-//	crc32 result, inputA
+//	crc32 result, %a4, inputA, inputB
 	ret
 
 Ifx_WAIT:

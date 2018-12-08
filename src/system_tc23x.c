@@ -130,27 +130,25 @@ static void disable_external_watchdog(void)
 	//	};
 	tlf35584_cmd_t wdtdiscmd[]=
 	{
+			// unprotect register (PROTCFG)
 			{.B={
 					.cmd = 1,
 					.addr = 3,
 					.data = 0xAB,
 					.parity = 0
 			}},
-
 			{.B={
 					.cmd = 1,
 					.addr = 3,
 					.data = 0xEF,
 					.parity = 0
 			}},
-
 			{.B={
 					.cmd = 1,
 					.addr = 3,
 					.data = 0x56,
 					.parity = 0
 			}},
-
 			{.B={
 					.cmd = 1,
 					.addr = 3,
@@ -158,6 +156,7 @@ static void disable_external_watchdog(void)
 					.parity = 0
 			}},
 
+			// disable window watchdog
 			{.B={
 					.cmd = 1,
 					.addr = 6,
@@ -165,6 +164,7 @@ static void disable_external_watchdog(void)
 					.parity = 0
 			}},
 
+			//disable err pin monitor (A-step)
 			{.B={
 					.cmd = 1,
 					.addr = 4,
@@ -172,6 +172,7 @@ static void disable_external_watchdog(void)
 					.parity = 0
 			}},
 
+			//disable err pin monitor (not A-step)
 			{.B={
 					.cmd = 1,
 					.addr = 5,
@@ -179,27 +180,25 @@ static void disable_external_watchdog(void)
 					.parity = 0
 			}},
 
+			//protect register (PROTCFG)
 			{.B={
 					.cmd = 1,
 					.addr = 3,
 					.data = 0xDF,
 					.parity = 0
 			}},
-
 			{.B={
 					.cmd = 1,
 					.addr = 3,
 					.data = 0x34,
 					.parity = 0
 			}},
-
 			{.B={
 					.cmd = 1,
 					.addr = 3,
 					.data = 0xBE,
 					.parity = 0
 			}},
-
 			{.B={
 					.cmd = 1,
 					.addr = 3,

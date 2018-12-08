@@ -282,6 +282,8 @@
     <InputSection Name="wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8"/>
     <InputSection Name="wm4.asm_prototype.h.9.44dc5ea9028f9327527fcb9a41f0dc02"/>
     <InputSection Name="wm4.asm_prototype.h.44.b8add633cbb005089a124a3621c7279a"/>
+    <InputSection Name="wm4.ifxdma_reg.h.42.31aa348fbb90964c268684151100267b"/>
+    <InputSection Name="wm4.ifxdma_bf.h.28.93ea9f677800880579dcdc79d9639400"/>
   </Input>
   <Files>
     <ObjectFile Name="src\system_tc23x.o"/>
@@ -332,6 +334,7 @@
     <ObjectFile Name="src\FreeRTOS_Source\portable\GCC\TC234\port.o"/>
     <ObjectFile Name="src\FreeRTOS_Source\portable\GCC\TC234\porttrap.o"/>
     <ObjectFile Name="src\md5.o"/>
+    <ObjectFile Name="src\tc234_dma_crc32.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>
