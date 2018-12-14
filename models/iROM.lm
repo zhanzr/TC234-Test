@@ -335,6 +335,7 @@
     <ObjectFile Name="src\FreeRTOS_Source\portable\GCC\TC234\porttrap.o"/>
     <ObjectFile Name="src\md5.o"/>
     <ObjectFile Name="src\tc234_dma_crc32.o"/>
+    <ObjectFile Name="src\sha1.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

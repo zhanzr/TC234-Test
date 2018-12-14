@@ -51,6 +51,7 @@
 #include "partest.h"
 
 #include "md5.h"
+#include "sha1.h"
 
 const uint32_t test_content[] = {0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 		0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
@@ -610,13 +611,24 @@ void print_task(void *pvParameters)
 				SYSTEM_IsCacheEnabled());
 		flush_stdout();
 
-		//Test The MDT digest
+		//Test The MD5 digest
 		uint8_t md5_result[16]={0};
 		md5((uint8_t*)test_content, sizeof(test_content), md5_result);
 		printf("\nThe Result:\n");
 		for(uint32_t i=0; i<sizeof(md5_result); ++i)
 		{
 			printf("%02x", md5_result[i]);
+		}
+		printf("\n");
+		flush_stdout();
+
+		//Test the SHA1 digest
+		uint8_t sha1_result[20]={0};
+		sha1((uint8_t*)test_content, sizeof(test_content), sha1_result);
+		printf("\nThe Result:\n");
+		for(uint32_t i=0; i<sizeof(sha1_result); ++i)
+		{
+			printf("%02x", sha1_result[i]);
 		}
 		printf("\n");
 		flush_stdout();
