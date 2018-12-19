@@ -111,9 +111,9 @@ Ifx_PARITY:
 //• Bit 29 represents +1/4
 //• etc.
 //Q31TOF D[c], D[a], D[b] (RR)
-Ifx_Q31TOF:
-	Q31TOF result, inputA, inputB
-	ret
+//Ifx_Q31TOF:
+//	Q31TOF result, inputA, inputB
+//	ret
 
 //Inverse Square Root Seed
 //An approximation of the reciprocal of the square root of D[a] is stored in D[c]. The accuracy of the result is no less
@@ -122,9 +122,9 @@ Ifx_Q31TOF:
 //signed ?. If the operand is a NaN (quiet or signalling), then the return result will be the quiet NaN 7FC00000H.
 //This instruction can be used to implement a floating-point square root function in software using the NewtonRaphson iterative method.
 //QSEED.F D[c], D[a] (RR)
-Ifx_QSEED_F:
-	QSEED.F result, inputA
-	ret
+//Ifx_QSEED_F:
+//	QSEED.F result, inputA
+//	ret
 
 //Restore the Interrupt Enable bit (ICR.IE) to the value saved in D[a][0].
 //RESTORE can only be executed in User-1 or Supervisor mode.

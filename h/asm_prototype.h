@@ -246,6 +246,91 @@ uint32_t Ifx_LT_U(uint32_t A, uint32_t B);
 int32_t Ifx_LT_W(int32_t A, int32_t B);
 uint32_t Ifx_LT_WU(uint32_t A, uint32_t B);
 
+uint32_t Ifx_MFCR(void);
+uint32_t Ifx_MTCR(void);
+
+uint32_t Ifx_MOV(uint32_t A);
+uint32_t Ifx_MOV_U(void);
+uint32_t Ifx_MOVH(void);
+
+uint32_t* Ifx_MOVH_A(void);
+uint32_t* Ifx_MOV_A(uint32_t A);
+uint32_t* Ifx_MOV_AA(uint32_t* pA);
+
+uint32_t Ifx_MOV_D(uint32_t* pA);
+
+int32_t Ifx_MAX(int32_t A, int32_t B);
+uint32_t Ifx_MAX_U(uint32_t A, uint32_t B);
+pack32 Ifx_MAX_B(pack32 A, pack32 B);
+pack32 Ifx_MAX_BU(pack32 A, pack32 B);
+pack32 Ifx_MAX_H(pack32 A, pack32 B);
+pack32 Ifx_MAX_HU(pack32 A, pack32 B);
+
+int32_t Ifx_MIN(int32_t A, int32_t B);
+uint32_t Ifx_MIN_U(uint32_t A, uint32_t B);
+pack32 Ifx_MIN_B(pack32 A, pack32 B);
+pack32 Ifx_MIN_BU(pack32 A, pack32 B);
+pack32 Ifx_MIN_H(pack32 A, pack32 B);
+pack32 Ifx_MIN_HU(pack32 A, pack32 B);
+
+int32_t Ifx_MUL(int32_t A, int32_t B);
+int32_t Ifx_MULS(int32_t A, int32_t B);
+uint64_t Ifx_MUL_U(uint32_t A, uint32_t B);
+uint32_t Ifx_MULS_U(uint32_t A, uint32_t B);
+
+int32_t Ifx_MUL_Q(int32_t A, int32_t B);
+uint64_t Ifx_MUL_H(uint32_t A, uint32_t B);
+uint64_t Ifx_MULM_H(uint32_t A, uint32_t B);
+uint64_t Ifx_MULMS_H(uint32_t A, uint32_t B);
+int32_t Ifx_MULR_H(int32_t A, int32_t B);
+int32_t Ifx_MULR_Q(int32_t A, int32_t B);
+
+float Ifx_MUL_F(float fA, float fB);
+
+int32_t Ifx_MADD(int32_t A, int32_t B, int32_t C);
+int32_t Ifx_MADDS(int32_t A, int32_t B, int32_t C);
+uint64_t Ifx_MADD_U(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MADDS_U(uint32_t A, uint32_t B, uint32_t C);
+
+float Ifx_MADD_F(float A, float B, float C);
+
+uint64_t Ifx_MADD_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MADDS_H(uint64_t A, uint32_t C, uint32_t D);
+
+uint32_t Ifx_MADD_Q(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MADDS_Q(uint32_t A, uint32_t B, uint32_t C);
+
+//Packed Multiply-Add Q Format Multi-precision
+//Packed Multiply-Add Q Format Multi-precision, Saturated
+uint64_t Ifx_MADDM_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MADDMS_H(uint64_t A, uint32_t C, uint32_t D);
+
+//Packed Multiply-Add Q Format with Rounding
+//Packed Multiply-Add Q Format with Rounding, Saturated
+uint32_t Ifx_MADDR_H(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MADDRS_H(uint32_t A, uint32_t B, uint32_t C);
+
+//Multiply-Add Q Format with Rounding
+//Multiply-Add Q Format with Rounding, Saturated
+uint32_t Ifx_MADDR_Q(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MADDRS_Q(uint32_t A, uint32_t B, uint32_t C);
+
+//Packed Multiply-Add/Subtract Q Format
+//Packed Multiply-Add/Subtract Q Format Saturated
+uint64_t Ifx_MADDSU_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MADDSUS_H(uint64_t A, uint32_t C, uint32_t D);
+
+//Packed Multiply-Add/Subtract Q Format Multi-precision
+//Packed Multiply-Add/Subtract Q Format Multi-precision Saturated
+uint64_t Ifx_MADDSUM_H(uint64_t A, uint32_t C, uint32_t D);
+uint64_t Ifx_MADDSUMS_H(uint64_t A, uint32_t C, uint32_t D);
+
+//Packed Multiply-Add/Subtract Q Format with Rounding
+//Packed Multiply-Add/Subtract Q Format with Rounding Saturated
+uint32_t Ifx_MADDSUR_H(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_MADDSURS_H(uint32_t A, uint32_t B, uint32_t C);
+uint32_t Ifx_Rand32(uint32_t seed, uint32_t B);//
+
 int32_t Ifx_MSUB(int32_t A, int32_t B, int32_t C);
 int32_t Ifx_MSUBS(int32_t A, int32_t B, int32_t C);
 uint64_t Ifx_MSUB_U(uint64_t A, uint32_t C, uint32_t D);

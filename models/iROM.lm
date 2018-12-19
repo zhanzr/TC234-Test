@@ -336,6 +336,9 @@
     <ObjectFile Name="src\md5.o"/>
     <ObjectFile Name="src\tc234_dma_crc32.o"/>
     <ObjectFile Name="src\sha1.o"/>
+    <ObjectFile Name="asm\test_M_1.o"/>
+    <ObjectFile Name="asm\test_M_2.o"/>
+    <ObjectFile Name="asm\test_float.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>
