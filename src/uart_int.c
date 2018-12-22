@@ -239,7 +239,6 @@ int _uart_sending(void)
 	return ret;
 }
 
-<<<<<<< HEAD
 size_t read(int fd, void *buffer, size_t count)
 {
 	//Dummy read, don't use scanf
@@ -257,38 +256,4 @@ size_t write(int fd, const void *buffer, size_t count)
 
 	return count;
 }
-=======
-//
-///* Check the serial line if a character has been received.
-//   returns 1 and the character in *chr if there is one
-//   else 0
-// */
-//int _poll_uart(unsigned char *chr)
-//{
-//	unsigned char ret;
-//	int res = 0;
-//
-//	if (RX_READY(UARTBASE))
-//	{
-//		ret = (unsigned char)GET_CHAR(UARTBASE);
-//		/* acknowledge receive */
-//		RX_CLEAR(UARTBASE);
-//		/* check for error condition */
-//		if (GET_ERROR_STATUS(UARTBASE))
-//		{
-//			/* reset error flags */
-//			RESET_ERROR(UARTBASE);
-//			/* ignore this character */
-//		}
-//		else
-//		{
-//			/* this is a valid character */
-//			*chr = ret;
-//			res = 1;
-//		}
-//	}
-//
-//	return res;
-//}
 
->>>>>>> 208fb92317c4fba5c6d74e2ee751740d82291d50
