@@ -50,15 +50,6 @@ typedef struct
 static TxBuffer_t sendBuf;
 static RxBuffer_t recvBuf;
 
-void SimpleDelay(uint32_t d)
-{
-	uint32_t t = d*2000;
-	while(--t)
-	{
-		  __asm__ volatile ("nop" ::: "memory");
-	}
-}
-
 /* FIFO support */
 static __inline int isEmptyTXFifo(void)
 {
@@ -159,6 +150,8 @@ static void _uart_rx_handler(int arg)
 		char c = _in_uart();
 		writeRXFifo(c);
 	}
+
+	vParTestToggleLED(3);
 }
 
 /* Interrupt Service Routine for TX */
