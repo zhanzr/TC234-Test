@@ -7,6 +7,8 @@
 #include <stdint.h>
 #include <math.h>
 
+//#include <complex.h>
+
 /* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
@@ -238,7 +240,7 @@ int core0_main(int argc, char** argv)
 			SYSTEM_IsCacheEnabled());
 	flush_stdout();
 
-//	Ifx_TestLED(3);
+	//	Ifx_TestLED(3);
 
 	extern void stm_wait(uint32_t us);
 	for(uint8_t i=0; i<4; ++i)
@@ -604,176 +606,339 @@ void print_task(void *pvParameters)
 				SYSTEM_IsCacheEnabled());
 		flush_stdout();
 
-//		//Test The MD5 digest
-//		uint8_t md5_result[16]={0};
-//		md5((uint8_t*)test_content, sizeof(test_content), md5_result);
-//		printf("\nThe Result:\n");
-//		for(uint32_t i=0; i<sizeof(md5_result); ++i)
-//		{
-//			printf("%02x", md5_result[i]);
-//		}
-//		printf("\n");
-//		flush_stdout();
-//
-//		//Test the SHA1 digest
-//		uint8_t sha1_result[20] = {0};
-//		sha1((uint8_t*)test_content, sizeof(test_content), sha1_result);
-//		printf("\nThe Result:\n");
-//		for(uint32_t i=0; i<sizeof(sha1_result); ++i)
-//		{
-//			printf("%02x", sha1_result[i]);
-//		}
-//		printf("\n");
-//		flush_stdout();
+		//		//Test The MD5 digest
+		//		uint8_t md5_result[16]={0};
+		//		md5((uint8_t*)test_content, sizeof(test_content), md5_result);
+		//		printf("\nThe Result:\n");
+		//		for(uint32_t i=0; i<sizeof(md5_result); ++i)
+		//		{
+		//			printf("%02x", md5_result[i]);
+		//		}
+		//		printf("\n");
+		//		flush_stdout();
+		//
+		//		//Test the SHA1 digest
+		//		uint8_t sha1_result[20] = {0};
+		//		sha1((uint8_t*)test_content, sizeof(test_content), sha1_result);
+		//		printf("\nThe Result:\n");
+		//		for(uint32_t i=0; i<sizeof(sha1_result); ++i)
+		//		{
+		//			printf("%02x", sha1_result[i]);
+		//		}
+		//		printf("\n");
+		//		flush_stdout();
 		{
-			//Test Float relevant instruction set
-			printf("Test Ifx_Add_F\n");
-			float fA = M_PI;
-			float fB = M_E;
-			float f_res = Ifx_Add_F(fA, fB);
-			printf("%f + %f = %f\n", fA, fB, f_res);
-			printf("\n");
-			flush_stdout();
+			//Test complex
+			double cos_table[] = {1.0, 0.7071067811865476, 6.123233995736766e-17, -0.7071067811865475, -1.0};
+			printf("Complex math test\n");
+			{
+				double rad = acos(1);
+				double _Complex z = cexp((__extension__ 1.0iF) * rad); // Euler's formula
+				printf("exp(i*%f) = [%.1f%, %.1f]\n", rad, creal(z), cimag(z));
+				flush_stdout();
 
-			printf("Test Ifx_SUB_F\n");
-			f_res = Ifx_SUB_F(fA, fB);
-			printf("%f - %f = %f\n", fA, fB, f_res);
-			printf("\n");
-			flush_stdout();
+				double length = cabs(z);
+				double arg = carg(z);
+				double prj = cproj(z);
+				double _Complex cnj = conj(z);
 
-			printf("Test Ifx_MUL_F\n");
-			f_res = Ifx_MUL_F(fA, fB);
-			printf("%f * %f = %f\n", fA, fB, f_res);
-			printf("\n");
-			flush_stdout();
+				printf("Length=%.3f, Arg=%.3f, Project=%.3f\n",
+						length,
+						arg,
+						prj
+				);
+				printf("Conjulate=[%.3f%, %.3f]\n",
+						creal(cnj),cimag(cnj)
+				);
+				flush_stdout();
 
-			printf("Test Ifx_Div_F\n");
-			f_res = Ifx_Div_F(fA, fB);
-			printf("%f / %f = %f\n", fA, fB, f_res);
-			printf("\n");
-			flush_stdout();
+				double _Complex logv = clog(z);
+				double _Complex pow2 = cpow(z, 2 + (__extension__ 1.0iF) *0);
+				double _Complex sqrtv = csqrt(z);
+				printf("log=[%.3f%, %.3f]\n",
+						creal(logv),cimag(logv)
+				);
+				printf("pow2=[%.3f%, %.3f]\n",
+						creal(pow2),cimag(pow2)
+				);
+				printf("sqrt=[%.3f%, %.3f]\n",
+						creal(sqrtv),cimag(sqrtv)
+				);
+				flush_stdout();
 
-			printf("\nTest MADD_F\n");
-			fA = 1.1;
-			fB = 2.2;
-			float fC = 3.3;
-			f_res = Ifx_MADD_F(fA, fB, fC);
-			printf("MADD_F[%f+%f*%f] = %f\n", fA, fB, fC, f_res);
-			flush_stdout();
+				double _Complex sinv = csin(z);
+				double _Complex cosv = ccos(z);
+				double _Complex tanv = ctan(z);
+				printf("sin=[%.3f%, %.3f]\n",
+						creal(sinv),cimag(sinv)
+				);
+				printf("cos=[%.3f%, %.3f]\n",
+						creal(cosv),cimag(cosv)
+				);
+				printf("tan=[%.3f%, %.3f]\n",
+						creal(tanv),cimag(tanv)
+				);
+				printf("\n");
+				flush_stdout();
+			}
 
-			printf("\nTest Ifx_MSUB_F\n");
-			fA = 1.1;
-			fB = 2.2;
-			fC = 3.3;
-			f_res = Ifx_MSUB_F(fA, fB, fC);
-			printf("MADD_F[%f-%f*%f] = %f\n", fA, fB, fC, f_res);
-			flush_stdout();
+			{
+				double rad = acos(0.7071067811865476);
+				double _Complex z = cexp((__extension__ 1.0iF) * rad); // Euler's formula
+				printf("exp(i*%f) = [%.1f%, %.1f]\n", rad, creal(z), cimag(z));
+				flush_stdout();
 
-			printf("\nTest CMP.F\n");
-			uint32_t res =  Ifx_Cmp_F(fA, fB);
-			printf("CMP.F[%f, %f]=%08X\n", fA, fB, res);
-			res =  Ifx_Cmp_F(fB, fA);
-			printf("CMP.F[%f, %f]=%08X\n", fB, fA, res);
-			res =  Ifx_Cmp_F(fA, fA);
-			printf("CMP.F[%f, %f]=%08X\n", fA, fA, res);
-			flush_stdout();
+				double length = cabs(z);
+				double arg = carg(z);
+				double prj = cproj(z);
+				double _Complex cnj = conj(z);
 
-			printf("\nTest Q31TOF\n");
-			uint32_t a = INT32_MAX;
-			uint32_t b = 10;
-			f_res = Ifx_Q31TOF(a, b);
-			printf("Q31TOF[%08X, %08X] = %f[%08X]\n", a, b, f_res, *((uint32_t*)&f_res));
-			a = INT32_MAX/2;
-			b = 20;
-			f_res = Ifx_Q31TOF(a, b);
-			printf("Q31TOF[%08X, %08X] = %f[%08X]\n", a, b, f_res, *((uint32_t*)&f_res));
-			flush_stdout();
+				printf("Length=%.3f, Arg=%.3f, Project=%.3f\n",
+						length,
+						arg,
+						prj
+				);
+				printf("Conjulate=[%.3f%, %.3f]\n",
+						creal(cnj),cimag(cnj)
+				);
+				flush_stdout();
 
-			printf("\nTest QSEED_F\n");
-			fA = 2500.0;
-			f_res = Ifx_QSEED_F(fA);
-			printf("QSEED_F[%f] = %f\n", fA, f_res);
-			fA = 0.0001;
-			f_res = Ifx_QSEED_F(fA);
-			printf("QSEED_F[%f] = %f\n", fA, f_res);
-			flush_stdout();
+				double _Complex logv = clog(z);
+				double _Complex pow2 = cpow(z, 2 + (__extension__ 1.0iF) *0);
+				double _Complex sqrtv = csqrt(z);
+				printf("log=[%.3f%, %.3f]\n",
+						creal(logv),cimag(logv)
+				);
+				printf("pow2=[%.3f%, %.3f]\n",
+						creal(pow2),cimag(pow2)
+				);
+				printf("sqrt=[%.3f%, %.3f]\n",
+						creal(sqrtv),cimag(sqrtv)
+				);
+				flush_stdout();
 
-			printf("\nTest UTOF\n");
-			a = UINT32_MAX/4;
-			fA = Ifx_UTOF(a);
-			printf("%08X %f %08X\n", a, fA, *(uint32_t*)&fA);
-			a = UINT32_MAX/8;
-			fA = Ifx_UTOF(a);
-			printf("%08X %f %08X\n", a, fA, *(uint32_t*)&fA);
-			flush_stdout();
+				double _Complex sinv = csin(z);
+				double _Complex cosv = ccos(z);
+				double _Complex tanv = ctan(z);
+				printf("sin=[%.3f%, %.3f]\n",
+						creal(sinv),cimag(sinv)
+				);
+				printf("cos=[%.3f%, %.3f]\n",
+						creal(cosv),cimag(cosv)
+				);
+				printf("tan=[%.3f%, %.3f]\n",
+						creal(tanv),cimag(tanv)
+				);
+				printf("\n");
+				flush_stdout();
+			}
 
-			printf("\nTest ITOF\n");
-			int32_t ai = INT32_MAX/10;
-			f_res = Ifx_Itof(ai);
-			printf("ITOF[%08X] = %f\n", ai, f_res);
-			ai = INT32_MAX/2;
-			f_res = Ifx_Itof(ai);
-			printf("ITOF[%08X] = %f\n", ai, f_res);
-			flush_stdout();
+			{
+				double rad = acos(6.123233995736766e-17);
+				double _Complex z = cexp((__extension__ 1.0iF) * rad); // Euler's formula
+				printf("exp(i*%f) = [%.1f%, %.1f]\n", rad, creal(z), cimag(z));
+				flush_stdout();
 
-			printf("\nTest FTOI\n");
-			fA = -1234.5678;
-			int32_t res_i = Ifx_Ftoi(fA);
-			printf("FTOI[%f] = %d\n", fA, res_i);
-			fA = -0.9999999;
-			res_i = Ifx_Ftoi(fA);
-			printf("FTOI[%f] = %d\n", fA, res_i);
-			flush_stdout();
+				double length = cabs(z);
+				double arg = carg(z);
+				double prj = cproj(z);
+				double _Complex cnj = conj(z);
 
-			printf("\nTest FTOI_Z\n");
-			fA = -1234.5678;
-			res_i = Ifx_Ftoi_Z(fA);
-			printf("FTOIZ[%f] = %d\n", fA, res_i);
-			fA = -0.9999999;
-			res_i = Ifx_Ftoi_Z(fA);
-			printf("FTOIZ[%f] = %d\n", fA, res_i);
-			flush_stdout();
+				printf("Length=%.3f, Arg=%.3f, Project=%.3f\n",
+						length,
+						arg,
+						prj
+				);
+				printf("Conjulate=[%.3f%, %.3f]\n",
+						creal(cnj),cimag(cnj)
+				);
+				flush_stdout();
 
-			printf("\nTest FTOU\n");
-			fA = 1234.5678;
-			res_i = Ifx_Ftou(fA);
-			printf("FTOU[%f] = %d\n", fA, res_i);
-			fA = 1.99999999;
-			res_i = Ifx_Ftou(fA);
-			printf("FTOU[%f] = %d\n", fA, res_i);
-			flush_stdout();
+				double _Complex logv = clog(z);
+				double _Complex pow2 = cpow(z, 2 + (__extension__ 1.0iF) *0);
+				double _Complex sqrtv = csqrt(z);
+				printf("log=[%.3f%, %.3f]\n",
+						creal(logv),cimag(logv)
+				);
+				printf("pow2=[%.3f%, %.3f]\n",
+						creal(pow2),cimag(pow2)
+				);
+				printf("sqrt=[%.3f%, %.3f]\n",
+						creal(sqrtv),cimag(sqrtv)
+				);
+				flush_stdout();
 
-			printf("\nTest FTOU_Z\n");
-			fA = 1234.5678;
-			res_i = Ifx_Ftou_Z(fA);
-			printf("FTOU_Z[%f] = %d\n", fA, res_i);
-			fA = 1.99999999;
-			res_i = Ifx_Ftou_Z(fA);
-			printf("FTOU_Z[%f] = %d\n", fA, res_i);
-			flush_stdout();
+				double _Complex sinv = csin(z);
+				double _Complex cosv = ccos(z);
+				double _Complex tanv = ctan(z);
+				printf("sin=[%.3f%, %.3f]\n",
+						creal(sinv),cimag(sinv)
+				);
+				printf("cos=[%.3f%, %.3f]\n",
+						creal(cosv),cimag(cosv)
+				);
+				printf("tan=[%.3f%, %.3f]\n",
+						creal(tanv),cimag(tanv)
+				);
+				printf("\n");
+				flush_stdout();
+			}
 
-			printf("\nTest FTOQ31\n");
-			fA = 1.2345678;
-			b = 4;
-			res = Ifx_Ftoq31(fA, b);
-			printf("FTOQ31[%f, %u] = %08X\n", fA, b, res);
-			fA = 0.5678;
-			b = 3;
-			res = Ifx_Ftoq31(fA, b);
-			printf("FTOQ31[%f, %u] = %08X\n", fA, b, res);
-			flush_stdout();
+			{
+				double rad = acos(-0.7071067811865475);
+				double _Complex z = cexp((__extension__ 1.0iF) * rad); // Euler's formula
+				printf("exp(i*%f) = [%.1f%, %.1f]\n", rad, creal(z), cimag(z));
+				flush_stdout();
 
-			printf("\nTest FTOQ31Z\n");
-			fA = 1.2345678;
-			b = 2;
-			res = Ifx_Ftoq31z(fA, b);
-			printf("FTOQ31Z[%f, %u] = %08X\n", fA, b, res);
-			fA = 0.5678;
-			b = 1;
-			res = Ifx_Ftoq31z(fA, b);
-			printf("FTOQ31Z[%f, %u] = %08X\n", fA, b, res);
-			flush_stdout();
+				double length = cabs(z);
+				double arg = carg(z);
+				double prj = cproj(z);
+				double _Complex cnj = conj(z);
+
+				printf("Length=%.3f, Arg=%.3f, Project=%.3f\n",
+						length,
+						arg,
+						prj
+				);
+				printf("Conjulate=[%.3f%, %.3f]\n",
+						creal(cnj),cimag(cnj)
+				);
+				flush_stdout();
+
+				double _Complex logv = clog(z);
+				double _Complex pow2 = cpow(z, 2 + (__extension__ 1.0iF) *0);
+				double _Complex sqrtv = csqrt(z);
+				printf("log=[%.3f%, %.3f]\n",
+						creal(logv),cimag(logv)
+				);
+				printf("pow2=[%.3f%, %.3f]\n",
+						creal(pow2),cimag(pow2)
+				);
+				printf("sqrt=[%.3f%, %.3f]\n",
+						creal(sqrtv),cimag(sqrtv)
+				);
+				flush_stdout();
+
+				double _Complex sinv = csin(z);
+				double _Complex cosv = ccos(z);
+				double _Complex tanv = ctan(z);
+				printf("sin=[%.3f%, %.3f]\n",
+						creal(sinv),cimag(sinv)
+				);
+				printf("cos=[%.3f%, %.3f]\n",
+						creal(cosv),cimag(cosv)
+				);
+				printf("tan=[%.3f%, %.3f]\n",
+						creal(tanv),cimag(tanv)
+				);
+				printf("\n");
+				flush_stdout();
+			}
+
+			{
+				double rad = acos(-1.0);
+				double _Complex z = cexp((__extension__ 1.0iF) * rad); // Euler's formula
+				printf("exp(i*%f) = [%.1f%, %.1f]\n", rad, creal(z), cimag(z));
+				flush_stdout();
+
+				double length = cabs(z);
+				double arg = carg(z);
+				double prj = cproj(z);
+				double _Complex cnj = conj(z);
+
+				printf("Length=%.3f, Arg=%.3f, Project=%.3f\n",
+						length,
+						arg,
+						prj
+				);
+				printf("Conjulate=[%.3f%, %.3f]\n",
+						creal(cnj),cimag(cnj)
+				);
+				flush_stdout();
+
+				double _Complex logv = clog(z);
+				double _Complex pow2 = cpow(z, 2 + (__extension__ 1.0iF) *0);
+				double _Complex sqrtv = csqrt(z);
+				printf("log=[%.3f%, %.3f]\n",
+						creal(logv),cimag(logv)
+				);
+				printf("pow2=[%.3f%, %.3f]\n",
+						creal(pow2),cimag(pow2)
+				);
+				printf("sqrt=[%.3f%, %.3f]\n",
+						creal(sqrtv),cimag(sqrtv)
+				);
+				flush_stdout();
+
+				double _Complex sinv = csin(z);
+				double _Complex cosv = ccos(z);
+				double _Complex tanv = ctan(z);
+				printf("sin=[%.3f%, %.3f]\n",
+						creal(sinv),cimag(sinv)
+				);
+				printf("cos=[%.3f%, %.3f]\n",
+						creal(cosv),cimag(cosv)
+				);
+				printf("tan=[%.3f%, %.3f]\n",
+						creal(tanv),cimag(tanv)
+				);
+				printf("\n");
+				flush_stdout();
+			}
 		}
+
+//		printf("Complex math test\n");
+//		for(uint8_t i=0; i<5; ++i)
+//		{
+//			double rad = i*2*M_PI/8;
+//			double _Complex z = cexp((__extension__ 1.0iF) * rad);
+//			double length = cabs(z);
+//			double arg = carg(z);
+//			double prj = cproj(z);
+//			double _Complex cnj = conj(z);
+//			printf("exp(i*%.3f) = [%.3f%, %.3f]\n",
+//					rad,
+//					creal(z),cimag(z) );
+//			printf("Length=%.3f, Arg=%.3f, Project=%.3f\n",
+//					length,
+//					arg,
+//					prj
+//			);
+//			printf("Conjulate=[%.3f%, %.3f]\n",
+//					creal(cnj),cimag(cnj)
+//			);
+//			flush_stdout();
+//
+//			double _Complex logv = clog(z);
+//			double _Complex pow2 = cpow(z, 2 + (__extension__ 1.0iF) *0);
+//			double _Complex sqrtv = csqrt(z);
+//			printf("log=[%.3f%, %.3f]\n",
+//					creal(logv),cimag(logv)
+//			);
+//			printf("pow2=[%.3f%, %.3f]\n",
+//					creal(pow2),cimag(pow2)
+//			);
+//			printf("sqrt=[%.3f%, %.3f]\n",
+//					creal(sqrtv),cimag(sqrtv)
+//			);
+//			flush_stdout();
+//
+//			double _Complex sinv = csin(z);
+//			double _Complex cosv = ccos(z);
+//			double _Complex tanv = ctan(z);
+//			printf("sin=[%.3f%, %.3f]\n",
+//					creal(sinv),cimag(sinv)
+//			);
+//			printf("cos=[%.3f%, %.3f]\n",
+//					creal(cosv),cimag(cosv)
+//			);
+//			printf("tan=[%.3f%, %.3f]\n",
+//					creal(tanv),cimag(tanv)
+//			);
+//
+//			printf("\n");
+//			flush_stdout();
+//		}
 
 		uint32_t NotifyValue = ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
 				portMAX_DELAY );/* Block indefinitely. */
