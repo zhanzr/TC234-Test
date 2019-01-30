@@ -1,3 +1,6 @@
+#include <machine/intrinsics.h>
+#include "bspconfig_tc23x.h"
+
 #include <stdio.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -8,9 +11,6 @@
 #include <stdint.h>
 #include <math.h>
 
-//#include <complex.h>
-
-/* Scheduler includes. */
 #include "FreeRTOS.h"
 #include "task.h"
 #include "croutine.h"
@@ -18,10 +18,6 @@
 #include "semphr.h"
 #include "timers.h"
 #include "event_groups.h"
-
-#include <machine/intrinsics.h>
-
-#include "bspconfig_tc23x.h"
 
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_bf.h)
