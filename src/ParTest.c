@@ -74,29 +74,25 @@
 #include "partest.h"
 
 /*---------------------------------------------------------------------------*/
-
-void vParTestInitialise( void )
-{
+extern void spi_init(void);
+void vParTestInitialise( void ) {
 	/* The Appkit TC234 v2.1 has 4 LEDs*/
 	led_init();
+
+	spi_init();
 }
 /*---------------------------------------------------------------------------*/
 
-void vParTestSetLED( unsigned portBASE_TYPE uxLED, signed portBASE_TYPE xValue )
-{
-	if( xValue != 0 )
-	{
+void vParTestSetLED( unsigned portBASE_TYPE uxLED, signed portBASE_TYPE xValue ) {
+	if( xValue != 0 ) {
 		led_off(uxLED);
-	}
-	else
-	{
+	} else {
 		led_on(uxLED);
 	}
 }
 /*---------------------------------------------------------------------------*/
 
-void vParTestToggleLED( unsigned portBASE_TYPE uxLED )
-{
+void vParTestToggleLED( unsigned portBASE_TYPE uxLED ) {
 	led_toggle(uxLED);
 }
 /*---------------------------------------------------------------------------*/

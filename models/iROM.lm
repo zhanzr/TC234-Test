@@ -120,7 +120,6 @@
     <InputSection Name="wm4.stddef.h.39.7e3d906ac58942e0b374c527445f5de5"/>
     <InputSection Name="wm4._default_types.h.6.1dbd2e581fd590860c7c17f21d147e91"/>
     <InputSection Name="wm4.system_tc2x.h.9.2e27cc81301ccba916487c1aef667a3c"/>
-    <InputSection Name="wm4.string.h.17.f8d12df81104836a3f2a5d589ae830d8"/>
     <InputSection Name="wm4.sharemasks.h.3.3fde5b77bff0ce3f5b9e984174679e3b"/>
     <InputSection Name="wm4.portmacro.h.113.055711d7afb6baf80bc58d47e0893575"/>
     <InputSection Name="wm4.ifxpmu_bf.h.28.07fc612673841a2c9a5dfa67923a6667"/>
@@ -134,7 +133,6 @@
     <InputSection Name="wm4.ifxstm_bf.h.28.72ff81a9d174f4a2ba66a2163ff690d8"/>
     <InputSection Name="wm4.ifxint_reg.h.42.7a57a05f1f4da0a67389fc3f55fe00e7"/>
     <InputSection Name="wm4.stddef.h.348.9a99de77b6ba3b4278b57e9cc6d6e349"/>
-    <InputSection Name="wm4.croutine.h.246.9d5543f1c91c5e9bede3e818a7019f48"/>
     <InputSection Name=".startup.code"/>
     <InputSection Name="wm4.list.h.103.6a12b7b9a7a136c3cca0ee53675c5498"/>
     <InputSection Name="wm4.portable.h.110.02230cba20d4e5e2bcfc3ad7d9603979"/>
@@ -154,11 +152,9 @@
     <InputSection Name="wm4.ifxscu_bf.h.28.9a07903c69e87b761063be2cfe1bc5c5"/>
     <InputSection Name="wm4.ifxeth_bf.h.28.1fab7a5371744212b6edd3ee2a158451"/>
     <InputSection Name="wm4.masks.h.3.a5eb25522e08033b0743e4868529f855"/>
-    <InputSection Name="wm4.timers.h.96.489fd98e23f60a1428d1c47e0ce13bb9"/>
     <InputSection Name="wm4.FreeRTOS.h.108.3806757560edf45b81784d3b375df1aa"/>
     <InputSection Name="wm4.ifxsrc_bf.h.28.44eeb5e1d11a3d6844599194b0382cf1"/>
     <InputSection Name="wm4.stddef.h.184.4e5d46709ab217f381b449671f32b922"/>
-    <InputSection Name="wm4.stdio.h.27.f2ac352bab34f31f9f478442827b2ba6"/>
     <InputSection Name="wm4.stddef.h.39.d0197034aa5fd947cae140b9289e6734"/>
     <InputSection Name="wm4.alloca.h.8.dfc0c703c47ec3e69746825b17d9e66d"/>
     <InputSection Name="wm4.bspconfig_tc23x.h.34.6228359b840d5c9aae057ef461027e39"/>
@@ -180,15 +176,12 @@
     <InputSection Name="wm4.mpu_wrappers.h.71.c0872672d360e197b5a999335351843d"/>
     <InputSection Name="wm4.ifxcpu_reg.h.48.efae3e83a47a32c1e62d28f181503bc1"/>
     <InputSection Name="wm4.masks.h.3.4d7944f42fcc83d25951713d08a4c641"/>
-    <InputSection Name="wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8"/>
-    <InputSection Name="wm4.StackMacros.h.71.f4b392b8a8ca858f54a8e6627398533d"/>
     <InputSection Name="wm4.stdlib.h.50.622023ed9abe014547a3bd67d796ebc1"/>
     <InputSection Name="wm4.lock.h.2.9bc98482741e5e2a9450b12934a684ea"/>
     <InputSection Name="wm4.addr.h.6.f282927099274b029d279350dbe2f032"/>
     <InputSection Name="wm4.tricoreabsnoabs.h.5.b67e96f0d85287f8f44fdcac76460423"/>
     <InputSection Name="wm4.addr.h.6.4925544be9a74e5d6fd1729b1b079508"/>
     <InputSection Name="wm4.ifxflash_bf.h.28.768faa5638310add094bc712205f110d"/>
-    <InputSection Name="wm4.asm_prototype.h.44.b8add633cbb005089a124a3621c7279a"/>
     <InputSection Name="wm4.addr.h.6.14d9412fd3a176d88bc25c17301bfa1a"/>
     <InputSection Name="wm4.ifxqspi_reg.h.51.6bbae5556c07695ffbec783b82bacef8"/>
     <InputSection Name="wm4.stddef.h.184.f740e675efc82b9790b2d86753673cd5"/>
@@ -208,7 +201,6 @@
     <InputSection Name="wm4.masks.h.3.304e5883ed4828dd469389148fa6bdea"/>
     <InputSection Name="wm4.sharemasks.h.3.2c0a626e0693b39348ef4460f44d48b2"/>
     <InputSection Name="wm4.masks.h.3.b68e75a65f2c0e13f884bcb224e2323a"/>
-    <InputSection Name="wm4.interrupts_tc23x.h.15.e764addd0bb2b4fdbe0d7862e17a92e9"/>
     <InputSection Name="wm4.ifxpmu_reg.h.42.d61df6a66f288cedd84f246887854423"/>
     <InputSection Name="wm4.masks.h.3.6a076c0e4dac27a59098a65f606d7905"/>
     <InputSection Name="wm4.assert.h.11.7043852a511d37ae606afa012e67e471"/>
@@ -284,6 +276,16 @@
     <InputSection Name="wm4.addr.h.6.aa1661b207b952b9e77fd5ef0e4f41be"/>
     <InputSection Name="wm4.masks.h.3.63403b7be0bffc80904db7034f507a3d"/>
     <InputSection Name="wm4.masks.h.3.e8524f2e240b43f145c9f6e901c714a0"/>
+    <InputSection Name="wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8"/>
+    <InputSection Name="wm4.string.h.17.f8d12df81104836a3f2a5d589ae830d8"/>
+    <InputSection Name="wm4.stdio.h.27.f2ac352bab34f31f9f478442827b2ba6"/>
+    <InputSection Name="wm4.timers.h.96.489fd98e23f60a1428d1c47e0ce13bb9"/>
+    <InputSection Name="wm4.croutine.h.246.9d5543f1c91c5e9bede3e818a7019f48"/>
+    <InputSection Name="wm4.interrupts_tc23x.h.15.e764addd0bb2b4fdbe0d7862e17a92e9"/>
+    <InputSection Name="wm4.asm_prototype.h.44.b8add633cbb005089a124a3621c7279a"/>
+    <InputSection Name="wm4.StackMacros.h.71.f4b392b8a8ca858f54a8e6627398533d"/>
+    <InputSection Name="wm4.enc28j60.h.2.c3f115408e1cd2a045c71b4a1a299a6c"/>
+    <InputSection Name="wm4.net.h.2.8d6771dd21546b3708c9043ee7b4a3b8"/>
   </Input>
   <Files>
     <ObjectFile Name="src\system_tc23x.o"/>
@@ -339,6 +341,9 @@
     <ObjectFile Name="asm\test_M_1.o"/>
     <ObjectFile Name="asm\test_M_2.o"/>
     <ObjectFile Name="asm\test_float.o"/>
+    <ObjectFile Name="src\server_net\enc28j60.o"/>
+    <ObjectFile Name="src\server_net\ip_arp_udp_tcp.o"/>
+    <ObjectFile Name="src\server_net\simple_server.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

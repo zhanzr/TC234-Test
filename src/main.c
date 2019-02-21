@@ -185,8 +185,11 @@ void test_tlf35584(void)
 	}
 }
 
-int core0_main(int argc, char** argv)
-{
+extern void interface_init(void);
+extern void protocol_init(void);
+extern void server_loop(void);
+
+int core0_main(int argc, char** argv) {
 	prvSetupHardware();
 
 	//	SYSTEM_EnaDisCache(1);
@@ -239,18 +242,23 @@ int core0_main(int argc, char** argv)
 
 	//	Ifx_TestLED(3);
 
-	extern void stm_wait(uint32_t us);
-	for(uint8_t i=0; i<4; ++i) {
-		for(uint32_t j=0; j<1000; ++j) {
-			stm_wait(500);
-		}
-		printf("%s STM Test Delay %u\n", _NEWLIB_VERSION, i);
-	}
+//	extern void stm_wait(uint32_t us);
+//	for(uint8_t i=0; i<4; ++i) {
+//		for(uint32_t j=0; j<1000; ++j) {
+//			stm_wait(500);
+//		}
+//		printf("%s STM Test Delay %u\n", _NEWLIB_VERSION, i);
+//	}
 	_syscall(200);
 
 	test_tlf35584();
 
 	//	test_dma_crc();
+
+	interface_init();
+	protocol_init();
+
+	server_loop();
 
 	/* The following function will only create more tasks and timers if
 	mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY is set to 0 (at the top of this

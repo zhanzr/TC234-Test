@@ -30,8 +30,7 @@
 static void disable_external_watchdog(void)
 {
 	/* check that this disabling has not been already done (e.g. by the debugger) */
-	if (QSPI2_GLOBALCON.B.EN)
-	{
+	if (QSPI2_GLOBALCON.B.EN){
 		/* don't do it again */
 		return;
 	}
@@ -102,8 +101,7 @@ static void disable_external_watchdog(void)
 	QSPI2_ECON1.B.CPOL = 0;
 	QSPI2_ECON1.B.PAREN = 0;
 
-	do
-	{
+	do{
 		/* PT2F,PT1F,RXF,TXF,ERRORFLAGS */
 		QSPI2_FLAGSCLEAR.B.ERRORCLEARS = 0x1F;
 		QSPI2_FLAGSCLEAR.B.PT1C = 1;
@@ -128,8 +126,7 @@ static void disable_external_watchdog(void)
 	//			0x8A01,								/* disable err pin monitor (not A-step) */
 	//			0x87be, 0x8668, 0x877d, 0x8795		/* protect register (PROTCFG) */
 	//	};
-	tlf35584_cmd_t wdtdiscmd[]=
-	{
+	tlf35584_cmd_t wdtdiscmd[]={
 			// unprotect register (PROTCFG)
 			{.B={
 					.cmd = 1,
@@ -208,8 +205,7 @@ static void disable_external_watchdog(void)
 	};
 
 	/* transfer all data */
-	for (uint8_t i = 0; i < sizeof(wdtdiscmd)/sizeof(wdtdiscmd[0]); ++i)
-	{
+	for (uint8_t i = 0; i < sizeof(wdtdiscmd)/sizeof(wdtdiscmd[0]); ++i) {
 		pack32 z_parity;
 		z_parity.u32 = Ifx_PARITY((uint32_t)wdtdiscmd[i].U);
 		wdtdiscmd[i].B.parity = z_parity.u8[0] ^ z_parity.u8[1];

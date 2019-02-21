@@ -23,10 +23,8 @@
 /* AppKit-TC2X4: P13.0 .. P13.3 --> LED D107 ... D110 */
 #define	PORT_LED	MODULE_P13
 
-void led_on(uint8_t n)
-{
-	switch (n)
-	{
+void led_on(uint8_t n) {
+	switch (n) {
 	case 0:
 		PORT_LED.OMR.B.PCL0 = 1;
 		break;
@@ -45,10 +43,8 @@ void led_on(uint8_t n)
 	}
 }
 
-void led_off(uint8_t n)
-{
-	switch (n)
-	{
+void led_off(uint8_t n) {
+	switch (n) {
 	case 0:
 		PORT_LED.OMR.B.PS0 = 1;
 		break;
@@ -67,10 +63,29 @@ void led_off(uint8_t n)
 	}
 }
 
-void led_toggle(uint8_t n)
-{
-	switch (n)
-	{
+//Note LEDs are negative logic controlled
+uint32_t led_stat(uint8_t n) {
+	switch (n) {
+	case 0:
+		return PORT_LED.OMR.B.PCL0;
+		break;
+	case 1:
+		return PORT_LED.OMR.B.PCL1;
+		break;
+	case 2:
+		return PORT_LED.OMR.B.PCL2;
+		break;
+	case 3:
+		return PORT_LED.OMR.B.PCL3;
+		break;
+
+	default:
+		break;
+	}
+}
+
+void led_toggle(uint8_t n) {
+	switch (n) {
 	case 0:
 		PORT_LED.OMR.U |= ((1<<IFX_P_OMR_PS0_OFF)|(1<<IFX_P_OMR_PCL0_OFF));
 		break;
@@ -89,9 +104,8 @@ void led_toggle(uint8_t n)
 	}
 }
 
-void led_init(void)
-{
-	/* initialise all LEDs (P13.0 .. P13.3) */
+void led_init(void) {
+	/* Initialize all LEDs (P13.0 .. P13.3) */
 	PORT_LED.IOCR0.B.PC0 = OUT_ODGPIO;
 	PORT_LED.IOCR0.B.PC1 = OUT_ODGPIO;
 	PORT_LED.IOCR0.B.PC2 = OUT_ODGPIO;
