@@ -1,0 +1,262 @@
+[Main]
+Signature=UDE_TARGINFO_2.0
+MCUs=Controller0
+Description=Application Kit with TC234
+Description1=Workaround for TLF35584 B/C-Step Bug
+Architecture=TriCore
+Vendor=Infineon
+Board=TC234 Application Kit
+
+[Controller0]
+Family=TriCore
+Type=TC23x
+Enabled=1
+IntClock=100000
+ExtClock=20000
+traceStreams=none
+
+[Controller0.Core0]
+Protocol=TC2_JTAG
+Enabled=1
+
+[Controller0.Core0.LoadedAddOn]
+UDEMemtool=1
+
+[Controller0.Core0.Tc2CoreTargIntf]
+PortType=DAS
+CommDevSel=
+MaxJtagClk=1000
+ConnOption=Reset
+ResetMode=Default
+SuspendSlaveCores=0
+UseIoinfoHalt=1
+ExecInitCmds=1
+TargetPort=Default
+ScanJTAG=0
+Ocds1ViaPod=0
+RefreshJtag=0
+RefreshHarr=0
+ReduceJtagClock=0
+UseDap=1
+DapMode=2PIN
+ResetWaitTime=500
+DiswdtOnReset=0
+SetPllOnReset=0x0
+SetPllOnReset2=0x0
+HandleMemAccBug=1
+MaxTry=1
+UseTranslateAddr=1
+DownloadToAllRams=1
+HaltAfterReset=1
+SimioAddr=g_JtagSimioAccess
+UseStmForPtm=1
+ExecOnStartCmds=0
+ExecOnHaltCmds=0
+UseTriggerToBreak=1
+UseOstateStable=1
+AllowJtagResetWhileRunning=1
+MaxAccRetry=1
+AccRetryDelay=100
+IvIcacheOnHalt=1
+IvPlbOnHalt=1
+FilterMemAcc=1
+DasDllPath=C:\Windows\SysWOW64\das_api.dll
+DasHost=
+DasTryStartSrv=1
+DasSrvPath=servers\udas\udas.exe
+DasStopSrv=1
+DasResetHelperBreakAddr=main
+DasResetMode=2
+DasRemoveLogFile=0
+DasForwardSerNum=0
+DasSrvSel=-1
+DasPortType=0
+DasPortSel=0
+CheckJtagId=1
+ReenableOcds=0
+EtksArbiterMode=None
+OpenDrainReset=0
+ExecOnConnectCmds=0
+FailOnResetMalfunction=0
+ResetPulseLen=10
+AddResetDelay=0
+UnlockInterface=0
+BootPasswd0=0x0
+BootPasswd1=0x0
+BootPasswd2=0x0
+BootPasswd3=0x0
+BootPasswd4=0x0
+BootPasswd5=0x0
+BootPasswd6=0x0
+BootPasswd7=0x0
+DebugResetOnDisconnect=0
+SetDebugEnableAb1DisablePin=0
+ExecOnExtRstCmds=0
+ExecEmemInitOnReset=0x0
+PasswordFile=
+HandleBmiHeader=0
+SetAutOkOnConnect=0
+DontUseWdtSusp=0
+UseDflashAccessFilter=1
+TargetAppHandshakeMode=None
+TargetAppHandshakeTimeout=100
+TargetAppHandshakeParameter0=0x0
+TargetAppHandshakeParameter1=0x0
+TargetAppHandshakeParameter2=0x0
+TargetAppHandshakeParameter3=0x0
+UseTL2OnHalt=1
+ReadPmcsrWhileRunning=0
+DasCmdTimeout=1000
+DasWaitAfterConnect=0
+
+[Controller0.Core0.Tc2CoreTargIntf.InitScript]
+; Workaround for TLF35584 B/C-Step Bug
+
+# QSPI2_CLC: Enable QSPI module. DISR=0,EDIS=1
+SET 0xF0001E00 0x8
+
+# QSPI2_GLOBALCON: Set the Global time quantum and Expect phase timeout in GLOBALCON register.
+# Also, enable Master mode.  MS=0, STROBE=15, EXPECT=12, TQ=0
+SET 0xF0001E10 0xF3000
+
+# QSPI2_PISEL: Select the Master Mode Receive Input in the PISEL register. Here, it is
+# input A (MRST0A). MRIS=0
+SET 0xF0001E04 0x0
+
+# QSPI2_GLOBALCON1: Enable the Single Move Mode in the GLOBALCON1 register.
+# TXFM=1, RXFM=1
+SET 0xF0001E14 0x14050000
+
+# QSPI2_ECON1: Enable Parity, and set values for Q, B and C fields in the ECON4 register
+#(since chip-select output 1, SLSO21 is used here). PAREN=1, C=0, B=2, A=1, Q=9
+SET 0xF0001E24 0x4249
+
+# QSPI2_SSOC: Enable the slave select output (Here SLSO21) and make the corresponding
+# signal active level low, in the SSOC register. OEN=0x80, AOL=0
+SET 0xF0001E48 0x00020000
+
+# P14_IOCR0: P14.2=SLSO21;
+SET 0xF003B410 0x00980000
+# P15_IOCR0: P15.3=SCLK2;
+SET 0xF003B510 0x98000000
+# P15_IOCR4: P15.5=MTSR2, P15.7=MRST2B
+SET 0xF003B514 0x00009800
+
+# QSPI2_FLAGSCLEAR
+SET 0xF0001E54 0xFFF
+
+# QSPI2_BACONENTRY: In the BACON register: Set the current frame as the last frame, and data
+# length in bits (Short frame mode). Data length is 15 bits + parity, MSB is shifted
+# first. The channel is selected properly (Here, channel 1 for SLSO21) Set
+# the trailing delay. CS=QSPI_SLSO,DL=14,BYTE=0,MSB=1,UINT=0,PARTYP=0,TRAIL=0,
+# TPRE=3,LEAD=0,LPRE=3,IDLE=0,IPRE=3,LAST=1
+SET 0xF0001E60 0x17206187
+
+# QSPI2_GLOBALCON: Put the QSPI module to RUN state.  MS=0, STROBE=15, EXPECT=12, TQ=0, EN=1
+SET 0xF0001E10 0x010F3000
+
+# QSPI2_DATAENTRY0: Write w parity   0x43AB,0x43EF,0x4356,0x4312,0x4693,0x4500,0x43DF,0x4334,0x43BE,0x43CA
+# UNLOCK1
+SET 0xF0001E64 0x43AB
+
+# QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+SET 0xF0001E54 0x200
+
+# QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+SET 0xF0001E54 0x400
+# QSPI2_DATAENTRY0: UNLOCK2
+SET 0xF0001E64 0x43EF
+
+# QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+SET 0xF0001E54 0x200
+
+# QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+SET 0xF0001E54 0x400
+# QSPI2_DATAENTRY0: UNLOCK3
+SET 0xF0001E64 0x4356
+
+# QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+SET 0xF0001E54 0x200
+
+# QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+SET 0xF0001E54 0x400
+# QSPI2_DATAENTRY0: UNLOCK4
+SET 0xF0001E64 0x4312
+
+# QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+SET 0xF0001E54 0x200
+
+# QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+SET 0xF0001E54 0x400
+# QSPI2_DATAENTRY0: WWD off
+SET 0xF0001E64 0x4693
+
+# QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+SET 0xF0001E54 0x200
+
+# QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+SET 0xF0001E54 0x400
+# QSPI2_DATAENTRY0: ERR-pin monitoring off
+SET 0xF0001E64 0x4500
+
+# QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+SET 0xF0001E54 0x200
+
+# QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+SET 0xF0001E54 0x400
+# QSPI2_DATAENTRY0: LOCK1
+SET 0xF0001E64 0x43DF
+
+# QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+SET 0xF0001E54 0x200
+
+# QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+SET 0xF0001E54 0x400
+# QSPI2_DATAENTRY0: LOCK2
+SET 0xF0001E64 0x4334
+
+# QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+SET 0xF0001E54 0x200
+
+# QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+SET 0xF0001E54 0x400
+# QSPI2_DATAENTRY0: LOCK3
+SET 0xF0001E64 0x43BE
+
+# QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+SET 0xF0001E54 0x200
+
+# QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+SET 0xF0001E54 0x400
+# QSPI2_DATAENTRY0: LOCK4
+SET 0xF0001E64 0x43CA
+
+# QSPI2_FLAGSCLEAR: Clear TX flag. TXC=1
+SET 0xF0001E54 0x200
+
+# QSPI2_FLAGSCLEAR: Clear RX flag. RXC=1
+SET 0xF0001E54 0x400
+
+; switch off FLASH error traps
+SET 0xF80020A8 0x8000
+SET 0xF80020AC 0x8000
+
+[Controller0.Core0.Tc2CoreTargIntf.OnStartScript]
+
+[Controller0.Core0.Tc2CoreTargIntf.OnHaltScript]
+
+[Controller0.Core0.Tc2CoreTargIntf.Suspend]
+STM0=1
+
+[Controller0.PFLASH0]
+Enabled=1
+EnableMemtoolByDefault=1
+
+[Controller0.DF_EEPROM]
+Enabled=1
+EnableMemtoolByDefault=1
+
+[Controller0.Core0.DebugServer.DbgFramework]
+FRAMEWORK_COLOR=6008319
+
+[Controller0.Core0.Tc2CoreTargIntf.OnConnectScript]

@@ -240,10 +240,8 @@ int core0_main(int argc, char** argv)
 	//	Ifx_TestLED(3);
 
 	extern void stm_wait(uint32_t us);
-	for(uint8_t i=0; i<4; ++i)
-	{
-		for(uint32_t j=0; j<1000; ++j)
-		{
+	for(uint8_t i=0; i<4; ++i) {
+		for(uint32_t j=0; j<1000; ++j) {
 			stm_wait(500);
 		}
 		printf("%s STM Test Delay %u\n", _NEWLIB_VERSION, i);
@@ -273,8 +271,7 @@ int core0_main(int argc, char** argv)
 	execution does reach here, then it is highly probably that the heap size
 	is too small for the idle and/or timer tasks to be created within
 	vTaskStartScheduler(). */
-	while(1)
-	{
+	while(1) {
 		_nop();
 	}
 
@@ -523,8 +520,7 @@ void print_task(void *pvParameters)
 {
 	char info_buf[512];
 
-	while(1)
-	{
+	while(1) {
 		//		vTaskDelay(4000 / portTICK_PERIOD_MS);
 		//		if(NULL != Message_Queue)
 		//		{
@@ -584,15 +580,7 @@ void print_task(void *pvParameters)
 
 		SYSTEM_EnaDisCache(1);
 
-		//		tmp_dcon2.U = _mfcr( CPU_DCON2 );
-		//		printf("Data Cache Size:%u KB\n"\
-		//				"Data Scratch Size:%u KB\n",
-		//				tmp_dcon2.B.DCACHE_SZE,
-		//				tmp_dcon2.B.DSCRATCH_SZE);
-		//		flush_stdout();
-		//
-		//		SYSTEM_EnaDisCache(0);
-		printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
+		printf("Tricore %04X Core:%04X, network test CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
 				__TRICORE_NAME__,
 				__TRICORE_CORE__,
 				SYSTEM_GetCpuClock()/1000000,
@@ -602,81 +590,6 @@ void print_task(void *pvParameters)
 				system_GetIntClock()/1000000,
 				SYSTEM_IsCacheEnabled());
 		flush_stdout();
-
-		//		//Test The MD5 digest
-		//		uint8_t md5_result[16]={0};
-		//		md5((uint8_t*)test_content, sizeof(test_content), md5_result);
-		//		printf("\nThe Result:\n");
-		//		for(uint32_t i=0; i<sizeof(md5_result); ++i)
-		//		{
-		//			printf("%02x", md5_result[i]);
-		//		}
-		//		printf("\n");
-		//		flush_stdout();
-		//
-		//		//Test the SHA1 digest
-		//		uint8_t sha1_result[20] = {0};
-		//		sha1((uint8_t*)test_content, sizeof(test_content), sha1_result);
-		//		printf("\nThe Result:\n");
-		//		for(uint32_t i=0; i<sizeof(sha1_result); ++i)
-		//		{
-		//			printf("%02x", sha1_result[i]);
-		//		}
-		//		printf("\n");
-		//		flush_stdout();
-
-//		printf("Complex math test\n");
-//		for(uint8_t i=0; i<5; ++i)
-//		{
-//			double rad = i*2*M_PI/8;
-//			double _Complex z = cexp((__extension__ 1.0iF) * rad);
-//			double length = cabs(z);
-//			double arg = carg(z);
-//			double prj = cproj(z);
-//			double _Complex cnj = conj(z);
-//			printf("exp(i*%.3f) = [%.3f%, %.3f]\n",
-//					rad,
-//					creal(z),cimag(z) );
-//			printf("Length=%.3f, Arg=%.3f, Project=%.3f\n",
-//					length,
-//					arg,
-//					prj
-//			);
-//			printf("Conjulate=[%.3f%, %.3f]\n",
-//					creal(cnj),cimag(cnj)
-//			);
-//			flush_stdout();
-//
-//			double _Complex logv = clog(z);
-//			double _Complex pow2 = cpow(z, 2 + (__extension__ 1.0iF) *0);
-//			double _Complex sqrtv = csqrt(z);
-//			printf("log=[%.3f%, %.3f]\n",
-//					creal(logv),cimag(logv)
-//			);
-//			printf("pow2=[%.3f%, %.3f]\n",
-//					creal(pow2),cimag(pow2)
-//			);
-//			printf("sqrt=[%.3f%, %.3f]\n",
-//					creal(sqrtv),cimag(sqrtv)
-//			);
-//			flush_stdout();
-//
-//			double _Complex sinv = csin(z);
-//			double _Complex cosv = ccos(z);
-//			double _Complex tanv = ctan(z);
-//			printf("sin=[%.3f%, %.3f]\n",
-//					creal(sinv),cimag(sinv)
-//			);
-//			printf("cos=[%.3f%, %.3f]\n",
-//					creal(cosv),cimag(cosv)
-//			);
-//			printf("tan=[%.3f%, %.3f]\n",
-//					creal(tanv),cimag(tanv)
-//			);
-//
-//			printf("\n");
-//			flush_stdout();
-//		}
 
 		uint32_t NotifyValue = ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
 				portMAX_DELAY );/* Block indefinitely. */
@@ -700,18 +613,6 @@ void print_task(void *pvParameters)
 				printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
 				printf("%s\r\n",info_buf);
 
-				//				uint8_t* buffer;
-				//				uint32_t tmpA, tmpB, tmpC, tmpD;
-				//				tmpA = xPortGetFreeHeapSize();
-				//				buffer = pvPortMalloc(1024);
-				//				tmpB = xPortGetFreeHeapSize();
-				//				if(buffer!=NULL)
-				//				{
-				//					vPortFree(buffer);
-				//					tmpC = xPortGetFreeHeapSize();
-				//					buffer = NULL;
-				//				}
-				//				printf("FreeMem3:\t %u %u %u\n", tmpA, tmpB, tmpC);
 				printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
 						__TRICORE_NAME__,
 						__TRICORE_CORE__,
