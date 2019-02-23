@@ -10,112 +10,55 @@
 #include "net.h"
 #include "timer.h"
 
-extern volatile uint16_t g_adc_buf[2];
-
 extern const uint8_t g_ip_addr[4];
 extern const uint8_t g_mac_addr[6];
 
-#if(0 != UDP_TEST_SUPPORT)
-#define TEST_UDP_PORT	((uint16_t)1200)
-static uint8_t udp_buf[MAX_FRAMELEN];
-#else
-#warning udp test disabled
-#endif //#if(0 != UDP_TEST_SUPPORT)
-
 static uint8_t net_buf[MAX_FRAMELEN];
-
-int32_t g_tmpK;
 
 const char ON_STR[] = "On";
 const char OFF_STR[] = "Off";
 
-const char ON_05_STR[] = "On05";
-const char OFF_05_STR[] = "Off05";
-const char ON_06_STR[] = "On06";
-const char OFF_06_STR[] = "Off06";
-const char ON_07_STR[] = "On07";
-const char OFF_07_STR[] = "Off07";
-const char ON_14_STR[] = "On14";
-const char OFF_14_STR[] = "Off14";
-const char ON_15_STR[] = "On15";
-const char OFF_15_STR[] = "Off15";
+const char ON_0_STR[] = "On0";
+const char OFF_0_STR[] = "Off0";
+const char ON_1_STR[] = "On1";
+const char OFF_1_STR[] = "Off1";
+const char ON_2_STR[] = "On2";
+const char OFF_2_STR[] = "Off2";
+const char ON_3_STR[] = "On3";
+const char OFF_3_STR[] = "Off3";
 
 #define LED_ON_STAT		0
 #define LED_OFF_STAT	1
 
-void LD_05_ON(void){
-	led_on(0);
-}
-
-void LD_05_OFF(void){
-	led_off(0);
-}
-
-uint32_t LD_05_Stat(void) {
-	return led_stat(0);
-}
-
-void LD_06_ON(void){
-	led_on(1);
-}
-
-void LD_06_OFF(void){
-	led_off(1);
-}
-
-uint32_t LD_06_Stat(void) {
-	return led_stat(1);
-}
-
-//Note LD_07 is positive control logic, other LDs are negative control logic
-void LD_07_ON(void){
-	led_on(2);
-}
-
-void LD_07_OFF(void){
-	led_off(2);
-}
-
-uint32_t LD_07_Stat(void) {
-	return led_stat(2);
-}
-
-void LD_14_ON(void){
-	led_on(3);
-}
-
-void LD_14_OFF(void){
-	led_off(3);
-}
-
-uint32_t LD_14_Stat(void) {
-	return led_stat(3);
-}
+#define CMD_LD0_ON	0x0100
+#define CMD_LD0_OFF	0x0000
+#define CMD_LD1_ON	0x0101
+#define CMD_LD1_OFF	0x0001
+#define CMD_LD2_ON	0x0102
+#define CMD_LD2_OFF	0x0002
+#define CMD_LD3_ON	0x0103
+#define CMD_LD3_OFF	0x0003
 
 int16_t analyse_get_url(char *str) {
 	char* p_str = str;
 
-	if (0==strncmp(p_str, ON_05_STR, strlen(ON_05_STR))) {
-		return 0x0105;
-	} else if (0==strncmp(p_str, OFF_05_STR, strlen(OFF_05_STR))) {
-		return 0x0005;
-	} else if (0==strncmp(p_str, ON_06_STR, strlen(ON_06_STR))) {
-		return 0x0106;
-	} else if (0==strncmp(p_str, OFF_06_STR, strlen(OFF_06_STR))) {
-		return 0x0006;
-	} else if (0==strncmp(p_str, ON_07_STR, strlen(ON_07_STR))) {
-		return 0x0107;
-	} else if (0==strncmp(p_str, OFF_07_STR, strlen(OFF_07_STR))) {
-		return 0x0007;
-	} else if (0==strncmp(p_str, ON_14_STR, strlen(ON_14_STR))) {
-		return 0x0114;
-	} else if (0==strncmp(p_str, OFF_14_STR, strlen(OFF_14_STR))) {
-		return 0x0014;
-	} else if (0==strncmp(p_str, ON_15_STR, strlen(ON_15_STR))) {
-		return 0x0115;
-	} else if (0==strncmp(p_str, OFF_15_STR, strlen(OFF_15_STR))) {
-		return 0x0015;
-	}else {
+	if (0==strncmp(p_str, ON_0_STR, strlen(ON_0_STR))) {
+		return CMD_LD0_ON;
+	} else if (0==strncmp(p_str, OFF_0_STR, strlen(OFF_0_STR))) {
+		return CMD_LD0_OFF;
+	} else if (0==strncmp(p_str, ON_1_STR, strlen(ON_1_STR))) {
+		return CMD_LD1_ON;
+	} else if (0==strncmp(p_str, OFF_1_STR, strlen(OFF_1_STR))) {
+		return CMD_LD1_OFF;
+	} else if (0==strncmp(p_str, ON_2_STR, strlen(ON_2_STR))) {
+		return CMD_LD2_ON;
+	} else if (0==strncmp(p_str, OFF_2_STR, strlen(OFF_2_STR))) {
+		return CMD_LD2_OFF;
+	} else if (0==strncmp(p_str, ON_3_STR, strlen(ON_3_STR))) {
+		return CMD_LD3_ON;
+	} else if (0==strncmp(p_str, OFF_3_STR, strlen(OFF_3_STR))) {
+		return CMD_LD3_OFF;
+	} else {
 		return(-1);
 	}
 }
@@ -136,9 +79,9 @@ uint16_t prepare_page(uint8_t *buf) {
 
 	sprintf((char*)tmp_compose_buf, "<p>DieTempSensor: %f 'C\r\n", read_dts_celsius());
 	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
-	plen=fill_tcp_data_p(buf,plen,("<p>Provided by Cortex M board\r\n"));
+	plen=fill_tcp_data_p(buf,plen,("<p>Simple Server on TC234 Appkit board\r\n"));
 
-	sprintf((char*)tmp_compose_buf, "<p>cpu: %u M, Sys:%u M, tick0:%08X, tick1:%08X, soft_spi:%u, newlib_v:%s\r\n",
+	sprintf((char*)tmp_compose_buf, "<p>cpu: %u M, Sys:%u M, STM0.TIM0:%08X, STM0.TIM1:%08X, soft_spi:%u, newlib:%s\r\n",
 			SYSTEM_GetCpuClock()/1000000,
 			SYSTEM_GetSysClock()/1000000,
 			MODULE_STM0.TIM0.U,
@@ -146,38 +89,10 @@ uint16_t prepare_page(uint8_t *buf) {
 			SOFT_SPI,
 			_NEWLIB_VERSION);
 	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);		
-//
-//	sprintf((char*)tmp_compose_buf,
-//			"<p>MAC Rev: 0x%02X VS:%08X VE:%08X VL:%08X\r\n",
-//			enc28j60getrev(),
-//			(uint32_t)VeneerStart,
-//			(uint32_t)VeneerEnd,
-//			(uint32_t)VeneerSize);
-//	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
 
-//	sprintf((char*)tmp_compose_buf,
-//			"<p>rcs:%08X rce:%08X rcl:%08X\r\n",
-//			(uint32_t)__ram_code_start,
-//			(uint32_t)__ram_code_end,
-//			(uint32_t)__ram_code_size);
-//	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
-
-//	sprintf((char*)tmp_compose_buf,
-//			"<p>hbs:%08X hbe:%08X hbl:%08X\r\n",
-//			(uint32_t)Heap_Bank1_Start,
-//			(uint32_t)Heap_Bank1_End,
-//			(uint32_t)Heap_Bank1_Size);
-//	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
-//
-//	sprintf((char*)tmp_compose_buf,
-//			"<p>isp:%08X ss:%08X\r\n",
-//			(uint32_t)__initial_sp,
-//			(uint32_t)stack_size);
-//	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
-
-	//LED 0.5 Control hypelink
-	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 05 Status:"));
-	if ((LED_ON_STAT == LD_05_Stat())){
+	//LED 0 Control hypelink
+	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 0 Status:"));
+	if ((LED_ON_STAT == led_stat(0))){
 		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
 		plen=fill_tcp_data_p(buf,plen,(ON_STR));
 		plen=fill_tcp_data_p(buf,plen,("</font>"));
@@ -191,16 +106,16 @@ uint16_t prepare_page(uint8_t *buf) {
 	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
 			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
 	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
-	if ((LED_ON_STAT == LD_05_Stat())){
-		plen=fill_tcp_data_p(buf,plen,(OFF_05_STR));
+	if ((LED_ON_STAT == led_stat(0))){
+		plen=fill_tcp_data_p(buf,plen,(OFF_0_STR));
 	}else{
-		plen=fill_tcp_data_p(buf,plen,(ON_05_STR));
+		plen=fill_tcp_data_p(buf,plen,(ON_0_STR));
 	}
 	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
 
-	//LED 0.6 Control hypelink
-	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 06 Status:"));
-	if ((LED_ON_STAT == LD_06_Stat())){
+	//LED 1 Control hypelink
+	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 1 Status:"));
+	if ((LED_ON_STAT == led_stat(1))){
 		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
 		plen=fill_tcp_data_p(buf,plen,(ON_STR));
 		plen=fill_tcp_data_p(buf,plen,("</font>"));
@@ -214,16 +129,16 @@ uint16_t prepare_page(uint8_t *buf) {
 	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
 			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
 	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
-	if ((LED_ON_STAT == LD_06_Stat())){
-		plen=fill_tcp_data_p(buf,plen,(OFF_06_STR));
+	if ((LED_ON_STAT == led_stat(1))){
+		plen=fill_tcp_data_p(buf,plen,(OFF_1_STR));
 	}else{
-		plen=fill_tcp_data_p(buf,plen,(ON_06_STR));
+		plen=fill_tcp_data_p(buf,plen,(ON_1_STR));
 	}
 	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
 
-	//LED 0.7 Control hypelink
-	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 07 Status:"));
-	if ((LED_ON_STAT == LD_07_Stat())){
+	//LED 2 Control hypelink
+	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 2 Status:"));
+	if ((LED_ON_STAT == led_stat(2))){
 		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
 		plen=fill_tcp_data_p(buf,plen,(ON_STR));
 		plen=fill_tcp_data_p(buf,plen,("</font>"));
@@ -237,16 +152,16 @@ uint16_t prepare_page(uint8_t *buf) {
 	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
 			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
 	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
-	if ((LED_ON_STAT == LD_07_Stat())){
-		plen=fill_tcp_data_p(buf,plen,(OFF_07_STR));
+	if ((LED_ON_STAT == led_stat(2))){
+		plen=fill_tcp_data_p(buf,plen,(OFF_2_STR));
 	}else{
-		plen=fill_tcp_data_p(buf,plen,(ON_07_STR));
+		plen=fill_tcp_data_p(buf,plen,(ON_2_STR));
 	}
 	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
 
-	//LED 1.4 Control hypelink
-	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 14 Status:"));
-	if ((LED_ON_STAT == LD_14_Stat())){
+	//LED 3 Control hypelink
+	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 3 Status:"));
+	if ((LED_ON_STAT == led_stat(3))){
 		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
 		plen=fill_tcp_data_p(buf,plen,(ON_STR));
 		plen=fill_tcp_data_p(buf,plen,("</font>"));
@@ -260,10 +175,10 @@ uint16_t prepare_page(uint8_t *buf) {
 	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
 			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
 	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
-	if ((LED_ON_STAT == LD_14_Stat())){
-		plen=fill_tcp_data_p(buf,plen,(OFF_14_STR));
+	if ((LED_ON_STAT == led_stat(3))){
+		plen=fill_tcp_data_p(buf,plen,(OFF_3_STR));
 	}else{
-		plen=fill_tcp_data_p(buf,plen,(ON_14_STR));
+		plen=fill_tcp_data_p(buf,plen,(ON_3_STR));
 	}
 	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
 
@@ -280,7 +195,7 @@ uint16_t prepare_page(uint8_t *buf) {
 	plen=fill_tcp_data_p(buf,plen,("</body>\r\n"));
 	plen=fill_tcp_data_p(buf,plen,("</html>\r\n"));	
 
-	printf("web page len:%u\n", plen);
+	printf("content len:%u\n", plen);
 
 	return plen;
 }
@@ -300,7 +215,6 @@ void server_loop(void) {
 	uint16_t payloadlen=0;
 	int16_t cmd16;
 
-	//init the ethernet/ip layer:
 	while(true){
 		plen = enc28j60PacketReceive(MAX_FRAMELEN, net_buf);
 
@@ -356,43 +270,41 @@ void server_loop(void) {
 					plen=fill_tcp_data_p(net_buf,0,("HTTP/1.0 401 Unauthorized\r\nContent-Type: text/html\r\n\r\n<h1>401 Unauthorized</h1>"));
 					goto SENDTCP;
 				}
-				if (0x0105 == cmd16)	{
-					if(LED_ON_STAT != LD_05_Stat()) {
-						LD_05_ON();
-						printf(" O05 ");
+				if (CMD_LD0_ON == cmd16)	{
+					if(LED_ON_STAT != led_stat(0)) {
+						led_on(0);
 					} else {
-						printf(" N05 ");
+						;
 					}
-				} else if (0x0005 == cmd16) {
-					if(LED_OFF_STAT != LD_05_Stat()) {
-						LD_05_OFF();
-						printf(" F05 ");
+				} else if (CMD_LD0_OFF == cmd16) {
+					if(LED_OFF_STAT != led_stat(0)) {
+						led_off(0);
 					} else {
-						printf(" G05 ");
+						;
 					}
-				} else if (0x0106 == cmd16)	{
-					if(LED_ON_STAT != LD_06_Stat()) {
-						LD_06_ON();
+				} else if (CMD_LD1_ON == cmd16)	{
+					if(LED_ON_STAT != led_stat(1)) {
+						led_on(1);
 					}
-				} else if (0x0006 == cmd16) {
-					if(LED_OFF_STAT != LD_06_Stat()) {
-						LD_06_OFF();
+				} else if (CMD_LD1_OFF == cmd16) {
+					if(LED_OFF_STAT != led_stat(1)) {
+						led_off(1);
 					}
-				} else if (0x0107 == cmd16)	{
-					if(LED_ON_STAT != LD_07_Stat()) {
-						LD_07_ON();
+				} else if (CMD_LD2_ON == cmd16)	{
+					if(LED_ON_STAT != led_stat(2)) {
+						led_on(2);
 					}
-				} else if (0x0007 == cmd16) {
-					if(LED_OFF_STAT != LD_07_Stat()) {
-						LD_07_OFF();
+				} else if (CMD_LD2_OFF == cmd16) {
+					if(LED_OFF_STAT != led_stat(2)) {
+						led_off(2);
 					}
-				} else if (0x0114 == cmd16)	{
-					if(LED_ON_STAT != LD_14_Stat()) {
-						LD_14_ON();
+				} else if (CMD_LD3_ON == cmd16)	{
+					if(LED_ON_STAT != led_stat(3)) {
+						led_on(3);
 					}
-				} else if (0x0014 == cmd16) {
-					if(LED_OFF_STAT != LD_14_Stat()) {
-						LD_14_OFF();
+				} else if (CMD_LD3_OFF == cmd16) {
+					if(LED_OFF_STAT != led_stat(3)) {
+						led_off(3);
 					}
 				}
 				//Update Web Page Content
@@ -405,24 +317,7 @@ void server_loop(void) {
 				make_tcp_ack_with_data(net_buf,plen);
 				continue;
 			}
-		}
-#if(0 != UDP_TEST_SUPPORT)
-		else if ( (net_buf[IP_PROTO_P]==IP_PROTO_UDP_V)&&
-				(net_buf[UDP_DST_PORT_H_P]==(TEST_UDP_PORT>>8))&&
-				(net_buf[UDP_DST_PORT_L_P]==(uint8_t)TEST_UDP_PORT) ) {
-			//Process UDP Packet with port TEST_UDP_PORT
-			payloadlen=	net_buf[UDP_LEN_H_P];
-			payloadlen = payloadlen<<8;
-			payloadlen = (payloadlen+net_buf[UDP_LEN_L_P])-UDP_HEADER_LEN;
-
-			for(uint16_t i=0; i<payloadlen; i++){
-				udp_buf[i]=net_buf[UDP_DATA_P+i];
-			}
-
-			make_udp_reply_from_request(net_buf,udp_buf, payloadlen, TEST_UDP_PORT);
-		}
-#endif //#if(0 != UDP_TEST_SUPPORT)
-		else {
+		} else {
 			//;
 		}
 	}

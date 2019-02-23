@@ -20,7 +20,6 @@
 #include TC_INCLUDE(TCPATH/IfxCpu_reg.h)
 #include TC_INCLUDE(TCPATH/IfxCpu_bf.h)
 
-/* AppKit-TC2X4: P13.0 .. P13.3 --> LED D107 ... D110 */
 #define	PORT_LED	MODULE_P13
 
 void led_on(uint8_t n) {
@@ -67,16 +66,16 @@ void led_off(uint8_t n) {
 uint32_t led_stat(uint8_t n) {
 	switch (n) {
 	case 0:
-		return PORT_LED.OMR.B.PCL0;
+		return PORT_LED.IN.B.P0;
 		break;
 	case 1:
-		return PORT_LED.OMR.B.PCL1;
+		return PORT_LED.IN.B.P1;
 		break;
 	case 2:
-		return PORT_LED.OMR.B.PCL2;
+		return PORT_LED.IN.B.P2;
 		break;
 	case 3:
-		return PORT_LED.OMR.B.PCL3;
+		return PORT_LED.IN.B.P3;
 		break;
 
 	default:
@@ -105,11 +104,13 @@ void led_toggle(uint8_t n) {
 }
 
 void led_init(void) {
-	/* Initialize all LEDs (P13.0 .. P13.3) */
-	PORT_LED.IOCR0.B.PC0 = OUT_ODGPIO;
-	PORT_LED.IOCR0.B.PC1 = OUT_ODGPIO;
-	PORT_LED.IOCR0.B.PC2 = OUT_ODGPIO;
-	PORT_LED.IOCR0.B.PC3 = OUT_ODGPIO;
+	// Initialize all LEDs (P13.0 .. P13.3) -> D107 ... D110
+	// The LEDs are controlled by negative logic, so both of open-drain output and push-pull work
+	// But only in push-pull output method, the pin state could be read back via IN register
+	PORT_LED.IOCR0.B.PC0 = OUT_PPGPIO;
+	PORT_LED.IOCR0.B.PC1 = OUT_PPGPIO;
+	PORT_LED.IOCR0.B.PC2 = OUT_PPGPIO;
+	PORT_LED.IOCR0.B.PC3 = OUT_PPGPIO;
 
 	/* all LEDs OFF */
 	PORT_LED.OMR.B.PS0 = 1;

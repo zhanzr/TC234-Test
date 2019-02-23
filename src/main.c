@@ -49,26 +49,6 @@
 
 #include "partest.h"
 
-#include "md5.h"
-#include "sha1.h"
-
-const uint32_t test_content[] = {0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
-		0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
-		0x698098d8, 0x8b44f7af, 0xffff5bb1, 0x895cd7be,
-		0x6b901122, 0xfd987193, 0xa679438e, 0x49b40821,
-		0xf61e2562, 0xc040b340, 0x265e5a51, 0xe9b6c7aa,
-		0xd62f105d, 0x02441453, 0xd8a1e681, 0xe7d3fbc8,
-		0x21e1cde6, 0xc33707d6, 0xf4d50d87, 0x455a14ed,
-		0xa9e3e905, 0xfcefa3f8, 0x676f02d9, 0x8d2a4c8a,
-		0xfffa3942, 0x8771f681, 0x6d9d6122, 0xfde5380c,
-		0xa4beea44, 0x4bdecfa9, 0xf6bb4b60, 0xbebfbc70,
-		0x289b7ec6, 0xeaa127fa, 0xd4ef3085, 0x04881d05,
-		0xd9d4d039, 0xe6db99e5, 0x1fa27cf8, 0xc4ac5665,
-		0xf4292244, 0x432aff97, 0xab9423a7, 0xfc93a039,
-		0x655b59c3, 0x8f0ccc92, 0xffeff47d, 0x85845dd1,
-		0x6fa87e4f, 0xfe2ce6e0, 0xa3014314, 0x4e0811a1,
-		0xf7537e82, 0xbd3af235, 0x2ad7d2bb, 0xeb86d391};
-
 #define MESSAGE_Q_NUM   2
 QueueHandle_t Message_Queue;
 
@@ -77,15 +57,6 @@ SemaphoreHandle_t BinarySemaphore;
 SemaphoreHandle_t CountSemaphore;
 
 SemaphoreHandle_t MutexSemaphore;
-
-TimerHandle_t 	AutoReloadTimer_Handle;
-TimerHandle_t	OneShotTimer_Handle;
-
-EventGroupHandle_t EventGroupHandler;
-#define EVENTBIT_0	(1<<0)
-#define EVENTBIT_1	(1<<1)
-#define EVENTBIT_2	(1<<2)
-#define EVENTBIT_ALL	(EVENTBIT_0|EVENTBIT_1|EVENTBIT_2)
 /*----------------------------------------------------------*/
 
 /* Constants for the ComTest tasks. */
@@ -109,21 +80,16 @@ TaskHandle_t StartTask_Handler;
 void start_task(void *pvParameters);
 
 TaskHandle_t g_task0_handler;
-void led0_task(void *pvParameters);
-
-TaskHandle_t g_task1_handler;
-void led1_task(void *pvParameters);
+void maintaince_task(void *pvParameters);
 
 TaskHandle_t g_info_task_handler;
 void print_task(void *pvParameters);
 
-void test_tlf35584(void)
-{
+void test_tlf35584(void) {
 	tlf35584_cmd_t tmp_tlf_cmd;
 	tlf35584_cmd_t res_tlf_cmd;
 
-	for(uint8_t i=0; i<0x34; ++i)
-	{
+	for(uint8_t i=0; i<0x34; ++i) {
 		tmp_tlf_cmd.B.cmd = 0;
 		tmp_tlf_cmd.B.addr = i;
 		tmp_tlf_cmd.B.data = 0;
@@ -197,10 +163,6 @@ int core0_main(int argc, char** argv) {
 	uart_init(mainCOM_TEST_BAUD_RATE);
 
 	config_dts();
-	//	config_gpsr();
-	//	config_eru();
-	//	config_dflash();
-	//	enable_performance_cnt();
 
 	printf("%s %s\n", _NEWLIB_VERSION, __func__);
 
@@ -211,23 +173,15 @@ int core0_main(int argc, char** argv) {
 			"EmuDevice?%s\n" \
 			"Flash SIZE:%u KB\n"\
 			"HSM:%s\n"\
-			"SpeedGrade:%X\n"\
-			"FlashVer:%X\n",
+			"SpeedGrade:%X\n",
 			MODULE_SCU.CHIPID.B.CHID,
 			(MODULE_SCU.CHIPID.B.CHREV/0x10)+'A',
 			MODULE_SCU.CHIPID.B.CHTEC,
 			(MODULE_SCU.CHIPID.B.EEA==1)?"Yes":"No",
 					FLASH_SIZE_TABLE_KB[MODULE_SCU.CHIPID.B.FSIZE%0x0c],
 					(MODULE_SCU.CHIPID.B.SEC==1)?"Yes":"No",
-							MODULE_SCU.CHIPID.B.SP,
-							MODULE_SCU.CHIPID.B.UCODE
-	);
-	flush_stdout();
-
-	printf("DEPT:%s MANUF:%s\n",
-			(0==MODULE_SCU.MANID.B.DEPT)?"ATV Microcontroller department":"Unknown",
-					(0xc1==MODULE_SCU.MANID.B.MANUF)?"Infineon Technologies":"Unknown"
-	);
+							MODULE_SCU.CHIPID.B.SP
+							);
 	flush_stdout();
 
 	printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,CE:%d\n",
@@ -240,20 +194,9 @@ int core0_main(int argc, char** argv) {
 			SYSTEM_IsCacheEnabled());
 	flush_stdout();
 
-	//	Ifx_TestLED(3);
-
-//	extern void stm_wait(uint32_t us);
-//	for(uint8_t i=0; i<4; ++i) {
-//		for(uint32_t j=0; j<1000; ++j) {
-//			stm_wait(500);
-//		}
-//		printf("%s STM Test Delay %u\n", _NEWLIB_VERSION, i);
-//	}
 	_syscall(200);
 
-	test_tlf35584();
-
-	//	test_dma_crc();
+//	test_tlf35584();
 
 	interface_init();
 	protocol_init();
@@ -286,62 +229,6 @@ int core0_main(int argc, char** argv) {
 	return EXIT_SUCCESS;
 }
 
-
-/*-----------------------------------------------------------*/
-void AutoReloadCallback(TimerHandle_t xTimer)
-{
-	if(NULL != OneShotTimer_Handle)
-	{
-		xTimerStart(OneShotTimer_Handle,0);
-	}
-
-	if(EventGroupHandler!=NULL)
-	{
-		xEventGroupSetBits(EventGroupHandler,EVENTBIT_1);
-	}
-
-	//	xTaskNotify( g_task0_handler, 1, eSetValueWithOverwrite);
-	//	xTaskNotify( g_task1_handler, 2, eSetValueWithOverwrite);
-	//	xTaskNotify( g_info_task_handler, 3, eSetValueWithOverwrite);
-	start_dts_measure();
-	vParTestToggleLED(2);
-}
-
-void OneShotCallback(TimerHandle_t xTimer)
-{
-	char info_buf[256];
-
-	vParTestToggleLED(0);
-	vParTestToggleLED(1);
-
-	if(EventGroupHandler!=NULL)
-	{
-		xEventGroupSetBits(EventGroupHandler,EVENTBIT_0);
-	}
-
-	if(NULL != BinarySemaphore)
-	{
-		if(pdTRUE == xSemaphoreTake(BinarySemaphore, portMAX_DELAY))
-		{
-			vTaskList(info_buf);
-			if(NULL != MutexSemaphore)
-			{
-				if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
-				{
-					//					printf("%s,TaskList Len:%d\r\n",
-					//							pcTaskGetName(NULL),
-					//							strlen(info_buf));
-					//					printf("%s\r\n",info_buf);
-
-					xSemaphoreGive(MutexSemaphore);
-				}
-			}
-
-			xSemaphoreGive(BinarySemaphore);
-		}
-	}
-}
-
 void start_task(void *pvParameters)
 {
 	Message_Queue = xQueueCreate(MESSAGE_Q_NUM, sizeof(uint32_t));
@@ -350,38 +237,12 @@ void start_task(void *pvParameters)
 
 	MutexSemaphore = xSemaphoreCreateMutex();
 
-	AutoReloadTimer_Handle=xTimerCreate((const char*		)"AT",
-			(TickType_t			)1000 / portTICK_PERIOD_MS,
-			(UBaseType_t		)pdTRUE,
-			(void*				)1,
-			(TimerCallbackFunction_t)AutoReloadCallback);
-
-	OneShotTimer_Handle=xTimerCreate((const char*			)"OT",
-			(TickType_t			)500 / portTICK_PERIOD_MS,
-			(UBaseType_t			)pdFALSE,
-			(void*					)2,
-			(TimerCallbackFunction_t)OneShotCallback);
-
-	EventGroupHandler = xEventGroupCreate();
-
-	if(NULL != AutoReloadTimer_Handle)
-	{
-		xTimerStart(AutoReloadTimer_Handle, 0);
-	}
-
-	xTaskCreate((TaskFunction_t )led0_task,
-			(const char*    )"led0_task",
+	xTaskCreate((TaskFunction_t )maintaince_task,
+			(const char*    )"maintaince_task",
 			(uint16_t       )768,
 			(void*          )NULL,
 			(UBaseType_t    )tskIDLE_PRIORITY + 2,
 			(TaskHandle_t*  )&g_task0_handler);
-
-	xTaskCreate((TaskFunction_t )led1_task,
-			(const char*    )"led1_task",
-			(uint16_t       )768,
-			(void*          )NULL,
-			(UBaseType_t    )tskIDLE_PRIORITY + 2,
-			(TaskHandle_t*  )&g_task1_handler);
 
 	xTaskCreate((TaskFunction_t )print_task,
 			(const char*    )"print_task",
@@ -392,229 +253,32 @@ void start_task(void *pvParameters)
 	vTaskDelete(StartTask_Handler);
 }
 
-void led0_task(void *pvParameters)
-{
+void maintaince_task(void *pvParameters) {
 	char info_buf[512];
 	EventBits_t EventValue;
 
-	while(1)
-	{
-		//    	vParTestToggleLED(0);
-		//		vTaskDelay(4000 / portTICK_PERIOD_MS);
-		if(EventGroupHandler!=NULL)
-		{
-			EventValue = xEventGroupGetBits(EventGroupHandler);
-			if(NULL != MutexSemaphore)
-			{
-				if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
-				{
-					//					printf("<%s,ev:%08X\n",
-					//							pcTaskGetName(NULL),
-					//							(uint32_t)EventValue);
-					xSemaphoreGive(MutexSemaphore);
-				}
-			}
-
-			EventValue = xEventGroupWaitBits((EventGroupHandle_t	)EventGroupHandler,
-					(EventBits_t			)EVENTBIT_0,
-					(BaseType_t			)pdTRUE,
-					(BaseType_t			)pdTRUE,
-					(TickType_t			)portMAX_DELAY);
-
-			EventValue = xEventGroupGetBits(EventGroupHandler);
-			if(NULL != MutexSemaphore)
-			{
-				if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
-				{
-					//					printf(">%s,ev:%08X\n",
-					//							pcTaskGetName(NULL),
-					//							(uint32_t)EventValue);
-					xSemaphoreGive(MutexSemaphore);
-				}
-			}
-		}
-
-		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
-				portMAX_DELAY );/* Block indefinitely. */
-
+	while(1) {
 		vTaskList(info_buf);
-		if(NULL != MutexSemaphore)
-		{
-			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
-			{
-				printf("%s,TaskList Len:%d, %08X\r\n",
-						pcTaskGetName(NULL),
-						strlen(info_buf),
-						NotifyValue);
-				printf("%s\r\n",info_buf);
+		if(NULL != MutexSemaphore) {
+			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
 
-				xSemaphoreGive(MutexSemaphore);
-			}
-		}
-	}
-}
-
-void led1_task(void *pvParameters)
-{
-	char info_buf[512];
-	EventBits_t EventValue;
-
-	while(1)
-	{
-		//    	vParTestToggleLED(1);
-		//		vTaskDelay(4000 / portTICK_PERIOD_MS);
-		if(EventGroupHandler!=NULL)
-		{
-			EventValue = xEventGroupGetBits(EventGroupHandler);
-			if(NULL != MutexSemaphore)
-			{
-				if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
-				{
-					//					printf("<%s,ev:%08X\n",
-					//							pcTaskGetName(NULL),
-					//							(uint32_t)EventValue);
-					xSemaphoreGive(MutexSemaphore);
-				}
-			}
-
-			EventValue = xEventGroupWaitBits((EventGroupHandle_t	)EventGroupHandler,
-					(EventBits_t			)EVENTBIT_1,
-					(BaseType_t			)pdTRUE,
-					(BaseType_t			)pdTRUE,
-					(TickType_t			)portMAX_DELAY);
-
-			EventValue = xEventGroupGetBits(EventGroupHandler);
-			if(NULL != MutexSemaphore)
-			{
-				if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
-				{
-					//					printf(">%s,ev:%08X\n",
-					//							pcTaskGetName(NULL),
-					//							(uint32_t)EventValue);
-					xSemaphoreGive(MutexSemaphore);
-				}
-			}
-		}
-
-		if(NULL != Message_Queue)
-		{
-			uint32_t tmpTicks = xTaskGetTickCount();
-			xQueueSend(Message_Queue, &tmpTicks, 0);
-		}
-
-		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
-				portMAX_DELAY );/* Block indefinitely. */
-
-		vTaskList(info_buf);
-		if(NULL != MutexSemaphore)
-		{
-			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
-			{
-				printf("%s,TaskList Len:%d, %08X\r\n",
-						pcTaskGetName(NULL),
-						strlen(info_buf),
-						NotifyValue);
 				printf("%s\r\n",info_buf);
 
 				xSemaphoreGive(MutexSemaphore);
 			}
 		}
 
-
+		vTaskDelay(4000 / portTICK_PERIOD_MS);
 	}
 }
 
-void print_task(void *pvParameters)
-{
+void print_task(void *pvParameters) {
 	char info_buf[512];
 
 	while(1) {
-		//		vTaskDelay(4000 / portTICK_PERIOD_MS);
-		//		if(NULL != Message_Queue)
-		//		{
-		//			uint32_t tmpU32;
-		//			if(xQueueReceive(Message_Queue, &tmpU32, portMAX_DELAY))
-		//			{
-		//				mutex_printf("%08X\n", (uint32_t)&Message_Queue);
-		//				mutex_printf("CPU:%u Hz %u %u\n",
-		//						get_cpu_frequency(),
-		//						xTaskGetTickCount(),
-		//						tmpU32
-		//				);
-		//			}
-		//		}
-		//		else
-		//		{
-		//			mutex_printf("%08X\n", (uint32_t)&Message_Queue);
-		//		    vTaskDelay(1000 / portTICK_PERIOD_MS);
-		//		}
-
-		printf("%s %s\n", _NEWLIB_VERSION, __func__);
-		//		test_tlf35584();
-
-		const uint32_t FLASH_SIZE_TABLE_KB[]={256, 512, 1024, 1536, 2048, 2560, 3072, 4096, 5120, 1024*6, 1024*7, 1024*8};
-		printf("CHIPID:%X\n"\
-				"%c step\n" \
-				"AurixGen:%u\n"\
-				"EmuDevice?%s\n" \
-				"Flash SIZE:%u KB\n"\
-				"HSM:%s\n"\
-				"SpeedGrade:%X\n"\
-				"FlashVer:%X\n",
-				MODULE_SCU.CHIPID.B.CHID,
-				(MODULE_SCU.CHIPID.B.CHREV/0x10)+'A',
-				MODULE_SCU.CHIPID.B.CHTEC,
-				(MODULE_SCU.CHIPID.B.EEA==1)?"Yes":"No",
-						FLASH_SIZE_TABLE_KB[MODULE_SCU.CHIPID.B.FSIZE%0x0c],
-						(MODULE_SCU.CHIPID.B.SEC==1)?"Yes":"No",
-								MODULE_SCU.CHIPID.B.SP,
-								MODULE_SCU.CHIPID.B.UCODE
-		);
-		flush_stdout();
-
-		printf("DEPT:%s MANUF:%s\n",
-				(0==MODULE_SCU.MANID.B.DEPT)?"ATV Microcontroller department":"Unknown",
-						(0xc1==MODULE_SCU.MANID.B.MANUF)?"Infineon Technologies":"Unknown"
-		);
-		flush_stdout();
-
-		Ifx_CPU_DCON2 tmp_dcon2;
-		tmp_dcon2.U = _mfcr( CPU_DCON2 );
-		printf("Data Cache Size:%u KB\n"\
-				"Data Scratch Size:%u KB\n",
-				tmp_dcon2.B.DCACHE_SZE,
-				tmp_dcon2.B.DSCRATCH_SZE);
-		flush_stdout();
-
-		SYSTEM_EnaDisCache(1);
-
-		printf("Tricore %04X Core:%04X, network test CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
-				__TRICORE_NAME__,
-				__TRICORE_CORE__,
-				SYSTEM_GetCpuClock()/1000000,
-				SYSTEM_GetSysClock()/1000000,
-				SYSTEM_GetStmClock()/1000000,
-				system_GetPllClock()/1000000,
-				system_GetIntClock()/1000000,
-				SYSTEM_IsCacheEnabled());
-		flush_stdout();
-
-		uint32_t NotifyValue = ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
-				portMAX_DELAY );/* Block indefinitely. */
-		printf("DTS Triggered %.3f P15.4:%u\n",
-				read_dts_celsius(),
-				MODULE_P15.IN.B.P4);
-		flush_stdout();
-
 		vTaskList(info_buf);
-		if(NULL != MutexSemaphore)
-		{
-			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY))
-			{
-				printf("%s,TaskList Len:%d, %08X\r\n",
-						pcTaskGetName(NULL),
-						strlen(info_buf),
-						NotifyValue);
+		if(NULL != MutexSemaphore) {
+			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
 				printf("%s\r\n",info_buf);
 
 				vTaskGetRunTimeStats(info_buf);
@@ -636,30 +300,11 @@ void print_task(void *pvParameters)
 			}
 		}
 
-		//        if(NULL != CountSemaphore)
-		//        {
-		//        	if(pdTRUE == xSemaphoreTake(CountSemaphore, portMAX_DELAY))
-		//        	{
-		//        		vTaskList(info_buf);
-		//        		printf("TaskList Len:%d\r\n", strlen(info_buf));
-		//        		printf("%s\r\n",info_buf);
-		//
-		//        		vTaskGetRunTimeStats(info_buf);
-		//        		printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
-		//        		printf("%s\r\n",info_buf);
-		//
-		//        		uint32_t tmp_sema_cnt = uxSemaphoreGetCount(CountSemaphore);
-		//        		printf("SemaCnt %08X: %d\n", (uint32_t)&CountSemaphore, tmp_sema_cnt);
-		//                xSemaphoreGive(CountSemaphore);
-		//                tmp_sema_cnt = uxSemaphoreGetCount(CountSemaphore);
-		//        		printf("SemaCnt %08X: %d\n", (uint32_t)&CountSemaphore, tmp_sema_cnt);
-		//        	}
-		//        }
+		vTaskDelay(4000 / portTICK_PERIOD_MS);
 	}
 }
 
-static void prvSetupHardware( void )
-{
+static void prvSetupHardware( void ) {
 	system_clk_config_200_100();
 
 	/* activate interrupt system */
@@ -689,8 +334,7 @@ void vApplicationMallocFailedHook( void )
 }
 /*-----------------------------------------------------------*/
 
-void vApplicationTickHook( void )
-{
+void vApplicationTickHook( void ) {
 #if mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY != 1
 	{
 		/* vApplicationTickHook() will only be called if configUSE_TICK_HOOK is set
@@ -707,8 +351,7 @@ void vApplicationTickHook( void )
 
 /*-----------------------------------------------------------*/
 
-void vApplicationIdleHook( void )
-{
+void vApplicationIdleHook( void ) {
 	/* vApplicationIdleHook() will only be called if configUSE_IDLE_HOOK is set
 	to 1 in FreeRTOSConfig.h.  It will be called on each iteration of the idle
 	task.  It is essential that code added to this hook function never attempts

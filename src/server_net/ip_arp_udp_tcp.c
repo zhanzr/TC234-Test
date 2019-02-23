@@ -395,36 +395,3 @@ void make_tcp_ack_with_data(uint8_t *buf,uint32_t dlen) {
 	enc28j60PacketSend(IP_HEADER_LEN+TCP_HEADER_LEN_PLAIN+dlen+ETH_HEADER_LEN,buf);
 }
 
-#if(0 != UDP_TEST_SUPPORT)
-// you can send a max of 220 bytes of data
-void make_udp_reply_from_request(uint8_t *buf,char *data,uint32_t datalen,uint32_t port){
-	uint32_t i=0;
-	uint32_t ck;
-	make_eth(buf);
-
-	// total length field in the IP header must be set:
-	i= IP_HEADER_LEN+UDP_HEADER_LEN+datalen;
-	buf[IP_TOTLEN_H_P]=i>>8;
-	buf[IP_TOTLEN_L_P]=i;
-	make_ip(buf);
-	buf[UDP_DST_PORT_H_P]=port>>8;
-	buf[UDP_DST_PORT_L_P]=port & 0xff;
-	// source port does not matter and is what the sender used.
-	// calculte the udp length:
-	buf[UDP_LEN_H_P]=datalen>>8;
-	buf[UDP_LEN_L_P]=UDP_HEADER_LEN+datalen;
-	// zero the checksum
-	buf[UDP_CHECKSUM_H_P]=0;
-	buf[UDP_CHECKSUM_L_P]=0;
-	// copy the data:
-	while(i<datalen) {
-		buf[UDP_DATA_P+i]=data[i];
-		i++;
-	}
-	ck=checksum(&buf[IP_SRC_P], 16 + datalen,1);
-	buf[UDP_CHECKSUM_H_P]=ck>>8;
-	buf[UDP_CHECKSUM_L_P]=ck& 0xff;
-
-	enc28j60PacketSend(UDP_HEADER_LEN+IP_HEADER_LEN+ETH_HEADER_LEN+datalen,buf);
-}
-#endif //#if(0 != UDP_TEST_SUPPORT)

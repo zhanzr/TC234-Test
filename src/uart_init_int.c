@@ -13,8 +13,7 @@
 #include <machine/wdtcon.h>
 
 /* Initialise asynchronous interface to operate at baudrate,8,n,1 */
-void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_isr)(int arg))
-{
+void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_isr)(int arg)) {
 	/* install handlers for transmit and receive interrupts */
 	InterruptInstall(SRC_ID_ASCLIN0TX, uart_tx_isr, TXC_ISR_PRIO, 0);
 	InterruptInstall(SRC_ID_ASCLIN0RX, uart_rx_isr, RXD_ISR_PRIO, 0);
@@ -26,26 +25,25 @@ void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_i
 	port_UART->OMR.B.PS0 = 1;
 
 	uint32_t numerator;
-	switch (baudrate)
-	{
+	switch (baudrate) {
 	case   9600 :
-		numerator =   BAUD_9600;
+		numerator = NUMERATOR_BAUD_9600;
 		break;
 
 	case  19200 :
-		numerator =  BAUD_19200;
+		numerator = NUMERATOR_BAUD_19200;
 		break;
 
 	case  38400 :
-		numerator =  BAUD_38400;
+		numerator = NUMERATOR_BAUD_38400;
 		break;
 
 	case  57600 :
-		numerator =  BAUD_57600;
+		numerator = NUMERATOR_BAUD_57600;
 		break;
 
 	case 115200 :
-		numerator = BAUD_115200;
+		numerator =NUMERATOR_BAUD_115200;
 		break;
 
 	default:

@@ -27,14 +27,27 @@ void uart_init_poll(int baudrate)
 	/* baudrate values at 100 MHz */
 	denominator = 3125;
 
-	switch (baudrate)
-	{
-		case   9600 : numerator =   BAUD_9600; break;
-		case  19200 : numerator =  BAUD_19200; break;
-		default     :
-		case  38400 : numerator =  BAUD_38400; break;
-		case  57600 : numerator =  BAUD_57600; break;
-		case 115200 : numerator = BAUD_115200; break;
+	switch (baudrate){
+	case  9600 :
+		numerator =  NUMERATOR_BAUD_9600;
+		break;
+
+	case 19200 :
+		numerator = NUMERATOR_BAUD_19200;
+		break;
+
+	case 38400 :
+		numerator =  NUMERATOR_BAUD_38400;
+		break;
+
+	case 57600 :
+		numerator =  NUMERATOR_BAUD_57600;
+		break;
+
+	case 115200 :
+	default:
+		numerator = NUMERATOR_BAUD_115200;
+		break;
 	}
 
 	/* Enable ASCn */

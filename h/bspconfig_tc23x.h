@@ -55,11 +55,11 @@ static Ifx_P * const port_UART = (Ifx_P *)&MODULE_P14;
 #define UARTBASE				asclin0
 
 /* baud rate values at SysClock 100 MHz */
-#define BAUD_9600				(48 * 1)
-#define BAUD_19200				(48 * 2)
-#define BAUD_38400				(48 * 4)
-#define BAUD_57600				(48 * 6)
-#define BAUD_115200				(48 * 12)
+#define NUMERATOR_BAUD_9600				(48 * 1)
+#define NUMERATOR_BAUD_19200			(48 * 2)
+#define NUMERATOR_BAUD_38400			(48 * 4)
+#define NUMERATOR_BAUD_57600			(48 * 6)
+#define NUMERATOR_BAUD_115200			(48 * 12)
 
 /* Port Modes */
 #define IN_NOPULL0				0x00	/* Port Input No Pull Device */

@@ -243,9 +243,6 @@
 //#define SOFT_SPI	0
 #define SOFT_SPI	1
 
-#define UDP_TEST_SUPPORT	0
-//#define UDP_TEST_SUPPORT	1
-
 void spi_init(void);
 
 void enc28j60Init(const uint8_t* macaddr);
