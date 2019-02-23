@@ -288,6 +288,7 @@
     <InputSection Name="wm4.net.h.2.8d6771dd21546b3708c9043ee7b4a3b8"/>
     <InputSection Name="wm4.bspconfig_tc23x.h.55.e1d87cb2991eb49856b6a701bdf32c1d"/>
     <InputSection Name="wm4.enc28j60.h.2.c45d4928729f2bf853b38f9335d8b1e5"/>
+    <InputSection Name="wm4.net.h.2.dc9a3e35f4e8cf81bdc2e152d2d819f2"/>
   </Input>
   <Files>
     <ObjectFile Name="src\system_tc23x.o"/>

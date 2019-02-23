@@ -100,4 +100,16 @@
 
 #define HTTP_PORT	80
 
+#define LED_ON_STAT		0
+#define LED_OFF_STAT	1
+
+#define CMD_LD0_ON	0x0100
+#define CMD_LD0_OFF	0x0000
+#define CMD_LD1_ON	0x0101
+#define CMD_LD1_OFF	0x0001
+#define CMD_LD2_ON	0x0102
+#define CMD_LD2_OFF	0x0002
+#define CMD_LD3_ON	0x0103
+#define CMD_LD3_OFF	0x0003
+
 #endif
