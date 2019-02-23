@@ -162,8 +162,6 @@ extern void server_loop(void);
 extern const uint8_t g_ip_addr[4];
 extern const uint8_t g_mac_addr[6];
 
-volatile uint8_t net_buf[MAX_FRAMELEN];
-
 const char ON_STR[] = "On";
 const char OFF_STR[] = "Off";
 
@@ -202,7 +200,7 @@ int16_t analyse_get_url(char *str) {
 
 uint16_t prepare_page(uint8_t *buf) {
 	uint16_t plen;
-	uint8_t tmp_compose_buf[128];
+	uint8_t tmp_compose_buf[512];
 
 	plen=fill_tcp_data_p(buf,0,("HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nPragma: no-cache\r\n\r\n"));
 
@@ -216,7 +214,7 @@ uint16_t prepare_page(uint8_t *buf) {
 
 	sprintf((char*)tmp_compose_buf, "<p>DieTempSensor: %f 'C\r\n", read_dts_celsius());
 	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
-	plen=fill_tcp_data_p(buf,plen,("<p>Simple Server on TC234 Appkit board\r\n"));
+	plen=fill_tcp_data_p(buf,plen,("<p>Server on TC234 Appkit board\r\n"));
 
 	sprintf((char*)tmp_compose_buf, "<p>cpu: %u M, Sys:%u M, STM0.TIM1:%08X, soft_spi:%u, newlib:%s\r\n",
 			SYSTEM_GetCpuClock()/1000000,
@@ -318,6 +316,16 @@ uint16_t prepare_page(uint8_t *buf) {
 	}
 	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
 
+	//Task Information
+	plen=fill_tcp_data_p(buf,plen,("\r\n<p>TaskList:\r\n"));
+	vTaskList(tmp_compose_buf);
+	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
+	plen=fill_tcp_data_p(buf,plen,("\r\n"));
+	plen=fill_tcp_data_p(buf,plen,("\r\n<p>RunTimeStats:\r\n"));
+	vTaskGetRunTimeStats(tmp_compose_buf);
+	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
+	plen=fill_tcp_data_p(buf,plen,("\r\n"));
+
 	//Refresh hypelink
 	plen=fill_tcp_data_p(buf,plen,("<p><a href=\""));
 	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
@@ -384,14 +392,14 @@ int core0_main(int argc, char** argv) {
 			SYSTEM_IsCacheEnabled());
 	flush_stdout();
 
-	_syscall(200);
+	_syscall(101);
 
 //	test_tlf35584();
 
 	interface_init();
 	protocol_init();
 
-	server_loop();
+//	server_loop();
 
 	/* The following function will only create more tasks and timers if
 	mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY is set to 0 (at the top of this
@@ -419,78 +427,178 @@ int core0_main(int argc, char** argv) {
 	return EXIT_SUCCESS;
 }
 
-void start_task(void *pvParameters)
-{
+void start_task(void *pvParameters) {
 	Message_Queue = xQueueCreate(MESSAGE_Q_NUM, sizeof(uint32_t));
 
 	CountSemaphore = xSemaphoreCreateCounting(2, 2);
 
 	MutexSemaphore = xSemaphoreCreateMutex();
 
-//	xTaskCreate((TaskFunction_t )maintaince_task,
-//			(const char*    )"maintaince_task",
-//			(uint16_t       )768,
-//			(void*          )NULL,
-//			(UBaseType_t    )tskIDLE_PRIORITY + 2,
-//			(TaskHandle_t*  )&g_task0_handler);
+	xTaskCreate((TaskFunction_t )maintaince_task,
+			(const char*    )"maintaince_task",
+			(uint16_t       )768,
+			(void*          )NULL,
+			(UBaseType_t    )tskIDLE_PRIORITY + 1,
+			(TaskHandle_t*  )&g_task0_handler);
 
 	xTaskCreate((TaskFunction_t )print_task,
 			(const char*    )"print_task",
-			(uint16_t       )14*1024,
+			(uint16_t       )10*1024,
 			(void*          )NULL,
 			(UBaseType_t    )tskIDLE_PRIORITY + 2,
 			(TaskHandle_t*  )&g_info_task_handler);
 	vTaskDelete(StartTask_Handler);
 }
 
-//void maintaince_task(void *pvParameters) {
+void maintaince_task(void *pvParameters) {
 //	char info_buf[512];
-//	EventBits_t EventValue;
-//
-//	while(1) {
+
+	while(1) {
 //		vTaskList(info_buf);
 //		if(NULL != MutexSemaphore) {
 //			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
-//
 //				printf("%s\r\n",info_buf);
+//
+//				vTaskGetRunTimeStats(info_buf);
+//				printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
+//				printf("%s\r\n",info_buf);
+//
+//				printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
+//						__TRICORE_NAME__,
+//						__TRICORE_CORE__,
+//						SYSTEM_GetCpuClock()/1000000,
+//						SYSTEM_GetSysClock()/1000000,
+//						SYSTEM_GetStmClock()/1000000,
+//						system_GetPllClock()/1000000,
+//						system_GetIntClock()/1000000,
+//						SYSTEM_IsCacheEnabled());
+//				flush_stdout();
 //
 //				xSemaphoreGive(MutexSemaphore);
 //			}
 //		}
-//
-//		vTaskDelay(4000 / portTICK_PERIOD_MS);
-//	}
-//}
+		start_dts_measure();
+
+		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
+						portMAX_DELAY );/* Block indefinitely. */
+		vTaskDelay(40 / portTICK_PERIOD_MS);
+	}
+}
 
 void print_task(void *pvParameters) {
 	char info_buf[512];
+	volatile uint8_t net_buf[MAX_FRAMELEN];
 
-	while(1) {
-		vTaskList(info_buf);
-		if(NULL != MutexSemaphore) {
-			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
-				printf("%s\r\n",info_buf);
+	uint16_t payloadlen;
+	uint16_t dat_p;
+	int16_t cmd16;
 
-				vTaskGetRunTimeStats(info_buf);
-				printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
-				printf("%s\r\n",info_buf);
+	while(true) {
+		payloadlen = enc28j60PacketReceive(MAX_FRAMELEN, net_buf);
 
-				printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
-						__TRICORE_NAME__,
-						__TRICORE_CORE__,
-						SYSTEM_GetCpuClock()/1000000,
-						SYSTEM_GetSysClock()/1000000,
-						SYSTEM_GetStmClock()/1000000,
-						system_GetPllClock()/1000000,
-						system_GetIntClock()/1000000,
-						SYSTEM_IsCacheEnabled());
-				flush_stdout();
-
-				xSemaphoreGive(MutexSemaphore);
+		if(payloadlen==0) {
+			vTaskDelay(20 / portTICK_PERIOD_MS);
+			continue;
+		} else if(eth_type_is_arp_and_my_ip(net_buf,payloadlen)) {
+			//Process ARP Request
+			make_arp_answer_from_request(net_buf);
+			continue;
+		} else if(eth_type_is_ip_and_my_ip(net_buf,payloadlen)==0) {
+			//Only Process IP Packet destinated at me
+			printf("$");
+			continue;
+		} else if(net_buf[IP_PROTO_P]==IP_PROTO_ICMP_V && net_buf[ICMP_TYPE_P]==ICMP_TYPE_ECHOREQUEST_V){
+			//Process ICMP packet
+			printf("Rxd ICMP from [%d.%d.%d.%d]\n",net_buf[ETH_ARP_SRC_IP_P],net_buf[ETH_ARP_SRC_IP_P+1],
+					net_buf[ETH_ARP_SRC_IP_P+2],net_buf[ETH_ARP_SRC_IP_P+3]);
+			make_echo_reply_from_request(net_buf, payloadlen);
+			continue;
+		} else if (net_buf[IP_PROTO_P]==IP_PROTO_TCP_V&&net_buf[TCP_DST_PORT_H_P]==0&&net_buf[TCP_DST_PORT_L_P]==HTTP_PORT) {
+			//Process TCP packet with HTTP_PORT
+			printf("Rxd TCP http pkt\n");
+			if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_SYN_V) {
+				printf("Type SYN\n");
+				make_tcp_synack_from_syn(net_buf);
+				continue;
 			}
-		}
+			if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_ACK_V) {
+				printf("Type ACK\n");
+				init_len_info(net_buf); // init some data structures
+				dat_p=get_tcp_data_pointer();
+				if (dat_p==0) {
+					if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_FIN_V) {
+						make_tcp_ack_from_any(net_buf);
+					}
+					continue;
+				}
+				// Process Telnet request
+				if (strncmp("GET ",(char *)&(net_buf[dat_p]),4)!=0){
+					payloadlen=fill_tcp_data_p(net_buf,0,("Tricore\r\n\n\rHTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<h1>200 OK</h1>"));
+					goto SENDTCP;
+				}
+				//Process HTTP Request
+				if (strncmp("/ ",(char *)&(net_buf[dat_p+4]),2)==0) {
+					//Update Web Page Content
+					payloadlen=prepare_page(net_buf);
+					goto SENDTCP;
+				}
 
-		vTaskDelay(4000 / portTICK_PERIOD_MS);
+				//Analysis the command in the URL
+				cmd16 = analyse_get_url((char *)&(net_buf[dat_p+5]));
+				if (cmd16 < 0) {
+					payloadlen=fill_tcp_data_p(net_buf,0,("HTTP/1.0 401 Unauthorized\r\nContent-Type: text/html\r\n\r\n<h1>401 Unauthorized</h1>"));
+					goto SENDTCP;
+				}
+				if (CMD_LD0_ON == cmd16)	{
+					if(LED_ON_STAT != led_stat(0)) {
+						led_on(0);
+					} else {
+						;
+					}
+				} else if (CMD_LD0_OFF == cmd16) {
+					if(LED_OFF_STAT != led_stat(0)) {
+						led_off(0);
+					} else {
+						;
+					}
+				} else if (CMD_LD1_ON == cmd16)	{
+					if(LED_ON_STAT != led_stat(1)) {
+						led_on(1);
+					}
+				} else if (CMD_LD1_OFF == cmd16) {
+					if(LED_OFF_STAT != led_stat(1)) {
+						led_off(1);
+					}
+				} else if (CMD_LD2_ON == cmd16)	{
+					if(LED_ON_STAT != led_stat(2)) {
+						led_on(2);
+					}
+				} else if (CMD_LD2_OFF == cmd16) {
+					if(LED_OFF_STAT != led_stat(2)) {
+						led_off(2);
+					}
+				} else if (CMD_LD3_ON == cmd16)	{
+					if(LED_ON_STAT != led_stat(3)) {
+						led_on(3);
+					}
+				} else if (CMD_LD3_OFF == cmd16) {
+					if(LED_OFF_STAT != led_stat(3)) {
+						led_off(3);
+					}
+				}
+				//Update Web Page Content
+				payloadlen=prepare_page(net_buf);
+
+				SENDTCP:
+				// send ack for http get
+				make_tcp_ack_from_any(net_buf);
+				// send data
+				make_tcp_ack_with_data(net_buf,payloadlen);
+				continue;
+			}
+		} else {
+			//;
+		}
 	}
 }
 
