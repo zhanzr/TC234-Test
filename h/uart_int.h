@@ -21,13 +21,11 @@ int _uart_puts(const char *str);
 int _uart_getchar(char *c);
 int _uart_sending(void);
 
-static inline void flush_stdout(void)
-{
+static inline void flush_stdout(void) {
 	__asm__ volatile ("nop" ::: "memory");
 	__asm volatile ("" : : : "memory");
 	/* wait until sending has finished */
-	while (_uart_sending())
-	{
+	while (_uart_sending()) {
 		;
 	}
 }

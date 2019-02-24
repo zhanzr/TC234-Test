@@ -243,9 +243,41 @@
 //#define SOFT_SPI	0
 #define SOFT_SPI	1
 
+/*Static IP ADDRESS*/
+#define IP_ADDR0   192
+#define IP_ADDR1   168
+#define IP_ADDR2   32
+#define IP_ADDR3   33
+
+/*NETMASK*/
+#define NETMASK_ADDR0   255
+#define NETMASK_ADDR1   255
+#define NETMASK_ADDR2   255
+#define NETMASK_ADDR3   0
+
+/*Gateway Address*/
+#define GW_ADDR0   192
+#define GW_ADDR1   168
+#define GW_ADDR2   32
+#define GW_ADDR3   1
+
+/* MAC ADDRESS: MAC_ADDR0:MAC_ADDR1:MAC_ADDR2:MAC_ADDR3:MAC_ADDR4:MAC_ADDR5 */
+#define MAC_ADDR0   ((uint8_t)0x12)
+#define MAC_ADDR1   ((uint8_t)0x34)
+#define MAC_ADDR2   ((uint8_t)0x56)
+#define MAC_ADDR3   ((uint8_t)0x78)
+#define MAC_ADDR4   ((uint8_t)0x9A)
+#define MAC_ADDR5   ((uint8_t)0xBC)
+
+/* Definition of the Ethernet driver buffers size and count */
+#define ETH_RX_BUF_SIZE                MAX_FRAMELEN /* buffer size for receive               */
+#define ETH_TX_BUF_SIZE                MAX_FRAMELEN /* buffer size for transmit              */
+#define ETH_RXBUFNB                    ((uint32_t)4)       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */
+#define ETH_TXBUFNB                    ((uint32_t)4)       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */
+
 void spi_init(void);
 
-void enc28j60Init(const uint8_t* macaddr);
+void enc28j60Init(void);
 uint8_t enc28j60getrev(void);
 void enc28j60PacketSend(uint32_t len, uint8_t* packet);
 uint32_t enc28j60PacketReceive(uint32_t maxlen, uint8_t* packet);

@@ -254,7 +254,7 @@ static void enc28j60clkout(uint8_t clk) {
 	enc28j60Write(ECOCON, clk & 0x7);
 }
 
-void enc28j60Init(const uint8_t* macaddr) {
+void enc28j60Init(void) {
 	//Soft Reset of the MAC
 	enc28j60WriteOp(ENC28J60_SOFT_RESET, 0, ENC28J60_SOFT_RESET);
 	_nop();
@@ -310,12 +310,12 @@ void enc28j60Init(const uint8_t* macaddr) {
 	enc28j60Write(MAMXFLH, MAX_FRAMELEN>>8);
 
 	// NOTE: MAC address in ENC28J60 is byte-backward
-	enc28j60Write(MAADR5, macaddr[0]);	
-	enc28j60Write(MAADR4, macaddr[1]);
-	enc28j60Write(MAADR3, macaddr[2]);
-	enc28j60Write(MAADR2, macaddr[3]);
-	enc28j60Write(MAADR1, macaddr[4]);
-	enc28j60Write(MAADR0, macaddr[5]);
+	enc28j60Write(MAADR5, MAC_ADDR0);
+	enc28j60Write(MAADR4, MAC_ADDR1);
+	enc28j60Write(MAADR3, MAC_ADDR2);
+	enc28j60Write(MAADR2, MAC_ADDR3);
+	enc28j60Write(MAADR1, MAC_ADDR4);
+	enc28j60Write(MAADR0, MAC_ADDR5);
 
 	enc28j60PhyWrite(PHCON1, PHCON1_PDPXMD);
 

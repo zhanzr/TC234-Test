@@ -54,14 +54,15 @@
 #include "net.h"
 #include "timer.h"
 
-#define MESSAGE_Q_NUM   2
-QueueHandle_t Message_Queue;
-
-SemaphoreHandle_t BinarySemaphore;
-
-SemaphoreHandle_t CountSemaphore;
+#include "lwip/netif.h"
+#include "lwip/tcpip.h"
+#include "app_ethernet.h"
+#include "httpserver-socket.h"
 
 SemaphoreHandle_t MutexSemaphore;
+
+struct netif gnetif; /* network interface structure */
+
 /*----------------------------------------------------------*/
 
 /* Constants for the ComTest tasks. */
@@ -90,78 +91,6 @@ void maintaince_task(void *pvParameters);
 TaskHandle_t g_info_task_handler;
 void print_task(void *pvParameters);
 
-void test_tlf35584(void) {
-	tlf35584_cmd_t tmp_tlf_cmd;
-	tlf35584_cmd_t res_tlf_cmd;
-
-	for(uint8_t i=0; i<0x34; ++i) {
-		tmp_tlf_cmd.B.cmd = 0;
-		tmp_tlf_cmd.B.addr = i;
-		tmp_tlf_cmd.B.data = 0;
-		tmp_tlf_cmd.B.parity = 0;
-		pack32 z_parity;
-		z_parity.u32 = Ifx_PARITY((uint32_t)tmp_tlf_cmd.U);
-		tmp_tlf_cmd.B.parity = z_parity.u8[0] ^ z_parity.u8[1];
-
-		QSPI2_DATAENTRY0.B.E = (uint32_t)tmp_tlf_cmd.U;
-		/* wait until transfer is complete */
-		while (!QSPI2_STATUS.B.TXF)
-			;
-		/* clear TX flag */
-		QSPI2_FLAGSCLEAR.B.TXC = 1;
-		/* wait for receive is finished */
-		while (!QSPI2_STATUS.B.RXF)
-			;
-		/* clear RX flag */
-		QSPI2_FLAGSCLEAR.B.RXC = 1;
-
-		//read
-		res_tlf_cmd.U = QSPI2_RXEXIT.U;
-		printf("%04X [%02X]=%02X\n",
-				res_tlf_cmd.U,
-				tmp_tlf_cmd.B.addr,
-				res_tlf_cmd.B.data
-		);
-		flush_stdout();
-	}
-
-	{
-		tmp_tlf_cmd.B.cmd = 0;
-		tmp_tlf_cmd.B.addr = 0x3f;
-		tmp_tlf_cmd.B.data = 0;
-		tmp_tlf_cmd.B.parity = 0;
-		pack32 z_parity;
-		z_parity.u32 = Ifx_PARITY((uint32_t)tmp_tlf_cmd.U);
-		tmp_tlf_cmd.B.parity = z_parity.u8[0] ^ z_parity.u8[1];
-
-		QSPI2_DATAENTRY0.B.E = (uint32_t)tmp_tlf_cmd.U;
-		/* wait until transfer is complete */
-		while (!QSPI2_STATUS.B.TXF)
-			;
-		/* clear TX flag */
-		QSPI2_FLAGSCLEAR.B.TXC = 1;
-		/* wait for receive is finished */
-		while (!QSPI2_STATUS.B.RXF)
-			;
-		/* clear RX flag */
-		QSPI2_FLAGSCLEAR.B.RXC = 1;
-		//read
-		res_tlf_cmd.U = QSPI2_RXEXIT.U;
-		printf("%04X [%02X]=%02X\n",
-				res_tlf_cmd.U,
-				tmp_tlf_cmd.B.addr,
-				res_tlf_cmd.B.data
-		);
-		flush_stdout();
-	}
-}
-
-extern void interface_init(void);
-extern void server_loop(void);
-
-extern const uint8_t g_ip_addr[4];
-extern const uint8_t g_mac_addr[6];
-
 const char ON_STR[] = "On";
 const char OFF_STR[] = "Off";
 
@@ -173,6 +102,10 @@ const char ON_2_STR[] = "On2";
 const char OFF_2_STR[] = "Off2";
 const char ON_3_STR[] = "On3";
 const char OFF_3_STR[] = "Off3";
+
+void interface_init(void) {
+	enc28j60Init();
+}
 
 int16_t analyse_get_url(char *str) {
 	char* p_str = str;
@@ -197,159 +130,159 @@ int16_t analyse_get_url(char *str) {
 		return(-1);
 	}
 }
-
-uint16_t prepare_page(uint8_t *buf) {
-	uint16_t plen;
-	uint8_t tmp_compose_buf[512];
-
-	plen=fill_tcp_data_p(buf,0,("HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nPragma: no-cache\r\n\r\n"));
-
-	plen=fill_tcp_data_p(buf,plen,("<!DOCTYPE html>\r\n<html lang=\"en\">\r\n"));
-
-	sprintf((char*)tmp_compose_buf, "<title>Server[%s]</title>\r\n", __TIME__);
-	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
-
-	plen=fill_tcp_data_p(buf,plen,("<body>\r\n"));
-	plen=fill_tcp_data_p(buf,plen,("<center>\r\n"));
-
-	sprintf((char*)tmp_compose_buf, "<p>DieTempSensor: %f 'C\r\n", read_dts_celsius());
-	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
-	plen=fill_tcp_data_p(buf,plen,("<p>Server on TC234 Appkit board\r\n"));
-
-	sprintf((char*)tmp_compose_buf, "<p>cpu: %u M, Sys:%u M, STM0.TIM1:%08X, soft_spi:%u, newlib:%s\r\n",
-			SYSTEM_GetCpuClock()/1000000,
-			SYSTEM_GetSysClock()/1000000,
-			MODULE_STM0.TIM1.U,
-			SOFT_SPI,
-			_NEWLIB_VERSION);
-	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
-
-	//LED 0 Control hypelink
-	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 0 Status:"));
-	if ((LED_ON_STAT == led_stat(0))){
-		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
-		plen=fill_tcp_data_p(buf,plen,(ON_STR));
-		plen=fill_tcp_data_p(buf,plen,("</font>"));
-	} else {
-		plen=fill_tcp_data_p(buf,plen,("<font color=\"green\">"));
-		plen=fill_tcp_data_p(buf,plen,(OFF_STR));
-		plen=fill_tcp_data_p(buf,plen,("</font>"));
-	}
-
-	plen=fill_tcp_data_p(buf,plen,("\t\t<a href=\""));
-	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
-			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
-	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
-	if ((LED_ON_STAT == led_stat(0))){
-		plen=fill_tcp_data_p(buf,plen,(OFF_0_STR));
-	}else{
-		plen=fill_tcp_data_p(buf,plen,(ON_0_STR));
-	}
-	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
-
-	//LED 1 Control hypelink
-	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 1 Status:"));
-	if ((LED_ON_STAT == led_stat(1))){
-		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
-		plen=fill_tcp_data_p(buf,plen,(ON_STR));
-		plen=fill_tcp_data_p(buf,plen,("</font>"));
-	} else {
-		plen=fill_tcp_data_p(buf,plen,("<font color=\"green\">"));
-		plen=fill_tcp_data_p(buf,plen,(OFF_STR));
-		plen=fill_tcp_data_p(buf,plen,("</font>"));
-	}
-
-	plen=fill_tcp_data_p(buf,plen,("\t\t<a href=\""));
-	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
-			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
-	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
-	if ((LED_ON_STAT == led_stat(1))){
-		plen=fill_tcp_data_p(buf,plen,(OFF_1_STR));
-	}else{
-		plen=fill_tcp_data_p(buf,plen,(ON_1_STR));
-	}
-	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
-
-	//LED 2 Control hypelink
-	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 2 Status:"));
-	if ((LED_ON_STAT == led_stat(2))){
-		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
-		plen=fill_tcp_data_p(buf,plen,(ON_STR));
-		plen=fill_tcp_data_p(buf,plen,("</font>"));
-	} else {
-		plen=fill_tcp_data_p(buf,plen,("<font color=\"green\">"));
-		plen=fill_tcp_data_p(buf,plen,(OFF_STR));
-		plen=fill_tcp_data_p(buf,plen,("</font>"));
-	}
-
-	plen=fill_tcp_data_p(buf,plen,("\t\t<a href=\""));
-	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
-			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
-	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
-	if ((LED_ON_STAT == led_stat(2))){
-		plen=fill_tcp_data_p(buf,plen,(OFF_2_STR));
-	}else{
-		plen=fill_tcp_data_p(buf,plen,(ON_2_STR));
-	}
-	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
-
-	//LED 3 Control hypelink
-	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 3 Status:"));
-	if ((LED_ON_STAT == led_stat(3))){
-		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
-		plen=fill_tcp_data_p(buf,plen,(ON_STR));
-		plen=fill_tcp_data_p(buf,plen,("</font>"));
-	} else {
-		plen=fill_tcp_data_p(buf,plen,("<font color=\"green\">"));
-		plen=fill_tcp_data_p(buf,plen,(OFF_STR));
-		plen=fill_tcp_data_p(buf,plen,("</font>"));
-	}
-
-	plen=fill_tcp_data_p(buf,plen,("\t\t<a href=\""));
-	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
-			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
-	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
-	if ((LED_ON_STAT == led_stat(3))){
-		plen=fill_tcp_data_p(buf,plen,(OFF_3_STR));
-	}else{
-		plen=fill_tcp_data_p(buf,plen,(ON_3_STR));
-	}
-	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
-
-	//Task Information
-	plen=fill_tcp_data_p(buf,plen,("\r\n<p>TaskList:\r\n"));
-	vTaskList(tmp_compose_buf);
-	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
-	plen=fill_tcp_data_p(buf,plen,("\r\n"));
-	plen=fill_tcp_data_p(buf,plen,("\r\n<p>RunTimeStats:\r\n"));
-	vTaskGetRunTimeStats(tmp_compose_buf);
-	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
-	plen=fill_tcp_data_p(buf,plen,("\r\n"));
-
-	//Refresh hypelink
-	plen=fill_tcp_data_p(buf,plen,("<p><a href=\""));
-	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
-			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
-	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
-	plen=fill_tcp_data_p(buf,plen,("\">[Refresh]</a>\r\n<p><a href=\""));
-
-	plen=fill_tcp_data_p(buf,plen,("<hr><p>Board Simple Server\r\n"));
-
-	plen=fill_tcp_data_p(buf,plen,("</center>\r\n"));
-	plen=fill_tcp_data_p(buf,plen,("</body>\r\n"));
-	plen=fill_tcp_data_p(buf,plen,("</html>\r\n"));
-
-	printf("content len:%u\n", plen);
-
-	return plen;
-}
+//
+//uint16_t prepare_page(uint8_t *buf) {
+//	uint16_t plen;
+//	uint8_t tmp_compose_buf[512];
+//
+//	plen=fill_tcp_data_p(buf,0,("HTTP/1.0 200 OK\r\nContent-Type: text/html\r\nPragma: no-cache\r\n\r\n"));
+//
+//	plen=fill_tcp_data_p(buf,plen,("<!DOCTYPE html>\r\n<html lang=\"en\">\r\n"));
+//
+//	sprintf((char*)tmp_compose_buf, "<title>Server[%s]</title>\r\n", __TIME__);
+//	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
+//
+//	plen=fill_tcp_data_p(buf,plen,("<body>\r\n"));
+//	plen=fill_tcp_data_p(buf,plen,("<center>\r\n"));
+//
+//	sprintf((char*)tmp_compose_buf, "<p>DieTempSensor: %f 'C\r\n", read_dts_celsius());
+//	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
+//	plen=fill_tcp_data_p(buf,plen,("<p>Server on TC234 Appkit board\r\n"));
+//
+//	sprintf((char*)tmp_compose_buf, "<p>cpu: %u M, Sys:%u M, STM0.TIM1:%08X, soft_spi:%u, newlib:%s\r\n",
+//			SYSTEM_GetCpuClock()/1000000,
+//			SYSTEM_GetSysClock()/1000000,
+//			MODULE_STM0.TIM1.U,
+//			SOFT_SPI,
+//			_NEWLIB_VERSION);
+//	plen=fill_tcp_data(buf,plen,(const char*)tmp_compose_buf);
+//
+//	//LED 0 Control hypelink
+//	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 0 Status:"));
+//	if ((LED_ON_STAT == led_stat(0))){
+//		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
+//		plen=fill_tcp_data_p(buf,plen,(ON_STR));
+//		plen=fill_tcp_data_p(buf,plen,("</font>"));
+//	} else {
+//		plen=fill_tcp_data_p(buf,plen,("<font color=\"green\">"));
+//		plen=fill_tcp_data_p(buf,plen,(OFF_STR));
+//		plen=fill_tcp_data_p(buf,plen,("</font>"));
+//	}
+//
+//	plen=fill_tcp_data_p(buf,plen,("\t\t<a href=\""));
+//	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
+//			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
+//	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
+//	if ((LED_ON_STAT == led_stat(0))){
+//		plen=fill_tcp_data_p(buf,plen,(OFF_0_STR));
+//	}else{
+//		plen=fill_tcp_data_p(buf,plen,(ON_0_STR));
+//	}
+//	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
+//
+//	//LED 1 Control hypelink
+//	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 1 Status:"));
+//	if ((LED_ON_STAT == led_stat(1))){
+//		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
+//		plen=fill_tcp_data_p(buf,plen,(ON_STR));
+//		plen=fill_tcp_data_p(buf,plen,("</font>"));
+//	} else {
+//		plen=fill_tcp_data_p(buf,plen,("<font color=\"green\">"));
+//		plen=fill_tcp_data_p(buf,plen,(OFF_STR));
+//		plen=fill_tcp_data_p(buf,plen,("</font>"));
+//	}
+//
+//	plen=fill_tcp_data_p(buf,plen,("\t\t<a href=\""));
+//	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
+//			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
+//	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
+//	if ((LED_ON_STAT == led_stat(1))){
+//		plen=fill_tcp_data_p(buf,plen,(OFF_1_STR));
+//	}else{
+//		plen=fill_tcp_data_p(buf,plen,(ON_1_STR));
+//	}
+//	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
+//
+//	//LED 2 Control hypelink
+//	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 2 Status:"));
+//	if ((LED_ON_STAT == led_stat(2))){
+//		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
+//		plen=fill_tcp_data_p(buf,plen,(ON_STR));
+//		plen=fill_tcp_data_p(buf,plen,("</font>"));
+//	} else {
+//		plen=fill_tcp_data_p(buf,plen,("<font color=\"green\">"));
+//		plen=fill_tcp_data_p(buf,plen,(OFF_STR));
+//		plen=fill_tcp_data_p(buf,plen,("</font>"));
+//	}
+//
+//	plen=fill_tcp_data_p(buf,plen,("\t\t<a href=\""));
+//	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
+//			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
+//	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
+//	if ((LED_ON_STAT == led_stat(2))){
+//		plen=fill_tcp_data_p(buf,plen,(OFF_2_STR));
+//	}else{
+//		plen=fill_tcp_data_p(buf,plen,(ON_2_STR));
+//	}
+//	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
+//
+//	//LED 3 Control hypelink
+//	plen=fill_tcp_data_p(buf,plen,("\r\n<p>LED 3 Status:"));
+//	if ((LED_ON_STAT == led_stat(3))){
+//		plen=fill_tcp_data_p(buf,plen,("<font color=\"red\">"));
+//		plen=fill_tcp_data_p(buf,plen,(ON_STR));
+//		plen=fill_tcp_data_p(buf,plen,("</font>"));
+//	} else {
+//		plen=fill_tcp_data_p(buf,plen,("<font color=\"green\">"));
+//		plen=fill_tcp_data_p(buf,plen,(OFF_STR));
+//		plen=fill_tcp_data_p(buf,plen,("</font>"));
+//	}
+//
+//	plen=fill_tcp_data_p(buf,plen,("\t\t<a href=\""));
+//	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
+//			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
+//	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
+//	if ((LED_ON_STAT == led_stat(3))){
+//		plen=fill_tcp_data_p(buf,plen,(OFF_3_STR));
+//	}else{
+//		plen=fill_tcp_data_p(buf,plen,(ON_3_STR));
+//	}
+//	plen=fill_tcp_data_p(buf,plen,("\">Toggle</a>"));
+//
+//	//Task Information
+//	plen=fill_tcp_data_p(buf,plen,("\r\n<p>TaskList:\r\n"));
+//	vTaskList(tmp_compose_buf);
+//	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
+//	plen=fill_tcp_data_p(buf,plen,("\r\n"));
+//	plen=fill_tcp_data_p(buf,plen,("\r\n<p>RunTimeStats:\r\n"));
+//	vTaskGetRunTimeStats(tmp_compose_buf);
+//	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
+//	plen=fill_tcp_data_p(buf,plen,("\r\n"));
+//
+//	//Refresh hypelink
+//	plen=fill_tcp_data_p(buf,plen,("<p><a href=\""));
+//	sprintf((char*)tmp_compose_buf, "http://%u.%u.%u.%u/",
+//			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
+//	plen=fill_tcp_data(buf,plen, (const char*)tmp_compose_buf);
+//	plen=fill_tcp_data_p(buf,plen,("\">[Refresh]</a>\r\n<p><a href=\""));
+//
+//	plen=fill_tcp_data_p(buf,plen,("<hr><p>Board Simple Server\r\n"));
+//
+//	plen=fill_tcp_data_p(buf,plen,("</center>\r\n"));
+//	plen=fill_tcp_data_p(buf,plen,("</body>\r\n"));
+//	plen=fill_tcp_data_p(buf,plen,("</html>\r\n"));
+//
+//	printf("content len:%u\n", plen);
+//
+//	return plen;
+//}
 
 void protocol_init(void){
 	//using static configuration now
 	printf("MAC:%02X,%02X,%02X,%02X,%02X,%02X\n",
-			g_mac_addr[0],g_mac_addr[1],g_mac_addr[2],g_mac_addr[3],g_mac_addr[4],g_mac_addr[5]);
+			MAC_ADDR0, MAC_ADDR1, MAC_ADDR2, MAC_ADDR3, MAC_ADDR4, MAC_ADDR5);
 	printf("IP:%d.%d.%d.%d\n",
-			g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
+			IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
 	printf("Port:%d\n",HTTP_PORT);
 }
 
@@ -360,7 +293,7 @@ int core0_main(int argc, char** argv) {
 
 	uart_init(mainCOM_TEST_BAUD_RATE);
 
-	config_dts();
+	//config_dts();
 
 	printf("%s %s\n", _NEWLIB_VERSION, __func__);
 
@@ -379,7 +312,7 @@ int core0_main(int argc, char** argv) {
 					FLASH_SIZE_TABLE_KB[MODULE_SCU.CHIPID.B.FSIZE%0x0c],
 					(MODULE_SCU.CHIPID.B.SEC==1)?"Yes":"No",
 							MODULE_SCU.CHIPID.B.SP
-							);
+	);
 	flush_stdout();
 
 	printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,CE:%d\n",
@@ -394,12 +327,11 @@ int core0_main(int argc, char** argv) {
 
 	_syscall(101);
 
-//	test_tlf35584();
-
 	interface_init();
-	protocol_init();
+	flush_stdout();
 
-//	server_loop();
+	protocol_init();
+	flush_stdout();
 
 	/* The following function will only create more tasks and timers if
 	mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY is set to 0 (at the top of this
@@ -408,7 +340,7 @@ int core0_main(int argc, char** argv) {
 
 	xTaskCreate((TaskFunction_t )start_task,
 			(const char*    )"start_task",
-			(uint16_t       )512,
+			(uint16_t       )1024,
 			(void*          )NULL,
 			(UBaseType_t    )tskIDLE_PRIORITY + 1,
 			(TaskHandle_t*  )&StartTask_Handler);
@@ -427,60 +359,122 @@ int core0_main(int argc, char** argv) {
 	return EXIT_SUCCESS;
 }
 
+extern err_t ethernetif_init(struct netif *netif);
+static void Netif_Config(void) {
+	ip_addr_t ipaddr;
+	ip_addr_t netmask;
+	ip_addr_t gw;
+	printf("%s %d\n", __func__, __LINE__);
+	flush_stdout();
+
+	IP_ADDR4(&ipaddr,IP_ADDR0,IP_ADDR1,IP_ADDR2,IP_ADDR3);
+	IP_ADDR4(&netmask,NETMASK_ADDR0,NETMASK_ADDR1,NETMASK_ADDR2,NETMASK_ADDR3);
+	IP_ADDR4(&gw,GW_ADDR0,GW_ADDR1,GW_ADDR2,GW_ADDR3);
+	printf("%s %d\n", __func__, __LINE__);
+	flush_stdout();
+
+	/* add the network interface */
+	netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
+	printf("%s %d\n", __func__, __LINE__);
+	flush_stdout();
+
+	/*  Registers the default network interface. */
+	netif_set_default(&gnetif);
+	printf("%s %d\n", __func__, __LINE__);
+	flush_stdout();
+
+	gnetif.flags |= NETIF_FLAG_UP;
+
+	if (netif_is_link_up(&gnetif)) {
+		/* When the netif is fully configured this function must be called.*/
+		printf("%s %d\n", __func__, __LINE__);
+		flush_stdout();
+		netif_set_up(&gnetif);
+		printf("%s %d\n", __func__, __LINE__);
+		flush_stdout();
+	} else {
+		/* When the netif link is down this function must be called */
+		printf("%s %d\n", __func__, __LINE__);
+		flush_stdout();
+		netif_set_down(&gnetif);
+		printf("%s %d\n", __func__, __LINE__);
+		flush_stdout();
+	}
+}
+
 void start_task(void *pvParameters) {
-	Message_Queue = xQueueCreate(MESSAGE_Q_NUM, sizeof(uint32_t));
-
-	CountSemaphore = xSemaphoreCreateCounting(2, 2);
-
 	MutexSemaphore = xSemaphoreCreateMutex();
+	printf("%s %d\n", __func__, __LINE__);
+	flush_stdout();
 
-	xTaskCreate((TaskFunction_t )maintaince_task,
-			(const char*    )"maintaince_task",
-			(uint16_t       )768,
-			(void*          )NULL,
-			(UBaseType_t    )tskIDLE_PRIORITY + 1,
-			(TaskHandle_t*  )&g_task0_handler);
+	/* Create tcp_ip stack thread */
+	tcpip_init(NULL, NULL);
+	printf("%s %d\n", __func__, __LINE__);
+	flush_stdout();
 
-	xTaskCreate((TaskFunction_t )print_task,
-			(const char*    )"print_task",
-			(uint16_t       )10*1024,
-			(void*          )NULL,
-			(UBaseType_t    )tskIDLE_PRIORITY + 2,
-			(TaskHandle_t*  )&g_info_task_handler);
+	/* Initialize the LwIP stack */
+	Netif_Config();
+	printf("%s %d\n", __func__, __LINE__);
+	flush_stdout();
+
+	/* Initialize webserver demo */
+	http_server_socket_init();
+	printf("%s %d\n", __func__, __LINE__);
+	flush_stdout();
+
+	/* Notify user about the network interface config */
+	//	  User_notification(&gnetif);
+
+	//	xTaskCreate((TaskFunction_t )maintaince_task,
+	//			(const char*    )"maintaince_task",
+	//			(uint16_t       )768,
+	//			(void*          )NULL,
+	//			(UBaseType_t    )tskIDLE_PRIORITY + 1,
+	//			(TaskHandle_t*  )&g_task0_handler);
+
+	//	xTaskCreate((TaskFunction_t )print_task,
+	//			(const char*    )"print_task",
+	//			(uint16_t       )10*1024,
+	//			(void*          )NULL,
+	//			(UBaseType_t    )tskIDLE_PRIORITY + 2,
+	//			(TaskHandle_t*  )&g_info_task_handler);
+
 	vTaskDelete(StartTask_Handler);
+	printf("%s %d\n", __func__, __LINE__);
+	flush_stdout();
 }
 
 void maintaince_task(void *pvParameters) {
-//	char info_buf[512];
+	//	char info_buf[512];
 
 	while(1) {
-//		vTaskList(info_buf);
-//		if(NULL != MutexSemaphore) {
-//			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
-//				printf("%s\r\n",info_buf);
-//
-//				vTaskGetRunTimeStats(info_buf);
-//				printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
-//				printf("%s\r\n",info_buf);
-//
-//				printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
-//						__TRICORE_NAME__,
-//						__TRICORE_CORE__,
-//						SYSTEM_GetCpuClock()/1000000,
-//						SYSTEM_GetSysClock()/1000000,
-//						SYSTEM_GetStmClock()/1000000,
-//						system_GetPllClock()/1000000,
-//						system_GetIntClock()/1000000,
-//						SYSTEM_IsCacheEnabled());
-//				flush_stdout();
-//
-//				xSemaphoreGive(MutexSemaphore);
-//			}
-//		}
-		start_dts_measure();
-
-		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
-						portMAX_DELAY );/* Block indefinitely. */
+		//		vTaskList(info_buf);
+		//		if(NULL != MutexSemaphore) {
+		//			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
+		//				printf("%s\r\n",info_buf);
+		//
+		//				vTaskGetRunTimeStats(info_buf);
+		//				printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
+		//				printf("%s\r\n",info_buf);
+		//
+		//				printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
+		//						__TRICORE_NAME__,
+		//						__TRICORE_CORE__,
+		//						SYSTEM_GetCpuClock()/1000000,
+		//						SYSTEM_GetSysClock()/1000000,
+		//						SYSTEM_GetStmClock()/1000000,
+		//						system_GetPllClock()/1000000,
+		//						system_GetIntClock()/1000000,
+		//						SYSTEM_IsCacheEnabled());
+		//				flush_stdout();
+		//
+		//				xSemaphoreGive(MutexSemaphore);
+		//			}
+		//		}
+		//		start_dts_measure();
+		//
+		//		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
+		//						portMAX_DELAY );/* Block indefinitely. */
 		vTaskDelay(40 / portTICK_PERIOD_MS);
 	}
 }
@@ -494,111 +488,111 @@ void print_task(void *pvParameters) {
 	int16_t cmd16;
 
 	while(true) {
-		payloadlen = enc28j60PacketReceive(MAX_FRAMELEN, net_buf);
-
-		if(payloadlen==0) {
-			vTaskDelay(20 / portTICK_PERIOD_MS);
-			continue;
-		} else if(eth_type_is_arp_and_my_ip(net_buf,payloadlen)) {
-			//Process ARP Request
-			make_arp_answer_from_request(net_buf);
-			continue;
-		} else if(eth_type_is_ip_and_my_ip(net_buf,payloadlen)==0) {
-			//Only Process IP Packet destinated at me
-			printf("$");
-			continue;
-		} else if(net_buf[IP_PROTO_P]==IP_PROTO_ICMP_V && net_buf[ICMP_TYPE_P]==ICMP_TYPE_ECHOREQUEST_V){
-			//Process ICMP packet
-			printf("Rxd ICMP from [%d.%d.%d.%d]\n",net_buf[ETH_ARP_SRC_IP_P],net_buf[ETH_ARP_SRC_IP_P+1],
-					net_buf[ETH_ARP_SRC_IP_P+2],net_buf[ETH_ARP_SRC_IP_P+3]);
-			make_echo_reply_from_request(net_buf, payloadlen);
-			continue;
-		} else if (net_buf[IP_PROTO_P]==IP_PROTO_TCP_V&&net_buf[TCP_DST_PORT_H_P]==0&&net_buf[TCP_DST_PORT_L_P]==HTTP_PORT) {
-			//Process TCP packet with HTTP_PORT
-			printf("Rxd TCP http pkt\n");
-			if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_SYN_V) {
-				printf("Type SYN\n");
-				make_tcp_synack_from_syn(net_buf);
-				continue;
-			}
-			if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_ACK_V) {
-				printf("Type ACK\n");
-				init_len_info(net_buf); // init some data structures
-				dat_p=get_tcp_data_pointer();
-				if (dat_p==0) {
-					if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_FIN_V) {
-						make_tcp_ack_from_any(net_buf);
-					}
-					continue;
-				}
-				// Process Telnet request
-				if (strncmp("GET ",(char *)&(net_buf[dat_p]),4)!=0){
-					payloadlen=fill_tcp_data_p(net_buf,0,("Tricore\r\n\n\rHTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<h1>200 OK</h1>"));
-					goto SENDTCP;
-				}
-				//Process HTTP Request
-				if (strncmp("/ ",(char *)&(net_buf[dat_p+4]),2)==0) {
-					//Update Web Page Content
-					payloadlen=prepare_page(net_buf);
-					goto SENDTCP;
-				}
-
-				//Analysis the command in the URL
-				cmd16 = analyse_get_url((char *)&(net_buf[dat_p+5]));
-				if (cmd16 < 0) {
-					payloadlen=fill_tcp_data_p(net_buf,0,("HTTP/1.0 401 Unauthorized\r\nContent-Type: text/html\r\n\r\n<h1>401 Unauthorized</h1>"));
-					goto SENDTCP;
-				}
-				if (CMD_LD0_ON == cmd16)	{
-					if(LED_ON_STAT != led_stat(0)) {
-						led_on(0);
-					} else {
-						;
-					}
-				} else if (CMD_LD0_OFF == cmd16) {
-					if(LED_OFF_STAT != led_stat(0)) {
-						led_off(0);
-					} else {
-						;
-					}
-				} else if (CMD_LD1_ON == cmd16)	{
-					if(LED_ON_STAT != led_stat(1)) {
-						led_on(1);
-					}
-				} else if (CMD_LD1_OFF == cmd16) {
-					if(LED_OFF_STAT != led_stat(1)) {
-						led_off(1);
-					}
-				} else if (CMD_LD2_ON == cmd16)	{
-					if(LED_ON_STAT != led_stat(2)) {
-						led_on(2);
-					}
-				} else if (CMD_LD2_OFF == cmd16) {
-					if(LED_OFF_STAT != led_stat(2)) {
-						led_off(2);
-					}
-				} else if (CMD_LD3_ON == cmd16)	{
-					if(LED_ON_STAT != led_stat(3)) {
-						led_on(3);
-					}
-				} else if (CMD_LD3_OFF == cmd16) {
-					if(LED_OFF_STAT != led_stat(3)) {
-						led_off(3);
-					}
-				}
-				//Update Web Page Content
-				payloadlen=prepare_page(net_buf);
-
-				SENDTCP:
-				// send ack for http get
-				make_tcp_ack_from_any(net_buf);
-				// send data
-				make_tcp_ack_with_data(net_buf,payloadlen);
-				continue;
-			}
-		} else {
-			//;
-		}
+		//		payloadlen = enc28j60PacketReceive(MAX_FRAMELEN, net_buf);
+		//
+		//		if(payloadlen==0) {
+		//			vTaskDelay(20 / portTICK_PERIOD_MS);
+		//			continue;
+		//		} else if(eth_type_is_arp_and_my_ip(net_buf,payloadlen)) {
+		//			//Process ARP Request
+		//			make_arp_answer_from_request(net_buf);
+		//			continue;
+		//		} else if(eth_type_is_ip_and_my_ip(net_buf,payloadlen)==0) {
+		//			//Only Process IP Packet destinated at me
+		//			printf("$");
+		//			continue;
+		//		} else if(net_buf[IP_PROTO_P]==IP_PROTO_ICMP_V && net_buf[ICMP_TYPE_P]==ICMP_TYPE_ECHOREQUEST_V){
+		//			//Process ICMP packet
+		//			printf("Rxd ICMP from [%d.%d.%d.%d]\n",net_buf[ETH_ARP_SRC_IP_P],net_buf[ETH_ARP_SRC_IP_P+1],
+		//					net_buf[ETH_ARP_SRC_IP_P+2],net_buf[ETH_ARP_SRC_IP_P+3]);
+		//			make_echo_reply_from_request(net_buf, payloadlen);
+		//			continue;
+		//		} else if (net_buf[IP_PROTO_P]==IP_PROTO_TCP_V&&net_buf[TCP_DST_PORT_H_P]==0&&net_buf[TCP_DST_PORT_L_P]==HTTP_PORT) {
+		//			//Process TCP packet with HTTP_PORT
+		//			printf("Rxd TCP http pkt\n");
+		//			if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_SYN_V) {
+		//				printf("Type SYN\n");
+		//				make_tcp_synack_from_syn(net_buf);
+		//				continue;
+		//			}
+		//			if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_ACK_V) {
+		//				printf("Type ACK\n");
+		//				init_len_info(net_buf); // init some data structures
+		//				dat_p=get_tcp_data_pointer();
+		//				if (dat_p==0) {
+		//					if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_FIN_V) {
+		//						make_tcp_ack_from_any(net_buf);
+		//					}
+		//					continue;
+		//				}
+		//				// Process Telnet request
+		//				if (strncmp("GET ",(char *)&(net_buf[dat_p]),4)!=0){
+		//					payloadlen=fill_tcp_data_p(net_buf,0,("Tricore\r\n\n\rHTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<h1>200 OK</h1>"));
+		//					goto SENDTCP;
+		//				}
+		//				//Process HTTP Request
+		//				if (strncmp("/ ",(char *)&(net_buf[dat_p+4]),2)==0) {
+		//					//Update Web Page Content
+		//					payloadlen=prepare_page(net_buf);
+		//					goto SENDTCP;
+		//				}
+		//
+		//				//Analysis the command in the URL
+		//				cmd16 = analyse_get_url((char *)&(net_buf[dat_p+5]));
+		//				if (cmd16 < 0) {
+		//					payloadlen=fill_tcp_data_p(net_buf,0,("HTTP/1.0 401 Unauthorized\r\nContent-Type: text/html\r\n\r\n<h1>401 Unauthorized</h1>"));
+		//					goto SENDTCP;
+		//				}
+		//				if (CMD_LD0_ON == cmd16)	{
+		//					if(LED_ON_STAT != led_stat(0)) {
+		//						led_on(0);
+		//					} else {
+		//						;
+		//					}
+		//				} else if (CMD_LD0_OFF == cmd16) {
+		//					if(LED_OFF_STAT != led_stat(0)) {
+		//						led_off(0);
+		//					} else {
+		//						;
+		//					}
+		//				} else if (CMD_LD1_ON == cmd16)	{
+		//					if(LED_ON_STAT != led_stat(1)) {
+		//						led_on(1);
+		//					}
+		//				} else if (CMD_LD1_OFF == cmd16) {
+		//					if(LED_OFF_STAT != led_stat(1)) {
+		//						led_off(1);
+		//					}
+		//				} else if (CMD_LD2_ON == cmd16)	{
+		//					if(LED_ON_STAT != led_stat(2)) {
+		//						led_on(2);
+		//					}
+		//				} else if (CMD_LD2_OFF == cmd16) {
+		//					if(LED_OFF_STAT != led_stat(2)) {
+		//						led_off(2);
+		//					}
+		//				} else if (CMD_LD3_ON == cmd16)	{
+		//					if(LED_ON_STAT != led_stat(3)) {
+		//						led_on(3);
+		//					}
+		//				} else if (CMD_LD3_OFF == cmd16) {
+		//					if(LED_OFF_STAT != led_stat(3)) {
+		//						led_off(3);
+		//					}
+		//				}
+		//				//Update Web Page Content
+		//				payloadlen=prepare_page(net_buf);
+		//
+		//				SENDTCP:
+		//				// send ack for http get
+		//				make_tcp_ack_from_any(net_buf);
+		//				// send data
+		//				make_tcp_ack_with_data(net_buf,payloadlen);
+		//				continue;
+		//			}
+		//		} else {
+		//			//;
+		//		}
 	}
 }
 
@@ -612,6 +606,8 @@ static void prvSetupHardware( void ) {
 
 	/* Initialize LED outputs. */
 	vParTestInitialise();
+
+	spi_init();
 }
 /*-----------------------------------------------------------*/
 

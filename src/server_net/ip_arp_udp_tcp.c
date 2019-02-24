@@ -10,11 +10,8 @@ static uint16_t g_info_data_len;
 //initial tcp sequence number
 static uint8_t g_seq_num = 0xa;
 
-const uint8_t g_ip_addr[4] = {192,168,32,33};
-const uint8_t g_mac_addr[6] = {0xB0,0x9A,0x78, 0x56, 0x34,0x12};
-
-void interface_init(void) {
-	enc28j60Init(g_mac_addr);	
+void interface_init(const uint8_t* p_mac_addr) {
+	enc28j60Init(p_mac_addr);
 }
 
 // The Ip checksum is calculated over the ip header only starting

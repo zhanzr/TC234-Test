@@ -101,7 +101,7 @@ peripheral clock. */
 #define configTICK_RATE_HZ					( ( TickType_t ) 1000UL )
 #define configMAX_PRIORITIES				( 15 )
 #define configMINIMAL_STACK_SIZE			( ( uint16_t ) 64 )
-#define configTOTAL_HEAP_SIZE				( ( size_t ) ( 80U * 1024U ) )
+#define configTOTAL_HEAP_SIZE				( ( size_t ) ( 70U * 1024U ) )
 #define configMAX_TASK_NAME_LEN				( 32 )
 #define configUSE_16_BIT_TICKS				0
 #define configIDLE_SHOULD_YIELD				0

@@ -78,8 +78,6 @@ extern void spi_init(void);
 void vParTestInitialise( void ) {
 	/* The Appkit TC234 v2.1 has 4 LEDs*/
 	led_init();
-
-	spi_init();
 }
 /*---------------------------------------------------------------------------*/
 
