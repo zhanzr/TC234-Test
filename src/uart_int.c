@@ -155,8 +155,7 @@ static void _uart_rx_handler(int arg)
 }
 
 /* Interrupt Service Routine for TX */
-static void _uart_tx_handler(int arg)
-{
+static void _uart_tx_handler(int arg) {
 	char c;
 	(void)arg;
 

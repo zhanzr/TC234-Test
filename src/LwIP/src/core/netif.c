@@ -625,31 +625,17 @@ netif_set_default(struct netif *netif)
 void
 netif_set_up(struct netif *netif)
 {
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 	if (!(netif->flags & NETIF_FLAG_UP)) {
 		netif->flags |= NETIF_FLAG_UP;
-		printf("%s %d\n", __func__, __LINE__);
-		flush_stdout();
 
 		MIB2_COPY_SYSUPTIME_TO(&netif->ts);
-		printf("%s %d\n", __func__, __LINE__);
-		flush_stdout();
 
 		NETIF_STATUS_CALLBACK(netif);
-		printf("%s %d\n", __func__, __LINE__);
-		flush_stdout();
 
 		if (netif->flags & NETIF_FLAG_LINK_UP) {
-			printf("%s %d\n", __func__, __LINE__);
-			flush_stdout();
 			netif_issue_reports(netif, NETIF_REPORT_TYPE_IPV4|NETIF_REPORT_TYPE_IPV6);
-			printf("%s %d\n", __func__, __LINE__);
-			flush_stdout();
 		}
 	}
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 }
 
 /** Send ARP/IGMP/MLD/RS events, e.g. on link-up/netif-up or addr-change

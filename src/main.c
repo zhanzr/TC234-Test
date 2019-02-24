@@ -364,63 +364,39 @@ static void Netif_Config(void) {
 	ip_addr_t ipaddr;
 	ip_addr_t netmask;
 	ip_addr_t gw;
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 
 	IP_ADDR4(&ipaddr,IP_ADDR0,IP_ADDR1,IP_ADDR2,IP_ADDR3);
 	IP_ADDR4(&netmask,NETMASK_ADDR0,NETMASK_ADDR1,NETMASK_ADDR2,NETMASK_ADDR3);
 	IP_ADDR4(&gw,GW_ADDR0,GW_ADDR1,GW_ADDR2,GW_ADDR3);
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 
 	/* add the network interface */
 	netif_add(&gnetif, &ipaddr, &netmask, &gw, NULL, &ethernetif_init, &tcpip_input);
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 
 	/*  Registers the default network interface. */
 	netif_set_default(&gnetif);
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 
 	gnetif.flags |= NETIF_FLAG_UP;
 
 	if (netif_is_link_up(&gnetif)) {
 		/* When the netif is fully configured this function must be called.*/
-		printf("%s %d\n", __func__, __LINE__);
-		flush_stdout();
 		netif_set_up(&gnetif);
-		printf("%s %d\n", __func__, __LINE__);
-		flush_stdout();
 	} else {
 		/* When the netif link is down this function must be called */
-		printf("%s %d\n", __func__, __LINE__);
-		flush_stdout();
 		netif_set_down(&gnetif);
-		printf("%s %d\n", __func__, __LINE__);
-		flush_stdout();
 	}
 }
 
 void start_task(void *pvParameters) {
 	MutexSemaphore = xSemaphoreCreateMutex();
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 
 	/* Create tcp_ip stack thread */
 	tcpip_init(NULL, NULL);
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 
 	/* Initialize the LwIP stack */
 	Netif_Config();
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 
 	/* Initialize webserver demo */
 	http_server_socket_init();
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 
 	/* Notify user about the network interface config */
 	//	  User_notification(&gnetif);
@@ -440,8 +416,6 @@ void start_task(void *pvParameters) {
 	//			(TaskHandle_t*  )&g_info_task_handler);
 
 	vTaskDelete(StartTask_Handler);
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 }
 
 void maintaince_task(void *pvParameters) {

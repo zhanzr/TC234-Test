@@ -56,11 +56,16 @@ void ENC28J60_CSL(void){
 	MODULE_P33.OMR.B.PCL9 = 1;
 }
 
+static inline void simple_delay(uint32_t t) {
+	for(uint32_t i=0; i<t; ++i) {
+		__asm__ volatile ("nop" ::: "memory");
+		__asm volatile ("" : : : "memory");
+	}
+}
+
 #define	BIT_DELAY	0
 static inline void bit_delay(uint32_t d){
-	for(uint32_t i=0; i<d; ++i){
-		_nop();
-	}
+	simple_delay(d);
 }
 
 static inline void spi_xfer(uint8_t *dout, uint8_t *din){
@@ -257,7 +262,7 @@ static void enc28j60clkout(uint8_t clk) {
 void enc28j60Init(void) {
 	//Soft Reset of the MAC
 	enc28j60WriteOp(ENC28J60_SOFT_RESET, 0, ENC28J60_SOFT_RESET);
-	_nop();
+	simple_delay(1000);
 
 	g_next_pkt_ptr = RXSTART_INIT;
 

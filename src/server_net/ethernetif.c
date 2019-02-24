@@ -54,6 +54,8 @@
 
 #include "FreeRTOS.h"
 
+#include "uart_int.h"
+
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /* The time to block waiting for input. */
@@ -62,8 +64,8 @@
 #define INTERFACE_THREAD_STACK_SIZE            ( 350 )
 
 /* Define those to better describe your network interface. */
-#define IFNAME0 's'
-#define IFNAME1 't'
+#define IFNAME0 'e'
+#define IFNAME1 'n'
 
 uint16_t g_low_input_len;
 volatile uint8_t net_buf[MAX_FRAMELEN];
@@ -95,8 +97,6 @@ TaskHandle_t g_input_handler;
  */
 static void low_level_init(struct netif *netif)
 {
-	uint8_t macaddress[6]= { MAC_ADDR0, MAC_ADDR1, MAC_ADDR2, MAC_ADDR3, MAC_ADDR4, MAC_ADDR5 };
-
 	/* configure ethernet peripheral (GPIOs, clocks, MAC, DMA) */
 
 	/* Set netif link flag */
@@ -123,7 +123,7 @@ static void low_level_init(struct netif *netif)
 	xTaskCreate((TaskFunction_t )ethernetif_input,
 			(const char*    )"ethernetif_input",
 			(uint16_t       )768,
-			(void*          )NULL,
+			(void*          )netif,
 			(UBaseType_t    )tskIDLE_PRIORITY + 3,
 			(TaskHandle_t*  )&g_input_handler);
 }
@@ -144,8 +144,7 @@ static void low_level_init(struct netif *netif)
  *       to become available since the stack doesn't retry to send a packet
  *       dropped because of memory failure (except for the TCP timers).
  */
-static err_t low_level_output(struct netif *netif, struct pbuf *p)
-{
+static err_t low_level_output(struct netif *netif, struct pbuf *p) {
 	err_t errval;
 	struct pbuf *q;
 	uint32_t framelength = 0;
@@ -170,8 +169,7 @@ static err_t low_level_output(struct netif *netif, struct pbuf *p)
  * @return a pbuf filled with the received packet (including MAC header)
  *         NULL on memory error
  */
-static struct pbuf * low_level_input(struct netif *netif)
-{
+static struct pbuf * low_level_input(struct netif *netif) {
 	struct pbuf *p = NULL, *q = NULL;
 	uint16_t len = 0;
 	uint8_t *buffer;
@@ -183,21 +181,20 @@ static struct pbuf * low_level_input(struct netif *netif)
 	/* Obtain the size of the packet and put it into the "len" variable. */
 	len = g_low_input_len;
 
-	if (len > 0)
-	{
+	if (len > 0) {
 		/* We allocate a pbuf chain of pbufs from the Lwip buffer pool */
 		p = pbuf_alloc(PBUF_RAW, len, PBUF_POOL);
 	}
 
-	if (p != NULL)
-	{
+	if (p != NULL) {
 		memcpy( (uint8_t*)((uint8_t*)p->payload), (uint8_t*)net_buf, g_low_input_len);
 	}
-
 
 	return p;
 }
 
+extern struct netif gnetif;
+extern err_t tcpip_input(struct pbuf *p, struct netif *inp);
 /**
  * @brief This function is the ethernetif_input task, it is processed when a packet
  * is ready to be read from the interface. It uses the function low_level_input()
@@ -211,20 +208,28 @@ void ethernetif_input( void const * argument ) {
 	struct pbuf *p;
 	struct netif *netif = (struct netif *) argument;
 
-	for( ;; )
-	{
+	for( ;; ) {
 		g_low_input_len = enc28j60PacketReceive(MAX_FRAMELEN, net_buf);
 
-		if(g_low_input_len!=0)
-		{
-			do
-			{
+		if(g_low_input_len!=0) {
+			do{
 				p = low_level_input( netif );
-				if (p != NULL)
-				{
-					if (netif->input( p, netif) != ERR_OK )
-					{
+
+				if (p != NULL) {
+					printf("%s %u, %08X, %08X\n",
+							__func__, g_low_input_len, (uint32_t)netif, (uint32_t)&gnetif);
+					flush_stdout();
+
+					printf("%08X, %08X\n",
+							(uint32_t)netif->input, (uint32_t)tcpip_input);
+					flush_stdout();
+					if (netif->input( p, netif) != ERR_OK ) {
+						printf("%s %d\n", __func__, __LINE__);
+						flush_stdout();
 						pbuf_free(p);
+					} else {
+						printf("%s %d\n", __func__, __LINE__);
+						flush_stdout();
 					}
 				}
 			}while(p!=NULL);

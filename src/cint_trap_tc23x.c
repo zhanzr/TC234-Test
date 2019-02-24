@@ -74,27 +74,35 @@ __asm (".text");
 
 /* Install TRAPHANDLER for trap TRAPNO.  */
 
-/* Send character CHR via the serial line */
-static __inline void _out_uart(const char chr)
-{
-	TX_CLEAR(UARTBASE);
-	/* send the character */
-	PUT_CHAR(UARTBASE, chr);
-}
-
-static inline void flush_stdout_trap(void)
-{
-	for(uint32_t i=0; i<1000; ++i)
-	{
+static inline void simple_delay(uint32_t t) {
+	for(uint32_t i=0; i<t; ++i) {
 		__asm__ volatile ("nop" ::: "memory");
 		__asm volatile ("" : : : "memory");
 	}
 }
 
-int _install_trap_handler(int trapno, void (*traphandler)(int))
-{
-	if ((trapno < 0) || (trapno >= MAX_TRAPS))
+/* Send character CHR via the serial line */
+static __inline void _out_uart(const char chr) {
+	TX_CLEAR(UARTBASE);
+	/* send the character */
+	PUT_CHAR(UARTBASE, chr);
+	simple_delay(10000);
+}
+
+static inline void _output_buf(const char* str, uint16_t len) {
+	for(uint16_t i=0; i<len; ++i) {
+		_out_uart(*(str+i));
+	}
+}
+
+static inline void flush_stdout_trap(void) {
+	simple_delay(10000);
+}
+
+int _install_trap_handler(int trapno, void (*traphandler)(int)) {
+	if ((trapno < 0) || (trapno >= MAX_TRAPS)) {
 		return 0;
+	}
 
 	Tdisptab[trapno] = traphandler;
 
@@ -290,31 +298,29 @@ static void __class_3_trap_handler(int tin)
 }
 
 /* System Bus and Peripheral Errors  */
-
-static void __class_4_trap_handler(int tin)
-{
+char g_tmp_output_buf[1024];
+static void __class_4_trap_handler(int tin) {
 	led_toggle(0);
 	led_toggle(1);
 
-	_out_uart('<');
-	flush_stdout_trap();
-	_out_uart('4');
-	flush_stdout_trap();
-	_out_uart('>');
-	flush_stdout_trap();
-	_out_uart('[');
-	flush_stdout_trap();
-	_out_uart('0'+tin);
-	flush_stdout_trap();
-	_out_uart(']');
-	flush_stdout_trap();
+	sprintf(g_tmp_output_buf, "[4_%i]\n", tin);
+	_output_buf(g_tmp_output_buf, strlen(g_tmp_output_buf));
+
+	sprintf(g_tmp_output_buf, "%08X %08X %08X %08X %08X %08X\n",
+			_mfcr( CPU_FCX ),
+			_mfcr( CPU_LCX ),
+			_mfcr( CPU_PCXI ),
+			_mfcr( CPU_ISP ),
+			_mfcr( CPU_PC ),
+			_mfcr( CPU_DSTR )
+	);
+	_output_buf(g_tmp_output_buf, strlen(g_tmp_output_buf));
 
 	while(1) {
 		_nop();
 	}
 
-	switch (tin)
-	{
+	switch (tin) {
 	case 1:
 		_debug(); /* PSE -- Program Fetch Synchronous Error  */
 		break;

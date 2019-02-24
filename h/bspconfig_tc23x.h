@@ -48,11 +48,9 @@ extern "C" {
 #include TC_INCLUDE(TCPATH/IfxAsclin_reg.h)
 #include TC_INCLUDE(TCPATH/IfxAsclin_bf.h)
 
-static Ifx_ASCLIN * const asclin0 = (Ifx_ASCLIN *)&MODULE_ASCLIN0;
-
 static Ifx_P * const port_UART = (Ifx_P *)&MODULE_P14;
 
-#define UARTBASE				asclin0
+#define UARTBASE	((Ifx_ASCLIN * const)&MODULE_ASCLIN0)
 
 /* baud rate values at SysClock 100 MHz */
 #define NUMERATOR_BAUD_9600				(48 * 1)

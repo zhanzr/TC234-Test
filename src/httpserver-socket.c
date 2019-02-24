@@ -262,44 +262,33 @@ void http_server_serve(int conn) {
  * @param arg: pointer on argument(not used here)
  * @retval None
  */
-static void http_server_socket_thread(void *arg)
-{
+static void http_server_socket_thread(void *arg) {
 	int sock, newconn, size;
 	struct sockaddr_in address, remotehost;
 
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
-
 	/* create a TCP socket */
-	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-	{
+	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
 		return;
 	}
 
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 	/* bind to port 80 at any interface */
 	address.sin_family = AF_INET;
 	address.sin_port = htons(80);
 	address.sin_addr.s_addr = INADDR_ANY;
 
-	if (bind(sock, (struct sockaddr *)&address, sizeof (address)) < 0)
-	{
+	if (bind(sock, (struct sockaddr *)&address, sizeof (address)) < 0) {
 		return;
 	}
 
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 	/* listen for incoming connections (TCP listen backlog = 5) */
 	listen(sock, 5);
 
 	size = sizeof(remotehost);
 
-	printf("%s %d\n", __func__, __LINE__);
+	printf("%s %d %08X\n", __func__, __LINE__, http_server_socket_thread);
 	flush_stdout();
 
-	while (1)
-	{
+	while (1) {
 		newconn = accept(sock, (struct sockaddr *)&remotehost, (socklen_t *)&size);
 		http_server_serve(newconn);
 	}
@@ -312,18 +301,12 @@ static void http_server_socket_thread(void *arg)
  */
 void http_server_socket_init(void) {
 	//	sys_thread_new("HTTP", http_server_socket_thread, NULL, 1024 * 10, WEBSERVER_THREAD_PRIO);
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
-
 	portBASE_TYPE xResult = xTaskCreate((TaskFunction_t )http_server_socket_thread,
 			(const char*    )"HTTP",
 			(uint16_t       )1024*8,
 			(void*          )NULL,
 			WEBSERVER_THREAD_PRIO,
 			(TaskHandle_t*  )&g_http_task_handler);
-
-	printf("%s %d %08X\n", __func__, __LINE__, xResult);
-	flush_stdout();
 }
 
 /**
@@ -332,9 +315,8 @@ void http_server_socket_init(void) {
  * @param  conn connection socket
  * @retval None
  */
-void DynWebPage(int conn)
-{
-	char pagehits[128] = {0};
+void DynWebPage(int conn) {
+	char pagehits[256];
 
 	memset(PAGE_BODY, 0, 512);
 
@@ -361,5 +343,3 @@ void DynWebPage(int conn)
 	write(conn, PAGE_START, strlen((char*)PAGE_START));
 	write(conn, PAGE_BODY, strlen(PAGE_BODY));
 }
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
