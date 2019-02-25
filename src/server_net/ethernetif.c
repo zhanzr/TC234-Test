@@ -52,7 +52,14 @@
 
 #include "enc28j60.h"
 
+#include "portmacro.h"
 #include "FreeRTOS.h"
+#include "task.h"
+#include "croutine.h"
+#include "queue.h"
+#include "semphr.h"
+#include "timers.h"
+#include "event_groups.h"
 
 #include "uart_int.h"
 
@@ -121,7 +128,7 @@ static void low_level_init(struct netif *netif)
 
 	/* create the task that handles the ETH_MAC */
 	xTaskCreate((TaskFunction_t )ethernetif_input,
-			(const char*    )"ethernetif_input",
+			(const char*    )"eth_input",
 			(uint16_t       )768,
 			(void*          )netif,
 			(UBaseType_t    )tskIDLE_PRIORITY + 3,
@@ -209,32 +216,23 @@ void ethernetif_input( void const * argument ) {
 	struct netif *netif = (struct netif *) argument;
 
 	for( ;; ) {
-		g_low_input_len = enc28j60PacketReceive(MAX_FRAMELEN, net_buf);
+		g_low_input_len = enc28j60PacketReceive(MAX_FRAMELEN, (uint8_t*)net_buf);
 
 		if(g_low_input_len!=0) {
 			do{
 				p = low_level_input( netif );
 
 				if (p != NULL) {
-					printf("%s %u, %08X, %08X\n",
-							__func__, g_low_input_len, (uint32_t)netif, (uint32_t)&gnetif);
-					flush_stdout();
-
-					printf("%08X, %08X\n",
-							(uint32_t)netif->input, (uint32_t)tcpip_input);
-					flush_stdout();
 					if (netif->input( p, netif) != ERR_OK ) {
-						printf("%s %d\n", __func__, __LINE__);
-						flush_stdout();
 						pbuf_free(p);
 					} else {
-						printf("%s %d\n", __func__, __LINE__);
-						flush_stdout();
+						g_low_input_len = 0;
+						vTaskDelay(pdMS_TO_TICKS(20));
 					}
 				}
 			}while(p!=NULL);
 		} else {
-			vTaskDelay(10 / portTICK_PERIOD_MS);
+			vTaskDelay(pdMS_TO_TICKS(20));
 		}
 	}
 }

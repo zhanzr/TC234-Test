@@ -51,6 +51,7 @@
 #include "string.h"
 #include "httpserver-socket.h"
 
+#include "portmacro.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "croutine.h"
@@ -285,9 +286,6 @@ static void http_server_socket_thread(void *arg) {
 
 	size = sizeof(remotehost);
 
-	printf("%s %d %08X\n", __func__, __LINE__, http_server_socket_thread);
-	flush_stdout();
-
 	while (1) {
 		newconn = accept(sock, (struct sockaddr *)&remotehost, (socklen_t *)&size);
 		http_server_serve(newconn);
@@ -301,9 +299,10 @@ static void http_server_socket_thread(void *arg) {
  */
 void http_server_socket_init(void) {
 	//	sys_thread_new("HTTP", http_server_socket_thread, NULL, 1024 * 10, WEBSERVER_THREAD_PRIO);
-	portBASE_TYPE xResult = xTaskCreate((TaskFunction_t )http_server_socket_thread,
+	portBASE_TYPE xResult = xTaskCreate(
+			(TaskFunction_t )http_server_socket_thread,
 			(const char*    )"HTTP",
-			(uint16_t       )1024*8,
+			(uint16_t       )1024,
 			(void*          )NULL,
 			WEBSERVER_THREAD_PRIO,
 			(TaskHandle_t*  )&g_http_task_handler);

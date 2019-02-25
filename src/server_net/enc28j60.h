@@ -272,8 +272,8 @@
 /* Definition of the Ethernet driver buffers size and count */
 #define ETH_RX_BUF_SIZE                MAX_FRAMELEN /* buffer size for receive               */
 #define ETH_TX_BUF_SIZE                MAX_FRAMELEN /* buffer size for transmit              */
-#define ETH_RXBUFNB                    ((uint32_t)4)       /* 4 Rx buffers of size ETH_RX_BUF_SIZE  */
-#define ETH_TXBUFNB                    ((uint32_t)4)       /* 4 Tx buffers of size ETH_TX_BUF_SIZE  */
+#define ETH_RXBUFNB                    ((uint32_t)2)       /* number of Rx buffers of size ETH_RX_BUF_SIZE  */
+#define ETH_TXBUFNB                    ((uint32_t)2)       /* number of Tx buffers of size ETH_TX_BUF_SIZE  */
 
 void spi_init(void);
 

@@ -71,6 +71,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "uart_int.h"
+
 /* Defining MPU_WRAPPERS_INCLUDED_FROM_API_FILE prevents task.h from redefining
 all the API functions to use the MPU wrappers.  That should only be done when
 task.h is included from an application file. */
@@ -683,6 +685,9 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 	TCB_t *pxNewTCB;
 	BaseType_t xReturn;
 
+	printf("%s %s %u %d %08X\n", __func__, pcName, usStackDepth, uxPriority, pxCreatedTask);
+	flush_stdout_trap();
+
 		/* If the stack grows down then allocate the stack then the TCB so the stack
 		does not grow into the TCB.  Likewise if the stack grows up then allocate
 		the TCB then the stack. */
@@ -748,7 +753,6 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 				pxNewTCB->ucStaticallyAllocated = tskDYNAMICALLY_ALLOCATED_STACK_AND_TCB;
 			}
 			#endif /* configSUPPORT_STATIC_ALLOCATION */
-
 			prvInitialiseNewTask( pxTaskCode, pcName, ( uint32_t ) usStackDepth, pvParameters, uxPriority, pxCreatedTask, pxNewTCB, NULL );
 			prvAddNewTaskToReadyList( pxNewTCB );
 			xReturn = pdPASS;

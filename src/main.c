@@ -59,7 +59,7 @@
 #include "app_ethernet.h"
 #include "httpserver-socket.h"
 
-SemaphoreHandle_t MutexSemaphore;
+//SemaphoreHandle_t MutexSemaphore;
 
 struct netif gnetif; /* network interface structure */
 
@@ -82,14 +82,13 @@ static void prvSetupHardware( void );
 
 /*-----------------------------------------------------------*/
 
-TaskHandle_t StartTask_Handler;
+TaskHandle_t g_start_task_handler;
 void start_task(void *pvParameters);
 
-TaskHandle_t g_task0_handler;
-void maintaince_task(void *pvParameters);
-
-TaskHandle_t g_info_task_handler;
-void print_task(void *pvParameters);
+//TaskHandle_t g_task0_handler;
+//void maintaince_task(void *pvParameters);
+//TaskHandle_t g_info_task_handler;
+//void print_task(void *pvParameters);
 
 const char ON_STR[] = "On";
 const char OFF_STR[] = "Off";
@@ -279,7 +278,7 @@ int16_t analyse_get_url(char *str) {
 
 void protocol_init(void){
 	//using static configuration now
-	printf("MAC:%02X,%02X,%02X,%02X,%02X,%02X\n",
+	printf("MAC:%02X-%02X-%02X-%02X-%02X-%02X\n",
 			MAC_ADDR0, MAC_ADDR1, MAC_ADDR2, MAC_ADDR3, MAC_ADDR4, MAC_ADDR5);
 	printf("IP:%d.%d.%d.%d\n",
 			IP_ADDR0, IP_ADDR1, IP_ADDR2, IP_ADDR3);
@@ -340,10 +339,10 @@ int core0_main(int argc, char** argv) {
 
 	xTaskCreate((TaskFunction_t )start_task,
 			(const char*    )"start_task",
-			(uint16_t       )1024,
+			(uint16_t       )512,
 			(void*          )NULL,
 			(UBaseType_t    )tskIDLE_PRIORITY + 1,
-			(TaskHandle_t*  )&StartTask_Handler);
+			(TaskHandle_t*  )&g_start_task_handler);
 
 	/* Now all the tasks have been started - start the scheduler. */
 	vTaskStartScheduler();
@@ -387,7 +386,7 @@ static void Netif_Config(void) {
 }
 
 void start_task(void *pvParameters) {
-	MutexSemaphore = xSemaphoreCreateMutex();
+//	MutexSemaphore = xSemaphoreCreateMutex();
 
 	/* Create tcp_ip stack thread */
 	tcpip_init(NULL, NULL);
@@ -415,13 +414,13 @@ void start_task(void *pvParameters) {
 	//			(UBaseType_t    )tskIDLE_PRIORITY + 2,
 	//			(TaskHandle_t*  )&g_info_task_handler);
 
-	vTaskDelete(StartTask_Handler);
+	vTaskDelete(g_start_task_handler);
 }
 
-void maintaince_task(void *pvParameters) {
-	//	char info_buf[512];
-
-	while(1) {
+//void maintaince_task(void *pvParameters) {
+//	//	char info_buf[512];
+//
+//	while(1) {
 		//		vTaskList(info_buf);
 		//		if(NULL != MutexSemaphore) {
 		//			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
@@ -449,19 +448,19 @@ void maintaince_task(void *pvParameters) {
 		//
 		//		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
 		//						portMAX_DELAY );/* Block indefinitely. */
-		vTaskDelay(40 / portTICK_PERIOD_MS);
-	}
-}
+//		vTaskDelay(40 / portTICK_PERIOD_MS);
+//	}
+//}
 
-void print_task(void *pvParameters) {
-	char info_buf[512];
-	volatile uint8_t net_buf[MAX_FRAMELEN];
-
-	uint16_t payloadlen;
-	uint16_t dat_p;
-	int16_t cmd16;
-
-	while(true) {
+//void print_task(void *pvParameters) {
+//	char info_buf[512];
+//	volatile uint8_t net_buf[MAX_FRAMELEN];
+//
+//	uint16_t payloadlen;
+//	uint16_t dat_p;
+//	int16_t cmd16;
+//
+//	while(true) {
 		//		payloadlen = enc28j60PacketReceive(MAX_FRAMELEN, net_buf);
 		//
 		//		if(payloadlen==0) {
@@ -567,8 +566,8 @@ void print_task(void *pvParameters) {
 		//		} else {
 		//			//;
 		//		}
-	}
-}
+//	}
+//}
 
 static void prvSetupHardware( void ) {
 	system_clk_config_200_100();

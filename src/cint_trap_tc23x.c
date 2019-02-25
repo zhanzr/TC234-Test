@@ -117,7 +117,7 @@ int _install_trap_handler(int trapno, void (*traphandler)(int)) {
 
 static void __class_0_trap_handler(int tin)
 {
-	led_toggle(0);
+	led_on(0);
 
 	_out_uart('<');
 	flush_stdout_trap();
@@ -152,7 +152,7 @@ static void __class_0_trap_handler(int tin)
 
 static void __class_1_trap_handler(int tin)
 {
-	led_toggle(1);
+	led_on(1);
 
 	_out_uart('<');
 	flush_stdout_trap();
@@ -207,7 +207,7 @@ static void __class_1_trap_handler(int tin)
 
 static void __class_2_trap_handler(int tin)
 {
-	led_toggle(2);
+	led_on(2);
 
 	_out_uart('<');
 	flush_stdout_trap();
@@ -300,8 +300,11 @@ static void __class_3_trap_handler(int tin)
 /* System Bus and Peripheral Errors  */
 char g_tmp_output_buf[1024];
 static void __class_4_trap_handler(int tin) {
-	led_toggle(0);
-	led_toggle(1);
+	led_on(0);
+	led_on(1);
+
+	_out_uart('<');
+	flush_stdout_trap();
 
 	sprintf(g_tmp_output_buf, "[4_%i]\n", tin);
 	_output_buf(g_tmp_output_buf, strlen(g_tmp_output_buf));
@@ -359,8 +362,8 @@ static void __class_4_trap_handler(int tin) {
 
 static void __class_5_trap_handler(int tin)
 {
-	led_toggle(1);
-	led_toggle(2);
+	led_on(1);
+	led_on(2);
 
 	_out_uart('<');
 	flush_stdout_trap();
@@ -395,8 +398,8 @@ static void __class_5_trap_handler(int tin)
 
 static void __class_7_trap_handler(int tin)
 {
-	led_toggle(2);
-	led_toggle(3);
+	led_on(2);
+	led_on(3);
 
 	_out_uart('<');
 	flush_stdout_trap();

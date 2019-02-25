@@ -59,6 +59,8 @@
 
 #if LWIP_NETCONN /* don't build if not configured for use in lwipopts.h */
 
+#include "uart_int.h"
+
 #include "lwip/api.h"
 #include "lwip/memp.h"
 
@@ -422,6 +424,8 @@ netconn_accept(struct netconn *conn, struct netconn **new_conn)
   }
 #else
   sys_arch_mbox_fetch(&conn->acceptmbox, &accept_ptr, 0);
+	printf("%s %08X %d\n", __func__, __LINE__, &conn->acceptmbox);
+	flush_stdout_trap();
 #endif /* LWIP_SO_RCVTIMEO*/
   newconn = (struct netconn *)accept_ptr;
   /* Register event with callback */
@@ -532,6 +536,8 @@ netconn_recv_data(struct netconn *conn, void **new_buf)
   }
 #else
   sys_arch_mbox_fetch(&conn->recvmbox, &buf, 0);
+	printf("%s %08X %d\n", __func__, __LINE__, &conn->recvmbox);
+	flush_stdout_trap();
 #endif /* LWIP_SO_RCVTIMEO*/
 
 #if LWIP_TCP

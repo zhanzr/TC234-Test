@@ -39,6 +39,8 @@
 
 #if !NO_SYS
 
+#include "uart_int.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "croutine.h"
@@ -68,9 +70,13 @@ portBASE_TYPE xInsideISR = pdFALSE;
  *---------------------------------------------------------------------------*/
 err_t sys_mbox_new( sys_mbox_t *pxMailBox, int iSize )
 {
-err_t xReturn = ERR_MEM;
+	err_t xReturn = ERR_MEM;
 
 	*pxMailBox = xQueueCreate( iSize, sizeof( void * ) );
+
+	printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
+	printf("%s %08X\n", __func__, pxMailBox);
+	flush_stdout_trap();
 
 	if( *pxMailBox != NULL )
 	{
@@ -96,12 +102,12 @@ err_t xReturn = ERR_MEM;
  *---------------------------------------------------------------------------*/
 void sys_mbox_free( sys_mbox_t *pxMailBox )
 {
-unsigned long ulMessagesWaiting;
+	unsigned long ulMessagesWaiting;
 
 	ulMessagesWaiting = uxQueueMessagesWaiting( *pxMailBox );
 	configASSERT( ( ulMessagesWaiting == 0 ) );
 
-	#if SYS_STATS
+#if SYS_STATS
 	{
 		if( ulMessagesWaiting != 0UL )
 		{
@@ -110,7 +116,11 @@ unsigned long ulMessagesWaiting;
 
 		SYS_STATS_DEC( mbox.used );
 	}
-	#endif /* SYS_STATS */
+#endif /* SYS_STATS */
+
+	printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
+	printf("%s %08X\n", __func__, pxMailBox);
+	flush_stdout_trap();
 
 	vQueueDelete( *pxMailBox );
 }
@@ -126,6 +136,9 @@ unsigned long ulMessagesWaiting;
  *---------------------------------------------------------------------------*/
 void sys_mbox_post( sys_mbox_t *pxMailBox, void *pxMessageToPost )
 {
+	printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
+	printf("%s %d\n", __func__, __LINE__);
+	flush_stdout_trap();
 	while( xQueueSendToBack( *pxMailBox, &pxMessageToPost, portMAX_DELAY ) != pdTRUE );
 }
 
@@ -144,24 +157,25 @@ void sys_mbox_post( sys_mbox_t *pxMailBox, void *pxMessageToPost )
  *---------------------------------------------------------------------------*/
 err_t sys_mbox_trypost( sys_mbox_t *pxMailBox, void *pxMessageToPost )
 {
-err_t xReturn;
-portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+	err_t xReturn;
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 
-	if( xInsideISR != pdFALSE )
-	{
+	if( xInsideISR != pdFALSE ) {
 		xReturn = xQueueSendFromISR( *pxMailBox, &pxMessageToPost, &xHigherPriorityTaskWoken );
-	}
-	else
-	{
+	} else {
 		xReturn = xQueueSend( *pxMailBox, &pxMessageToPost, ( TickType_t ) 0 );
 	}
 
-	if( xReturn == pdPASS )
-	{
+	printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
+	printf("%s %08X %08X %d %d\n", __func__, pxMailBox, pxMessageToPost, __LINE__, xReturn);
+	flush_stdout_trap();
+
+	if( xReturn == pdPASS ) {
 		xReturn = ERR_OK;
-	}
-	else
-	{
+	} else {
+		while(1) {
+			_nop();
+		}
 		/* The queue was already full. */
 		xReturn = ERR_MEM;
 		SYS_STATS_INC( mbox.err );
@@ -197,14 +211,18 @@ portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
  *---------------------------------------------------------------------------*/
 u32_t sys_arch_mbox_fetch( sys_mbox_t *pxMailBox, void **ppvBuffer, u32_t ulTimeOut )
 {
-void *pvDummy;
-TickType_t xStartTime, xEndTime, xElapsed;
-unsigned long ulReturn;
+	void *pvDummy;
+	TickType_t xStartTime, xEndTime, xElapsed;
+	unsigned long ulReturn;
 
 	xStartTime = xTaskGetTickCount();
 
 	if( NULL == ppvBuffer )
 	{
+		printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
+		printf("%s %08X %d\n", __func__, __LINE__, pxMailBox);
+		flush_stdout_trap();
+
 		ppvBuffer = &pvDummy;
 	}
 
@@ -218,12 +236,20 @@ unsigned long ulReturn;
 			xElapsed = ( xEndTime - xStartTime ) * portTICK_PERIOD_MS;
 
 			ulReturn = xElapsed;
+
+			printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
+			printf("%s %08X %d %d\n", __func__, pxMailBox, __LINE__, ulReturn);
+			flush_stdout_trap();
 		}
 		else
 		{
 			/* Timed out. */
 			*ppvBuffer = NULL;
 			ulReturn = SYS_ARCH_TIMEOUT;
+
+			printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
+			printf("%s %08X %d %d\n", __func__, pxMailBox, __LINE__, ulReturn);
+			flush_stdout_trap();
 		}
 	}
 	else
@@ -238,6 +264,10 @@ unsigned long ulReturn;
 		}
 
 		ulReturn = xElapsed;
+
+		printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
+		printf("%s %08X %d %d\n", __func__, pxMailBox, __LINE__, ulReturn);
+		flush_stdout_trap();
 	}
 
 	return ulReturn;
@@ -259,23 +289,33 @@ unsigned long ulReturn;
  *---------------------------------------------------------------------------*/
 u32_t sys_arch_mbox_tryfetch( sys_mbox_t *pxMailBox, void **ppvBuffer )
 {
-void *pvDummy;
-unsigned long ulReturn;
-long lResult;
-portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+	void *pvDummy;
+	unsigned long ulReturn;
+	long lResult;
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 
 	if( ppvBuffer== NULL )
 	{
+		printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
+		printf("%s %08X\n", __func__, pxMailBox);
+		flush_stdout_trap();
+
 		ppvBuffer = &pvDummy;
 	}
 
 	if( xInsideISR != pdFALSE )
 	{
 		lResult = xQueueReceiveFromISR( *pxMailBox, &( *ppvBuffer ), &xHigherPriorityTaskWoken );
+		printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
+		printf("%s %08X %d\n", __func__, pxMailBox, lResult);
+		flush_stdout_trap();
 	}
 	else
 	{
 		lResult = xQueueReceive( *pxMailBox, &( *ppvBuffer ), 0UL );
+		printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
+		printf("%s %08X %d\n", __func__, pxMailBox, lResult);
+		flush_stdout_trap();
 	}
 
 	if( lResult == pdPASS )
@@ -305,7 +345,7 @@ portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
  *---------------------------------------------------------------------------*/
 err_t sys_sem_new( sys_sem_t *pxSemaphore, u8_t ucCount )
 {
-err_t xReturn = ERR_MEM;
+	err_t xReturn = ERR_MEM;
 
 	vSemaphoreCreateBinary( ( *pxSemaphore ) );
 
@@ -352,8 +392,8 @@ err_t xReturn = ERR_MEM;
  *---------------------------------------------------------------------------*/
 u32_t sys_arch_sem_wait( sys_sem_t *pxSemaphore, u32_t ulTimeout )
 {
-TickType_t xStartTime, xEndTime, xElapsed;
-unsigned long ulReturn;
+	TickType_t xStartTime, xEndTime, xElapsed;
+	unsigned long ulReturn;
 
 	xStartTime = xTaskGetTickCount();
 
@@ -392,7 +432,7 @@ unsigned long ulReturn;
  * @return a new mutex */
 err_t sys_mutex_new( sys_mutex_t *pxMutex )
 {
-err_t xReturn = ERR_MEM;
+	err_t xReturn = ERR_MEM;
 
 	*pxMutex = xSemaphoreCreateMutex();
 
@@ -443,7 +483,7 @@ void sys_mutex_free( sys_mutex_t *pxMutex )
  *---------------------------------------------------------------------------*/
 void sys_sem_signal( sys_sem_t *pxSemaphore )
 {
-portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
+	portBASE_TYPE xHigherPriorityTaskWoken = pdFALSE;
 
 	if( xInsideISR != pdFALSE )
 	{
@@ -502,25 +542,25 @@ u32_t sys_now(void)
  * Outputs:
  *      sys_thread_t            -- Pointer to per-thread timeouts.
  *---------------------------------------------------------------------------*/
-sys_thread_t sys_thread_new( const char *pcName, void( *pxThread )( void *pvParameters ), void *pvArg, int iStackSize, int iPriority )
-{
-TaskHandle_t xCreatedTask;
-portBASE_TYPE xResult;
-sys_thread_t xReturn;
-
-	xResult = xTaskCreate( pxThread, pcName, iStackSize, pvArg, iPriority, &xCreatedTask );
-
-	if( xResult == pdPASS )
-	{
-		xReturn = xCreatedTask;
-	}
-	else
-	{
-		xReturn = NULL;
-	}
-
-	return xReturn;
-}
+//sys_thread_t sys_thread_new( const char *pcName, void( *pxThread )( void *pvParameters ), void *pvArg, int iStackSize, int iPriority )
+//{
+//	TaskHandle_t xCreatedTask;
+//	portBASE_TYPE xResult;
+//	sys_thread_t xReturn;
+//
+//	xResult = xTaskCreate( pxThread, pcName, iStackSize, pvArg, iPriority, &xCreatedTask );
+//
+//	if( xResult == pdPASS )
+//	{
+//		xReturn = xCreatedTask;
+//	}
+//	else
+//	{
+//		xReturn = NULL;
+//	}
+//
+//	return xReturn;
+//}
 
 /*---------------------------------------------------------------------------*
  * Routine:  sys_arch_protect

@@ -60,6 +60,8 @@
 #include "lwip/sys.h"
 #include "lwip/pbuf.h"
 
+#include "uart_int.h"
+
 #if LWIP_DEBUG_TIMERNAMES
 #define HANDLER(x) x, #x
 #else /* LWIP_DEBUG_TIMERNAMES */
@@ -409,11 +411,15 @@ sys_timeouts_mbox_fetch(sys_mbox_t *mbox, void **msg)
 again:
   if (!next_timeout) {
     sys_arch_mbox_fetch(mbox, msg, 0);
+	printf("%s %d %08X\n", __func__, __LINE__, mbox);
+	flush_stdout_trap();
     return;
   }
 
   sleeptime = sys_timeouts_sleeptime();
   if (sleeptime == 0 || sys_arch_mbox_fetch(mbox, msg, sleeptime) == SYS_ARCH_TIMEOUT) {
+		printf("%s %d %08X\n", __func__, __LINE__, mbox);
+		flush_stdout_trap();
     /* If a SYS_ARCH_TIMEOUT value is returned, a timeout occurred
        before a message could be fetched. */
     sys_check_timeouts();
