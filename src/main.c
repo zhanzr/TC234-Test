@@ -288,13 +288,34 @@ void protocol_init(void){
 int core0_main(int argc, char** argv) {
 	prvSetupHardware();
 
-	//	SYSTEM_EnaDisCache(1);
+//	SYSTEM_EnaDisCache(1);
 
 	uart_init(mainCOM_TEST_BAUD_RATE);
 
 	//config_dts();
+	uint8_t test_d[]={0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0};
+	printf("%p %04X\n", test_d, *(uint16_t*)test_d);
+	printf("%p %04X\n", test_d+1, *(uint16_t*)(test_d+1));
+	printf("%p %08X\n", test_d, *(uint32_t*)test_d);
+	printf("%p %08X\n", test_d+1, *(uint32_t*)(test_d+1));
+	printf("%p %08X\n", test_d+2, *(uint32_t*)(test_d+2));
+	printf("%p %08X\n", test_d+3, *(uint32_t*)(test_d+3));
+	flush_stdout();
 
-	printf("%s %s\n", _NEWLIB_VERSION, __func__);
+	printf("%08X %08X %08X %08X %08X %08X %08X\n",
+			_mfcr( CPU_FCX ),
+			_mfcr( CPU_LCX ),
+			_mfcr( CPU_PCXI ),
+			_mfcr( CPU_ISP ),
+			_mfcr( CPU_PC ),
+			_mfcr( CPU_DEADD ),
+			_mfcr( CPU_DSTR )
+	);
+	flush_stdout();
+	uint32_t* p32 = 0xD0000000 + 184*1024;
+	printf("%p %08X\n", p32, *(uint32_t*)(p32));
+
+	printf("%s\n", _NEWLIB_VERSION);
 
 	const uint32_t FLASH_SIZE_TABLE_KB[]={256, 512, 1024, 1536, 2048, 2560, 3072, 4096, 5120, 1024*6, 1024*7, 1024*8};
 	printf("CHIPID:%X\n"\
@@ -331,11 +352,6 @@ int core0_main(int argc, char** argv) {
 
 	protocol_init();
 	flush_stdout();
-
-	/* The following function will only create more tasks and timers if
-	mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY is set to 0 (at the top of this
-	file).  See the comments at the top of this file for more information. */
-	//	prvOptionallyCreateComprehensveTestApplication();
 
 	xTaskCreate((TaskFunction_t )start_task,
 			(const char*    )"start_task",

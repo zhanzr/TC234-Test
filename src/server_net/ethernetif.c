@@ -128,8 +128,8 @@ static void low_level_init(struct netif *netif)
 
 	/* create the task that handles the ETH_MAC */
 	xTaskCreate((TaskFunction_t )ethernetif_input,
-			(const char*    )"eth_input",
-			(uint16_t       )768,
+			(const char*    )"ei",
+			(uint16_t       )INTERFACE_THREAD_STACK_SIZE,
 			(void*          )netif,
 			(UBaseType_t    )tskIDLE_PRIORITY + 3,
 			(TaskHandle_t*  )&g_input_handler);
@@ -219,6 +219,10 @@ void ethernetif_input( void const * argument ) {
 		g_low_input_len = enc28j60PacketReceive(MAX_FRAMELEN, (uint8_t*)net_buf);
 
 		if(g_low_input_len!=0) {
+			printf("%u %08X\n", g_low_input_len, net_buf);
+			for(uint16_t i=0; i<g_low_input_len; ++i) {
+				printf("%02x ", net_buf[i]);
+			}
 			do{
 				p = low_level_input( netif );
 

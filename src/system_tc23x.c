@@ -314,11 +314,9 @@ static void system_set_pll(const PllInitValue_t *pPllInitValue)
 	}
 }
 
-void system_clk_config_200_100(void)
-{
+void system_clk_config_200_100(void) {
 	//	200/100 MHz @ 20MHz ext. clock
-	static const PllInitValue_t pll_init_200_100 =
-	{
+	static const PllInitValue_t pll_init_200_100 = {
 			.valOSCCON = 0x0007001C,
 			.valPLLCON0 = 0x01017600,
 			.valPLLCON1 = 0x00020505,
@@ -331,11 +329,9 @@ void system_clk_config_200_100(void)
 	system_set_pll(&pll_init_200_100);
 }
 
-void system_clk_config_100_50(void)
-{
+void system_clk_config_100_50(void) {
 	// 100/50 MHz @ 20MHz ext. clock
-	static const PllInitValue_t pll_init_100_50 =
-	{
+	static const PllInitValue_t pll_init_100_50 = {
 			.valOSCCON = 0x0007001C,
 			.valPLLCON0 = 0x01018A00,
 			.valPLLCON1 = 0x00020606,
@@ -348,47 +344,39 @@ void system_clk_config_100_50(void)
 	system_set_pll(&pll_init_100_50);
 }
 
-void SYSTEM_Init(void)
-{
+void SYSTEM_Init(void) {
 	disable_external_watchdog();
 }
 
-uint32_t system_GetPllClock(void)
-{
+uint32_t system_GetPllClock(void) {
 	uint32_t frequency = EXTCLK;	/* fOSC */
 
 	Ifx_SCU_PLLSTAT pllstat = MODULE_SCU.PLLSTAT;
 	Ifx_SCU_PLLCON0 pllcon0 = MODULE_SCU.PLLCON0;
 	Ifx_SCU_PLLCON1 pllcon1 = MODULE_SCU.PLLCON1;
 
-	if (0 == (pllstat.B.VCOBYST))
-	{
-		if (0 == (pllstat.B.FINDIS))
-		{
+	if (0 == (pllstat.B.VCOBYST)) {
+		if (0 == (pllstat.B.FINDIS)) {
 			/* normal mode */
 			frequency *= (pllcon0.B.NDIV + 1);		/* fOSC*N */
 			frequency /= (pllcon0.B.PDIV + 1);		/* .../P  */
 			frequency /= (pllcon1.B.K2DIV + 1);		/* .../K2 */
-		}
-		else	/* freerunning mode */
-		{
+		} else {
+			/* freerunning mode */
 			frequency = 800000000;		/* fVCOBASE 800 MHz (???) */
 			frequency /= (pllcon1.B.K2DIV + 1);		/* .../K2 */
 		}
-	}
-	else	/* prescaler mode */
-	{
+	} else {
+		/* prescaler mode */
 		frequency /= (pllcon1.B.K1DIV + 1);		/* fOSC/K1 */
 	}
 
 	return (uint32_t)frequency;
 }
 
-uint32_t system_GetIntClock(void)
-{
+uint32_t system_GetIntClock(void) {
 	uint32_t frequency = 0;
-	switch (MODULE_SCU.CCUCON0.B.CLKSEL)
-	{
+	switch (MODULE_SCU.CCUCON0.B.CLKSEL) {
 	default:
 	case 0:  /* back-up clock (typ. 100 MHz) */
 		frequency = 100000000ul;
@@ -400,129 +388,118 @@ uint32_t system_GetIntClock(void)
 	return frequency;
 }
 
-uint32_t SYSTEM_GetCpuClock(void)
-{
+uint32_t SYSTEM_GetCpuClock(void) {
 	uint32_t frequency = system_GetIntClock();
 	/* fCPU = fSRI */
 	uint32_t divider = MODULE_SCU.CCUCON0.B.SRIDIV;
 	uint32_t cpudiv = MODULE_SCU.CCUCON6.B.CPU0DIV;
-	if (0 == divider)
+	if (0 == divider) {
 		return 0;
-	frequency /= divider;
-
-	if (cpudiv != 0)
-	{
-		frequency *= (64 - cpudiv);
-		frequency /= 64;
 	}
 
-	return frequency;
+	frequency /= divider;
+
+	if (cpudiv != 0) {
+		frequency *= (64 - cpudiv);
+		frequency /= 64;
+	} else {
+		return frequency;
+	}
 }
 
-uint32_t SYSTEM_GetSysClock(void)
-{
+uint32_t SYSTEM_GetSysClock(void) {
 	uint32_t frequency = system_GetIntClock();
 	uint32_t divider = MODULE_SCU.CCUCON0.B.SPBDIV;
-	if (0 == divider)
+	if (0 == divider) {
 		return 0;
-	return (frequency / divider);
+	} else {
+		return (frequency / divider);
+	}
 }
 
-uint32_t SYSTEM_GetStmClock(void)
-{
+uint32_t SYSTEM_GetStmClock(void) {
 	uint32_t frequency = system_GetIntClock();
 	uint32_t divider = MODULE_SCU.CCUCON1.B.STMDIV;
-	if (0 == divider)
+	if (0 == divider) {
 		return 0;
-	return (frequency / divider);
+	} else {
+		return (frequency / divider);
+	}
 }
 
-uint32_t SYSTEM_GetCanClock(void)
-{
+uint32_t SYSTEM_GetCanClock(void) {
 	uint32_t frequency = system_GetIntClock();
 	uint32_t divider = MODULE_SCU.CCUCON1.B.CANDIV;
-	if (0 == divider)
+	if (0 == divider) {
 		return 0;
-	return (frequency / divider);
+	} else {
+		return (frequency / divider);
+	}
 }
 
-void SYSTEM_EnableProtectionExt(int Sel)
-{
-	if (Sel < 3)
+void SYSTEM_EnableProtectionExt(int Sel) {
+	if (Sel < 3) {
 		lock_wdtcon();			/* CPU watchdog */
-	else
+	} else {
 		lock_safety_wdtcon();	/* security watchdog */
+	}
 }
 
-void SYSTEM_DisableProtectionExt(int Sel)
-{
-	if (Sel < 3)
+void SYSTEM_DisableProtectionExt(int Sel) {
+	if (Sel < 3) {
 		unlock_wdtcon();		/* CPU watchdog */
-	else
+	} else {
 		unlock_safety_wdtcon();	/* security watchdog */
+	}
 }
 
-void SYSTEM_EnableSecProtection(void)
-{
+void SYSTEM_EnableSecProtection(void) {
 	lock_safety_wdtcon();
 }
 
-void SYSTEM_DisableSecProtection(void)
-{
+void SYSTEM_DisableSecProtection(void) {
 	unlock_safety_wdtcon();
 }
 
-int SYSTEM_Reset(void)
-{
+void SYSTEM_Reset(void) {
 	unlock_safety_wdtcon();
 	MODULE_SCU.SWRSTCON.B.SWRSTREQ = 1;
 	while (1)
 		;
-	return 0;
 }
 
-int SYSTEM_IdleExt(int CoreId)
-{
+void SYSTEM_IdleExt(int CoreId) {
 	unlock_wdtcon();
-
 	MODULE_SCU.PMCSR[0].U = 1;	/* request CPU idle mode */
-
 	lock_wdtcon();
-	return 0;
 }
 
-int SYSTEM_Sleep(void)
-{
+void SYSTEM_Sleep(void) {
 	unlock_wdtcon();
-
 	MODULE_SCU.PMCSR[0].U = 2;	/* request system sleep mode */
-
 	lock_wdtcon();
-	return 0;
 }
 
-
-int SYSTEM_IsCacheEnabled(void)
-{
+int SYSTEM_IsCacheEnabled(void) {
 	uint32_t ui = _mfcr(CPU_PCON0);
-	if (ui & 2)
+	if (ui & 2) {
 		return 0;	/* Cache is in bypass mode */
+	}
+
 	ui = _mfcr(CPU_PCON2);
-	if (0 == (ui & (IFX_CPU_PCON2_PCACHE_SZE_MSK << IFX_CPU_PCON2_PCACHE_SZE_OFF)))
+	if (0 == (ui & (IFX_CPU_PCON2_PCACHE_SZE_MSK << IFX_CPU_PCON2_PCACHE_SZE_OFF))) {
 		return 0;	/* Cache size is 0 */
-	return 1;
+	} else {
+		return 1;
+	}
 }
 
-void SYSTEM_EnaDisCache(int Enable)
-{
+void SYSTEM_EnaDisCache(int Enable) {
 	unlock_wdtcon();
-	if (Enable)
-	{
+	if (Enable) {
 		_mtcr(CPU_PCON0, 0);
 		_mtcr(CPU_DCON0, 0);
-	}
-	else	/* disable */
-	{
+	} else {
 		_mtcr(CPU_PCON0, 2);
 		_mtcr(CPU_PCON1, 3);
 		_mtcr(CPU_DCON0, 2);

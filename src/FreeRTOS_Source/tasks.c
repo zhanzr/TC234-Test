@@ -685,8 +685,8 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 	TCB_t *pxNewTCB;
 	BaseType_t xReturn;
 
-	printf("%s %s %u %d %08X\n", __func__, pcName, usStackDepth, uxPriority, pxCreatedTask);
-	flush_stdout_trap();
+//	printf("%s %s %u %d %08X\n", __func__, pcName, usStackDepth, uxPriority, pxCreatedTask);
+//	flush_stdout_trap();
 
 		/* If the stack grows down then allocate the stack then the TCB so the stack
 		does not grow into the TCB.  Likewise if the stack grows up then allocate

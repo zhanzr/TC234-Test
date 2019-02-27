@@ -134,12 +134,15 @@ void sys_mbox_free( sys_mbox_t *pxMailBox )
  *      sys_mbox_t mbox         -- Handle of mailbox
  *      void *data              -- Pointer to data to post
  *---------------------------------------------------------------------------*/
-void sys_mbox_post( sys_mbox_t *pxMailBox, void *pxMessageToPost )
-{
-	printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
-	printf("%s %d\n", __func__, __LINE__);
+void sys_mbox_post( sys_mbox_t *pxMailBox, void *pxMessageToPost ) {
+	printf("%s %08X %08X\t",
+			pcTaskGetName(xTaskGetCurrentTaskHandle()), pxMailBox, pxMessageToPost);
+	flush_stdout_trap();
+	printf("p-smp\n");
 	flush_stdout_trap();
 	while( xQueueSendToBack( *pxMailBox, &pxMessageToPost, portMAX_DELAY ) != pdTRUE );
+	printf("f-smp\n");
+	flush_stdout_trap();
 }
 
 /*---------------------------------------------------------------------------*
@@ -166,8 +169,17 @@ err_t sys_mbox_trypost( sys_mbox_t *pxMailBox, void *pxMessageToPost )
 		xReturn = xQueueSend( *pxMailBox, &pxMessageToPost, ( TickType_t ) 0 );
 	}
 
-	printf("%s\t", pcTaskGetName(xTaskGetCurrentTaskHandle()));
-	printf("%s %08X %08X %d %d\n", __func__, pxMailBox, pxMessageToPost, __LINE__, xReturn);
+	printf("%s %08X %08X\t",
+			pcTaskGetName(xTaskGetCurrentTaskHandle()), pxMailBox, pxMessageToPost);
+	flush_stdout_trap();
+	flush_stdout_trap();
+	flush_stdout_trap();
+	flush_stdout_trap();
+	flush_stdout_trap();
+	flush_stdout_trap();
+	flush_stdout_trap();
+	flush_stdout_trap();
+	printf("p-smt\n");
 	flush_stdout_trap();
 
 	if( xReturn == pdPASS ) {
@@ -180,6 +192,9 @@ err_t sys_mbox_trypost( sys_mbox_t *pxMailBox, void *pxMessageToPost )
 		xReturn = ERR_MEM;
 		SYS_STATS_INC( mbox.err );
 	}
+
+	printf("f-smt\n");
+	flush_stdout_trap();
 
 	return xReturn;
 }

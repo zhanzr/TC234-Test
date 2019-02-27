@@ -84,15 +84,15 @@ void SYSTEM_DisableProtection(void);
 
 /*! \brief Execute software reset
  */
-int SYSTEM_Reset(void);
+void SYSTEM_Reset(void);
 
 /*! \brief Execute Idle instruction
  */
-int SYSTEM_Idle(void);
+void SYSTEM_Idle(void);
 
 /*! \brief Execute power down function
  */
-int SYSTEM_Sleep(void);
+void SYSTEM_Sleep(void);
 
 /*! \brief Debug break system
  */

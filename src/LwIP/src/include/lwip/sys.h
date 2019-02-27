@@ -317,19 +317,6 @@ void sys_mbox_set_invalid(sys_mbox_t *mbox);
 #define sys_mbox_set_invalid_val(mbox) sys_mbox_set_invalid(&(mbox))
 #endif
 
-
-/**
- * @ingroup sys_misc
- * The only thread function:
- * Creates a new thread
- * ATTENTION: although this function returns a value, it MUST NOT FAIL (ports have to assert this!)
- * @param name human-readable name for the thread (used for debugging purposes)
- * @param thread thread-function
- * @param arg parameter passed to 'thread'
- * @param stacksize stack size in bytes for the new thread (may be ignored by ports)
- * @param prio priority of the new thread (may be ignored by ports) */
-sys_thread_t sys_thread_new(const char *name, lwip_thread_fn thread, void *arg, int stacksize, int prio);
-
 #endif /* NO_SYS */
 
 /* sys_init() must be called before anything else. */

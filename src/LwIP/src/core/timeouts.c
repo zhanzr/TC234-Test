@@ -417,8 +417,9 @@ again:
   }
 
   sleeptime = sys_timeouts_sleeptime();
-  if (sleeptime == 0 || sys_arch_mbox_fetch(mbox, msg, sleeptime) == SYS_ARCH_TIMEOUT) {
-		printf("%s %d %08X\n", __func__, __LINE__, mbox);
+  u32_t samf_ret = sys_arch_mbox_fetch(mbox, msg, sleeptime);
+  if (sleeptime == 0 || samf_ret == SYS_ARCH_TIMEOUT) {
+		printf("%s %d %08X, %d %d\n", __func__, __LINE__, mbox, sleeptime, samf_ret);
 		flush_stdout_trap();
     /* If a SYS_ARCH_TIMEOUT value is returned, a timeout occurred
        before a message could be fetched. */
