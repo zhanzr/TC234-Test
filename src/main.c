@@ -285,6 +285,26 @@ void protocol_init(void){
 	printf("Port:%d\n",HTTP_PORT);
 }
 
+extern void PMU_PFLASH0_SIZE(void);
+extern void PMU_PFLASH0_START(void);
+extern void PMU_PFLASH0_END(void);
+
+extern void PMU_DFLASH0_SIZE(void);
+extern void PMU_DFLASH0_START(void);
+extern void PMU_DFLASH0_END(void);
+
+extern void BROM_SIZE(void);
+extern void BROM_START(void);
+extern void BROM_END(void);
+
+extern void PMI_PSPR_SIZE(void);
+extern void PMI_PSPR_START(void);
+extern void PMI_PSPR_END(void);
+
+extern void DMI_DSPR_SIZE(void);
+extern void DMI_DSPR_START(void);
+extern void DMI_DSPR_END(void);
+
 int core0_main(int argc, char** argv) {
 	prvSetupHardware();
 
@@ -294,12 +314,23 @@ int core0_main(int argc, char** argv) {
 
 	//config_dts();
 	uint8_t test_d[]={0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0};
-	printf("%p %04X\n", test_d, *(uint16_t*)test_d);
-	printf("%p %04X\n", test_d+1, *(uint16_t*)(test_d+1));
-	printf("%p %08X\n", test_d, *(uint32_t*)test_d);
-	printf("%p %08X\n", test_d+1, *(uint32_t*)(test_d+1));
-	printf("%p %08X\n", test_d+2, *(uint32_t*)(test_d+2));
-	printf("%p %08X\n", test_d+3, *(uint32_t*)(test_d+3));
+	printf("%08X %04X\n", test_d, *(uint16_t*)test_d);
+	printf("%08X %04X\n", test_d+1, *(uint16_t*)(test_d+1));
+	printf("%08X %08X\n", test_d, *(uint32_t*)test_d);
+	printf("%08X %08X\n", test_d+1, *(uint32_t*)(test_d+1));
+	printf("%08X %08X\n", test_d+2, *(uint32_t*)(test_d+2));
+	printf("%08X %08X\n", test_d+3, *(uint32_t*)(test_d+3));
+	flush_stdout();
+
+	printf("PFLASH0 %08X %08X-%08X\n", PMU_PFLASH0_SIZE, PMU_PFLASH0_START, PMU_PFLASH0_END);
+	flush_stdout();
+	printf("DFLASH0 %08X %08X-%08X\n", PMU_DFLASH0_SIZE, PMU_DFLASH0_START, PMU_DFLASH0_END);
+	flush_stdout();
+	printf("BROM %08X %08X-%08X\n", BROM_SIZE, BROM_START, BROM_END);
+	flush_stdout();
+	printf("PSPR %08X %08X-%08X\n", PMI_PSPR_SIZE, PMI_PSPR_START, PMI_PSPR_END);
+	flush_stdout();
+	printf("DSPR %08X %08X-%08X\n", DMI_DSPR_SIZE, DMI_DSPR_START, DMI_DSPR_END);
 	flush_stdout();
 
 	printf("%08X %08X %08X %08X %08X %08X %08X\n",
