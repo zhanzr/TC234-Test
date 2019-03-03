@@ -3,6 +3,8 @@
 //******************************************************************************
 	.file	"test_float.S"
 
+    .section ".text"
+
 	.global Ifx_Add_F
 	.global	Ifx_SUB_F
 	.global	Ifx_MUL_F

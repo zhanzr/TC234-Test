@@ -11,16 +11,14 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-typedef union union_pack16
-{
+typedef union union_pack16 {
 	uint16_t u16;
 	int16_t i16;
 	uint8_t u8[2];
 	int8_t i8[2];
 }pack16;
 
-typedef union union_pack32
-{
+typedef union union_pack32 {
 	uint32_t u32;
 	int32_t i32;
 	uint16_t u16[2];
@@ -29,8 +27,7 @@ typedef union union_pack32
 	int8_t i8[4];
 }pack32;
 
-typedef union union_pack64
-{
+typedef union union_pack64 {
 	uint64_t u64;
 	int64_t i64;
 	uint32_t u32[2];
@@ -148,7 +145,7 @@ uint32_t Ifx_Cmp_F(float A, float B);
 uint32_t Ifx_Csub(uint32_t A, uint32_t B, uint32_t cond);
 uint32_t Ifx_Csubn(uint32_t A, uint32_t B, uint32_t cond);
 
-//D Initial Instuction Set
+//D Initial Instruction Set
 void Ifx_Debug(void);
 uint32_t Ifx_Dextr(uint32_t A, uint32_t B, uint32_t pos);
 uint32_t Ifx_Dextr_I(uint32_t A, uint32_t B);
@@ -167,7 +164,7 @@ uint64_t Ifx_DivInit_HU(uint32_t inputA, uint32_t inputB);
 uint64_t Ifx_Dvstep(uint64_t inputA64, uint32_t inputC);
 uint64_t Ifx_Dvstep_U(uint64_t inputA64, uint32_t inputC);
 
-//E and F Initial Instuction Set
+//E and F Initial Instruction Set
 uint32_t Ifx_Eq(uint32_t A, uint32_t B);
 uint32_t Ifx_Eq_fast(uint32_t A, uint32_t B);
 
@@ -370,8 +367,8 @@ uint64_t Ifx_MSUBADM_H(uint64_t A, uint32_t C, uint32_t D);
 uint64_t Ifx_MSUBADMS_H(uint64_t A, uint32_t C, uint32_t D);
 
 //Packed Multiply-Subtract/Add Q Format with Rounding
-//Packed Multiply-Subtract/Add Q Format with Rounding Saturated
 uint32_t Ifx_MSUBADR_H(uint32_t A, uint32_t B, uint32_t C);
+//Packed Multiply-Subtract/Add Q Format with Rounding Saturated
 uint32_t Ifx_MSUBADRS_H(uint32_t A, uint32_t B, uint32_t C);
 
 uint32_t Ifx_NAND(uint32_t A, uint32_t B);
@@ -496,6 +493,13 @@ uint32_t Ifx_XOR_GE_U(uint32_t A, uint32_t B, uint32_t C);
 uint32_t Ifx_XOR_LT(uint32_t A, uint32_t B, uint32_t C);
 //Less Than or Equal Accumulating Unsigned
 uint32_t Ifx_XOR_LT_U(uint32_t A, uint32_t B, uint32_t C);
+
+//Calculate the CRC32 checksum of a and inverse of b and return the result.
+//Generates the crc32 instruction. Only supported for TriCore1.6.x
+//(--core=tc1.6.x) and TriCore1.6.2 (--core=tc1.6.2). For example:
+uint32_t Ifx_CRC32(uint32_t A, uint32_t B);
+
+uint32_t Ifx_CRC32BW(uint32_t init, uint32_t input);
 
 void Ifx_Enable(void);
 

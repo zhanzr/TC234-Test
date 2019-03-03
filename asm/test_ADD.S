@@ -1,5 +1,4 @@
 //*****************************************************************************
-// File: test_ADD.S
 // Compiler: HIGHTEC
 //******************************************************************************
 // int32_t Ifx_Add(int32_t A, int32_t B)
@@ -10,7 +9,6 @@
 // int32_t Ifx_Addx_I(int32_t A)
 //uint32_t Ifx_Add_B(uint32_t A, uint32_t B);
 //uint32_t Ifx_Add_H(uint32_t A, uint32_t B);
-//float Ifx_Add_F(float A, float B);
 
 // INPUTS:
 // OUTPUT:
@@ -34,6 +32,9 @@
 // REGISTER USAGE:
 //            d2, d4,d5
 //******************************************************************************
+        .file   "test_ADD.S"
+
+        .section ".text"
 
 //External Reference
     .global Ifx_Add
@@ -43,10 +44,10 @@
     .global Ifx_Addx
     .global Ifx_Addx_I
     .global Ifx_Add_B
-    .global Ifx_Add_F
     .global Ifx_Add_H
 
     .global Ifx_CRC32
+    .global Ifx_CRC32BW
     .global Ifx_WAIT
 
     .global Ifx_TestLED
@@ -95,16 +96,12 @@ Ifx_Add_H:
 	add.h		result, inputA, inputB
     ret
 
-Ifx_Add_F:
-//	movh	inputA, 16270
-//	addi	inputA, inputA, 5243
-//	movh	inputB, 16398
-//	addi	inputB, inputB, 5243
-	add.f result, inputA, inputB
-    ret
-
 Ifx_CRC32:
-//	crc32 result, %a4, inputA, inputB
+	crc32 result, inputA, inputB
+	ret
+
+Ifx_CRC32BW:
+	//crc32b.w result, inputA, inputB
 	ret
 
 Ifx_WAIT:

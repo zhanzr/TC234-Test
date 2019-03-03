@@ -89,9 +89,6 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.2114635819" name="dns.c" rcbsApplicability="disable" resourcePath="src/LwIP/src/core/dns.c" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155.949056165">
-						<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155.949056165" name="TriCore C Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155"/>
-					</fileInfo>
 					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.585832385" name="FILES" rcbsApplicability="disable" resourcePath="src/LwIP/src/netif/FILES" toolsToInvoke=""/>
 					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.390483624" name="/" resourcePath="src/LwIP/doc">
 						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.1908644111" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable" unusedChildren="">
@@ -137,9 +134,12 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.2139967422" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1203714662" name="test_ADD.S" rcbsApplicability="disable" resourcePath="asm/test_ADD.S" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.82198736">
+						<tool id="com.rt.hightec.buildsystem.tricore.new.assembler.694596367.82198736" name="TriCore Assembler" superClass="com.rt.hightec.buildsystem.tricore.new.assembler.694596367"/>
+					</fileInfo>
 					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1125921551" name="generate_template.py" rcbsApplicability="disable" resourcePath="asm/generate_template.py" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry excluding="test_M_1.S|test_ADD.S|test_S_2.S|test_G_I.S|test_B_C.S|generate_template.py|test_ABSS.S|test_D.S|test_S_1.S|test_M_3_N.S|test_AND.S|test_O.S|test_ABSDIF.S|test_J.S|test_ADD.A.S|test_L.S|test_E_F.S|test_ADDS.S|test_T_U_X.S|test_M_2.S|test_ABSDIFS.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
+						<entry excluding="test_M_1.S|test_S_2.S|test_G_I.S|test_B_C.S|generate_template.py|test_ABSS.S|test_D.S|test_S_1.S|test_M_3_N.S|test_AND.S|test_O.S|test_ABSDIF.S|test_J.S|test_ADD.A.S|test_L.S|test_E_F.S|test_ADDS.S|test_T_U_X.S|test_M_2.S|test_ABSDIFS.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
 						<entry excluding="LwIP/src/core/dns.c|LwIP/src/netif/FILES|LwIP/src/netif/ppp|LwIP/src/netif/ethernetif_template.c|LwIP/src/netif/slipif.c|LwIP/src/netif/lowpan6.c|scu_eru.c|gpsr.c|dts.c|LwIP/src/core/ipv6|data_flash.c|server_net/ip_arp_udp_tcp.c|LwIP/src/apps/lwiperf|LwIP/src/apps/mdns|LwIP/src/apps/mqtt|LwIP/src/apps/netbiosns|LwIP/src/apps/snmp|LwIP/src/apps/sntp|LwIP/src/apps/tftp|LwIP/src/apps/httpd/fsdata.c|httpserver-netconn.c|fsdata_custom.c|LwIP/doc|LwIP/src/apps/httpd/makefsdata|LwIP/src/apps/httpd/fs|LwIP/test|LwIP/test/unit|LwIP/test/fuzz/fuzz.c|server_net/simple_server.c|md5.c|sha1.c|tc234_dma_crc32.c|FreeRTOS_Source/portable/MemMang/heap_2.c|FreeRTOS_Source/portable/GCC/TriCore_1782/porttrap.c|crt0.S|uart_init_poll.c|applproc0_loop.c|crt0-tc23x.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>

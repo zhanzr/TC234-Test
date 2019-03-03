@@ -56,13 +56,6 @@ void ENC28J60_CSL(void){
 	MODULE_P33.OMR.B.PCL9 = 1;
 }
 
-static inline void simple_delay(uint32_t t) {
-	for(uint32_t i=0; i<t; ++i) {
-		__asm__ volatile ("nop" ::: "memory");
-		__asm volatile ("" : : : "memory");
-	}
-}
-
 #define	BIT_DELAY	0
 static inline void bit_delay(uint32_t d){
 	simple_delay(d);
