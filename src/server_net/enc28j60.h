@@ -244,22 +244,22 @@
 #define SOFT_SPI	1
 
 /*Static IP ADDRESS*/
-#define IP_ADDR0   192
-#define IP_ADDR1   168
-#define IP_ADDR2   32
-#define IP_ADDR3   33
+#define IP_ADDR0   ((uint8_t)192)
+#define IP_ADDR1   ((uint8_t)168)
+#define IP_ADDR2   ((uint8_t)32)
+#define IP_ADDR3   ((uint8_t)33)
 
 /*NETMASK*/
-#define NETMASK_ADDR0   255
-#define NETMASK_ADDR1   255
-#define NETMASK_ADDR2   255
-#define NETMASK_ADDR3   0
+#define NETMASK_ADDR0   ((uint8_t)255)
+#define NETMASK_ADDR1   ((uint8_t)255)
+#define NETMASK_ADDR2   ((uint8_t)255)
+#define NETMASK_ADDR3   ((uint8_t)0)
 
 /*Gateway Address*/
-#define GW_ADDR0   192
-#define GW_ADDR1   168
-#define GW_ADDR2   32
-#define GW_ADDR3   1
+#define GW_ADDR0   ((uint8_t)192)
+#define GW_ADDR1   ((uint8_t)168)
+#define GW_ADDR2   ((uint8_t)32)
+#define GW_ADDR3   ((uint8_t)1)
 
 /* MAC ADDRESS: MAC_ADDR0:MAC_ADDR1:MAC_ADDR2:MAC_ADDR3:MAC_ADDR4:MAC_ADDR5 */
 #define MAC_ADDR0   ((uint8_t)0x12)

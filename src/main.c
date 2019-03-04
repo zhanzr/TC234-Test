@@ -59,7 +59,7 @@
 #include "app_ethernet.h"
 #include "httpserver-socket.h"
 
-//SemaphoreHandle_t MutexSemaphore;
+SemaphoreHandle_t MutexSemaphore;
 
 struct netif gnetif; /* network interface structure */
 
@@ -85,10 +85,10 @@ static void prvSetupHardware( void );
 TaskHandle_t g_start_task_handler;
 void start_task(void *pvParameters);
 
-//TaskHandle_t g_task0_handler;
-//void maintaince_task(void *pvParameters);
-//TaskHandle_t g_info_task_handler;
-//void print_task(void *pvParameters);
+TaskHandle_t g_task0_handler;
+void maintaince_task(void *pvParameters);
+TaskHandle_t g_info_task_handler;
+void print_task(void *pvParameters);
 
 const char ON_STR[] = "On";
 const char OFF_STR[] = "Off";
@@ -288,72 +288,71 @@ void protocol_init(void){
 int core0_main(int argc, char** argv) {
 	prvSetupHardware();
 
-//	SYSTEM_EnaDisCache(1);
+	//	SYSTEM_EnaDisCache(1);
 
 	uart_init(mainCOM_TEST_BAUD_RATE);
 
-	//config_dts();
+	config_dts();
 
-//https://www.scadacore.com/tools/programming-calculators/online-checksum-calculator/
-	uint32_t a = 1;
-	uint32_t b = 0;
-	uint32_t c = 0;
-//	uint32_t c = Ifx_CRC32(b, a);
-//	printf("CRC32(%08X, %08X) = %08X\n", a, b, c);
-//	flush_stdout();
+	//CRC32 Test
+	{
+		//https://www.scadacore.com/tools/programming-calculators/online-checksum-calculator/
+		uint32_t a = 1;
+		uint32_t b = 0;
+		uint32_t c = 0;
 
-    __asm__ volatile ("CRC32 %0,%1,%2" : "=d" (c) : "d"(b), "d"(a));
-	printf("CRC32(%08X, %08X) = %08X\n", a, b, c);
-	flush_stdout();
+		__asm__ volatile ("CRC32 %0,%1,%2" : "=d" (c) : "d"(b), "d"(a));
+		printf("CRC32(%08X, %08X) = %08X\n", a, b, c);
+		flush_stdout();
 
-	a = 0x01020304;
-	c = Ifx_CRC32(b, a);
-//	printf("CRC32(%08X, %08X) = %08X\n", a, b, c);
-//	flush_stdout();
-    __asm__ volatile ("CRC32 %0,%1,%2" : "=d" (c) : "d"(b), "d"(a));
-	printf("CRC32(%08X, %08X) = %08X\n", a, b, c);
-	flush_stdout();
+		a = 0x01020304;
+		c = Ifx_CRC32(b, a);
+		printf("CRC32(%08X, %08X) = %08X\n", a, b, c);
+		flush_stdout();
+		__asm__ volatile ("CRC32 %0,%1,%2" : "=d" (c) : "d"(b), "d"(a));
+		printf("CRC32(%08X, %08X) = %08X\n", a, b, c);
+		flush_stdout();
 
-	a = 0x11223344;
-	c = Ifx_CRC32(b, a);
-    __asm__ volatile ("CRC32 %0,%1,%2" : "=d" (c) : "d"(b), "d"(a));
-	printf("CRC32(%08X, %08X) = %08X\n", a, b, c);
-	flush_stdout();
+		a = 0x11223344;
+		c = Ifx_CRC32(b, a);
+		__asm__ volatile ("CRC32 %0,%1,%2" : "=d" (c) : "d"(b), "d"(a));
+		printf("CRC32(%08X, %08X) = %08X\n", a, b, c);
+		flush_stdout();
 
-	a = 0x61626364;
-	c = Ifx_CRC32(b, a);
-    __asm__ volatile ("CRC32 %0,%1,%2" : "=d" (c) : "d"(b), "d"(a));
-	printf("CRC32(%08X, %08X) = %08X\n", a, b, c);
-	flush_stdout();
+		a = 0x61626364;
+		c = Ifx_CRC32(b, a);
+		__asm__ volatile ("CRC32 %0,%1,%2" : "=d" (c) : "d"(b), "d"(a));
+		printf("CRC32(%08X, %08X) = %08X\n", a, b, c);
+		flush_stdout();
+	}
 
-	uint8_t test_d[]={0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0};
-	printf("%08X %04X\n", test_d, *(uint16_t*)test_d);
-	printf("%08X %04X\n", test_d+1, *(uint16_t*)(test_d+1));
-	printf("%08X %08X\n", test_d, *(uint32_t*)test_d);
-	printf("%08X %08X\n", test_d+1, *(uint32_t*)(test_d+1));
-	printf("%08X %08X\n", test_d+2, *(uint32_t*)(test_d+2));
-	printf("%08X %08X\n", test_d+3, *(uint32_t*)(test_d+3));
-	flush_stdout();
+	//Unaligned Access Test
+	{
+		uint8_t test_d[]={0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc, 0xde, 0xf0};
+		printf("%08X %04X\n", test_d, *(uint16_t*)test_d);
+		printf("%08X %04X\n", test_d+1, *(uint16_t*)(test_d+1));
+		printf("%08X %08X\n", test_d, *(uint32_t*)test_d);
+		printf("%08X %08X\n", test_d+1, *(uint32_t*)(test_d+1));
+		printf("%08X %08X\n", test_d+2, *(uint32_t*)(test_d+2));
+		printf("%08X %08X\n", test_d+3, *(uint32_t*)(test_d+3));
+		flush_stdout();
+	}
 
-    static unsigned int lock;
-
-    unsigned __builtin_tricore_cmpswapw
-    (volatile void *addr, unsigned new_value, unsigned compare_val);
-        while( __builtin_tricore_cmpswapw( &lock, 1, 0 ) ) ;
-
-	printf("%08X %08X %08X %08X %08X %08X %08X\n",
-			_mfcr( CPU_FCX ),
-			_mfcr( CPU_LCX ),
-			_mfcr( CPU_PCXI ),
-			_mfcr( CPU_ISP ),
-			_mfcr( CPU_PC ),
-			_mfcr( CPU_DEADD ),
-			_mfcr( CPU_DSTR )
-	);
-	flush_stdout();
-	uint32_t* p32 = 0xD0000000 + 184*1024;
-	printf("%p %08X\n", p32, *(uint32_t*)(p32));
-
+	//Out of range DSPR Access Test
+	{
+		//        	printf("%08X %08X %08X %08X %08X %08X %08X\n",
+		//        			_mfcr( CPU_FCX ),
+		//					_mfcr( CPU_LCX ),
+		//					_mfcr( CPU_PCXI ),
+		//					_mfcr( CPU_ISP ),
+		//					_mfcr( CPU_PC ),
+		//					_mfcr( CPU_DEADD ),
+		//					_mfcr( CPU_DSTR )
+		//        	);
+		//        	flush_stdout();
+		//        	uint32_t* p32 = 0xD0000000 + 184*1024;
+		//        	printf("%p %08X\n", p32, *(uint32_t*)(p32));
+	}
 	printf("%s\n", _NEWLIB_VERSION);
 
 	const uint32_t FLASH_SIZE_TABLE_KB[]={256, 512, 1024, 1536, 2048, 2560, 3072, 4096, 5120, 1024*6, 1024*7, 1024*8};
@@ -386,11 +385,11 @@ int core0_main(int argc, char** argv) {
 
 	_syscall(101);
 
-	interface_init();
-	flush_stdout();
-
-	protocol_init();
-	flush_stdout();
+	//	interface_init();
+	//	flush_stdout();
+	//
+	//	protocol_init();
+	//	flush_stdout();
 
 	xTaskCreate((TaskFunction_t )start_task,
 			(const char*    )"start_task",
@@ -440,17 +439,99 @@ static void Netif_Config(void) {
 	}
 }
 
+void rogue_task0(void *pvParameters) {
+	while(1) {
+		printf("%s-%s %s %d\n",
+				pcTaskGetName(xTaskGetCurrentTaskHandle()),
+				__FILE__, __func__, __LINE__);
+		flush_stdout();
+	}
+}
+
+void rogue_task1(void *pvParameters) {
+	while(1) {
+		printf("%s-%s %s %d\n",
+				pcTaskGetName(xTaskGetCurrentTaskHandle()),
+				__FILE__, __func__, __LINE__);
+		flush_stdout();
+	}
+}
+
+void semaphore_task0(void *pvParameters) {
+	while(1) {
+		if(NULL != MutexSemaphore) {
+			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
+				printf("%s-%s %s %d\n",
+						pcTaskGetName(xTaskGetCurrentTaskHandle()),
+						__FILE__, __func__, __LINE__);
+				flush_stdout();
+				xSemaphoreGive(MutexSemaphore);
+			}
+		}
+
+		vTaskDelay(5 / portTICK_PERIOD_MS);
+	}
+}
+
+void semaphore_task1(void *pvParameters) {
+	while(1) {
+		if(NULL != MutexSemaphore) {
+			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
+				printf("%s-%s %s %d\n",
+						pcTaskGetName(xTaskGetCurrentTaskHandle()),
+						__FILE__, __func__, __LINE__);
+				flush_stdout();
+				xSemaphoreGive(MutexSemaphore);
+			}
+		}
+
+		vTaskDelay(5 / portTICK_PERIOD_MS);
+	}
+}
+
+static uint32_t g_lock;
+
+void cmpswapw_task0(void *pvParameters) {
+	while(1) {
+		while( __builtin_tricore_cmpswapw( &g_lock, 1, 0 ) )  {
+			printf("%s-%s %s %d\n",
+					pcTaskGetName(xTaskGetCurrentTaskHandle()),
+					__FILE__, __func__, __LINE__);
+			flush_stdout();
+
+			g_lock = 0;
+		}
+
+		vTaskDelay(5 / portTICK_PERIOD_MS);
+	}
+}
+
+void cmpswapw_task1(void *pvParameters) {
+	while(1) {
+		while( __builtin_tricore_cmpswapw( &g_lock, 1, 0 ) )  {
+			printf("%s-%s %s %d\n",
+					pcTaskGetName(xTaskGetCurrentTaskHandle()),
+					__FILE__, __func__, __LINE__);
+			flush_stdout();
+
+			g_lock = 0;
+		}
+
+		vTaskDelay(5 / portTICK_PERIOD_MS);
+	}
+}
+
 void start_task(void *pvParameters) {
-//	MutexSemaphore = xSemaphoreCreateMutex();
+	MutexSemaphore = xSemaphoreCreateMutex();
 
-	/* Create tcp_ip stack thread */
-	tcpip_init(NULL, NULL);
-
-	/* Initialize the LwIP stack */
-	Netif_Config();
-
-	/* Initialize webserver demo */
-	http_server_socket_init();
+	//	/* Create tcp_ip stack thread */
+	//	tcpip_init(NULL, NULL);
+	//
+	//	/* Initialize the LwIP stack */
+	//	Netif_Config();
+	//
+	//	/* Initialize webserver demo */
+	//	http_server_socket_init();
 
 	/* Notify user about the network interface config */
 	//	  User_notification(&gnetif);
@@ -461,61 +542,132 @@ void start_task(void *pvParameters) {
 	//			(void*          )NULL,
 	//			(UBaseType_t    )tskIDLE_PRIORITY + 1,
 	//			(TaskHandle_t*  )&g_task0_handler);
-
+	//
 	//	xTaskCreate((TaskFunction_t )print_task,
 	//			(const char*    )"print_task",
 	//			(uint16_t       )10*1024,
 	//			(void*          )NULL,
-	//			(UBaseType_t    )tskIDLE_PRIORITY + 2,
+	//			(UBaseType_t    )tskIDLE_PRIORITY + 1,
 	//			(TaskHandle_t*  )&g_info_task_handler);
 
+//	xTaskCreate((TaskFunction_t )rogue_task0,
+//			(const char*    )"rogue_task0",
+//			(uint16_t       )768,
+//			(void*          )NULL,
+//			(UBaseType_t    )tskIDLE_PRIORITY + 1,
+//			(TaskHandle_t*  )NULL);
+//
+//	xTaskCreate((TaskFunction_t )rogue_task1,
+//			(const char*    )"rogue_task1",
+//			(uint16_t       )768,
+//			(void*          )NULL,
+//			(UBaseType_t    )tskIDLE_PRIORITY + 1,
+//			(TaskHandle_t*  )NULL);
+
+	//	xTaskCreate((TaskFunction_t )semaphore_task0,
+	//			(const char*    )"semaphore_task0",
+	//			(uint16_t       )768,
+	//			(void*          )NULL,
+	//			(UBaseType_t    )tskIDLE_PRIORITY + 1,
+	//			(TaskHandle_t*  )NULL);
+	//
+	//	xTaskCreate((TaskFunction_t )semaphore_task1,
+	//			(const char*    )"semaphore_task1",
+	//			(uint16_t       )768,
+	//			(void*          )NULL,
+	//			(UBaseType_t    )tskIDLE_PRIORITY + 1,
+	//			(TaskHandle_t*  )NULL);
+
+	xTaskCreate((TaskFunction_t )cmpswapw_task0,
+			(const char*    )"cmpswapw_task0",
+			(uint16_t       )768,
+			(void*          )NULL,
+			(UBaseType_t    )tskIDLE_PRIORITY + 1,
+			(TaskHandle_t*  )NULL);
+
+	xTaskCreate((TaskFunction_t )cmpswapw_task1,
+			(const char*    )"cmpswapw_task1",
+			(uint16_t       )768,
+			(void*          )NULL,
+			(UBaseType_t    )tskIDLE_PRIORITY + 1,
+			(TaskHandle_t*  )NULL);
 	vTaskDelete(g_start_task_handler);
 }
 
-//void maintaince_task(void *pvParameters) {
-//	//	char info_buf[512];
-//
-//	while(1) {
-		//		vTaskList(info_buf);
-		//		if(NULL != MutexSemaphore) {
-		//			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
-		//				printf("%s\r\n",info_buf);
-		//
-		//				vTaskGetRunTimeStats(info_buf);
-		//				printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
-		//				printf("%s\r\n",info_buf);
-		//
-		//				printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
-		//						__TRICORE_NAME__,
-		//						__TRICORE_CORE__,
-		//						SYSTEM_GetCpuClock()/1000000,
-		//						SYSTEM_GetSysClock()/1000000,
-		//						SYSTEM_GetStmClock()/1000000,
-		//						system_GetPllClock()/1000000,
-		//						system_GetIntClock()/1000000,
-		//						SYSTEM_IsCacheEnabled());
-		//				flush_stdout();
-		//
-		//				xSemaphoreGive(MutexSemaphore);
-		//			}
-		//		}
-		//		start_dts_measure();
-		//
-		//		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
-		//						portMAX_DELAY );/* Block indefinitely. */
-//		vTaskDelay(40 / portTICK_PERIOD_MS);
-//	}
-//}
+void maintaince_task(void *pvParameters) {
+	char info_buf[512];
 
-//void print_task(void *pvParameters) {
-//	char info_buf[512];
-//	volatile uint8_t net_buf[MAX_FRAMELEN];
-//
-//	uint16_t payloadlen;
-//	uint16_t dat_p;
-//	int16_t cmd16;
-//
-//	while(true) {
+	while(1) {
+		vTaskList(info_buf);
+		if(NULL != MutexSemaphore) {
+			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
+				printf("%s\n",
+						pcTaskGetName(xTaskGetCurrentTaskHandle()));
+				//				printf("%s\r\n",info_buf);
+				//
+				//				vTaskGetRunTimeStats(info_buf);
+				//				printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
+				//				printf("%s\r\n",info_buf);
+				//
+				//				printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
+				//						__TRICORE_NAME__,
+				//						__TRICORE_CORE__,
+				//						SYSTEM_GetCpuClock()/1000000,
+				//						SYSTEM_GetSysClock()/1000000,
+				//						SYSTEM_GetStmClock()/1000000,
+				//						system_GetPllClock()/1000000,
+				//						system_GetIntClock()/1000000,
+				//						SYSTEM_IsCacheEnabled());
+				flush_stdout();
+
+				xSemaphoreGive(MutexSemaphore);
+			}
+		}
+		start_dts_measure();
+
+		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
+				portMAX_DELAY );/* Block indefinitely. */
+		//		vTaskDelay(40 / portTICK_PERIOD_MS);
+	}
+}
+
+void print_task(void *pvParameters) {
+	char info_buf[512];
+	volatile uint8_t net_buf[MAX_FRAMELEN];
+
+	uint16_t payloadlen;
+	uint16_t dat_p;
+	int16_t cmd16;
+
+	while(true) {
+
+		vTaskList(info_buf);
+		if(NULL != MutexSemaphore) {
+			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
+				printf("%s\n",
+						pcTaskGetName(xTaskGetCurrentTaskHandle()));
+
+				//					printf("%s\r\n",info_buf);
+				//
+				//					vTaskGetRunTimeStats(info_buf);
+				//					printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
+				//					printf("%s\r\n",info_buf);
+				//
+				//					printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
+				//							__TRICORE_NAME__,
+				//							__TRICORE_CORE__,
+				//							SYSTEM_GetCpuClock()/1000000,
+				//							SYSTEM_GetSysClock()/1000000,
+				//							SYSTEM_GetStmClock()/1000000,
+				//							system_GetPllClock()/1000000,
+				//							system_GetIntClock()/1000000,
+				//							SYSTEM_IsCacheEnabled());
+				flush_stdout();
+
+				xSemaphoreGive(MutexSemaphore);
+			}
+		}
+
 		//		payloadlen = enc28j60PacketReceive(MAX_FRAMELEN, net_buf);
 		//
 		//		if(payloadlen==0) {
@@ -621,8 +773,8 @@ void start_task(void *pvParameters) {
 		//		} else {
 		//			//;
 		//		}
-//	}
-//}
+	}
+}
 
 static void prvSetupHardware( void ) {
 	system_clk_config_200_100();
