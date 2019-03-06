@@ -95,14 +95,6 @@ Ifx_Add_H:
 	add.h		result, inputA, inputB
     ret
 
-Ifx_Add_F:
-//	movh	inputA, 16270
-//	addi	inputA, inputA, 5243
-//	movh	inputB, 16398
-//	addi	inputB, inputB, 5243
-	add.f result, inputA, inputB
-    ret
-
 Ifx_CRC32:
 //	crc32 result, %a4, inputA, inputB
 	ret

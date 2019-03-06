@@ -3,6 +3,7 @@
 #include "net.h"
 #include "ip_arp_udp_tcp.h"
 #include "enc28j60.h"
+#include "uart_int.h"
 
 static uint16_t g_info_hdr_len;
 static uint16_t g_info_data_len;
@@ -77,7 +78,7 @@ static uint32_t checksum(uint8_t *buf, uint32_t len,uint8_t type){
 	return( (uint32_t) sum ^ 0xFFFF);
 }
 
-uint8_t eth_type_is_arp_and_my_ip(uint8_t *buf,uint32_t len){
+uint8_t eth_type_is_arp_and_my_ip(uint8_t *buf,uint32_t len) {
 	if (len<41){
 		return(0);
 	}
@@ -88,13 +89,18 @@ uint8_t eth_type_is_arp_and_my_ip(uint8_t *buf,uint32_t len){
 	}
 
 	//Not ARP Packet for myself
-	for(uint8_t i=0; i<4; ++i){
+	for(uint8_t i=0; i<4; ++i) {
 		if(buf[ETH_ARP_DST_IP_P+i] != g_ip_addr[i]){
 			return(0);
 		}
 	}
-	printf("Rxd ARP Req from [%d.%d.%d.%d]\n",
-	buf[ETH_ARP_SRC_IP_P],buf[ETH_ARP_SRC_IP_P+1],buf[ETH_ARP_SRC_IP_P+2],buf[ETH_ARP_SRC_IP_P+3]);
+//	printf("Rxd ARP Req from [%d.%d.%d.%d]\n",
+//	buf[ETH_ARP_SRC_IP_P],buf[ETH_ARP_SRC_IP_P+1],buf[ETH_ARP_SRC_IP_P+2],buf[ETH_ARP_SRC_IP_P+3]);
+	printf("r A R\n");
+//	for(uint32_t i=0; i<len; ++i) {
+//		printf("%02X ", *(buf+i));
+//	}
+//	flush_stdout();
 
 	return(1);
 }
@@ -242,9 +248,15 @@ void make_arp_answer_from_request(uint8_t *buf){
 		buf[ETH_ARP_SRC_IP_P+i]=g_ip_addr[i];
 	}
 
-	printf("Tricore[%d.%d.%d.%d]Send ARP Ans\n",g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
+	enc28j60PacketSend(42,buf);
 
-	enc28j60PacketSend(42,buf); 
+//	printf("Tricore[%d.%d.%d.%d]Send ARP Ans\n",g_ip_addr[0],g_ip_addr[1],g_ip_addr[2],g_ip_addr[3]);
+
+	printf("t A A\n");
+//	for(uint32_t i=0; i<42; ++i) {
+//		printf("%02X ", *(buf+i));
+//	}
+//	flush_stdout();
 }
 
 void make_echo_reply_from_request(uint8_t *buf,uint32_t len) {
