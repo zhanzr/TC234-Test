@@ -353,6 +353,243 @@ void protocol_init(void){
 	printf("Port:%d\n",HTTP_PORT);
 }
 
+const IfxFlash_flashSector IfxFlash_dFlashTableEepLog[IFXFLASH_DFLASH_NUM_LOG_SECTORS] = {
+		{0xAF000000 + 0 * 0x2000,  0xAF000000 + 1 * 0x2000 - 1 },
+		{0xAF000000 + 1 * 0x2000,  0xAF000000 + 2 * 0x2000 - 1 },
+		{0xAF000000 + 2 * 0x2000,  0xAF000000 + 3 * 0x2000 - 1 },
+		{0xAF000000 + 3 * 0x2000,  0xAF000000 + 4 * 0x2000 - 1 },
+		{0xAF000000 + 4 * 0x2000,  0xAF000000 + 5 * 0x2000 - 1 },
+		{0xAF000000 + 5 * 0x2000,  0xAF000000 + 6 * 0x2000 - 1 },
+		{0xAF000000 + 6 * 0x2000,  0xAF000000 + 7 * 0x2000 - 1 },
+		{0xAF000000 + 7 * 0x2000,  0xAF000000 + 8 * 0x2000 - 1 },
+		{0xAF000000 + 8 * 0x2000,  0xAF000000 + 9 * 0x2000 - 1 },
+		{0xAF000000 + 9 * 0x2000,  0xAF000000 + 10 * 0x2000 - 1},
+		{0xAF000000 + 10 * 0x2000, 0xAF000000 + 11 * 0x2000 - 1},
+		{0xAF000000 + 11 * 0x2000, 0xAF000000 + 12 * 0x2000 - 1},
+		{0xAF000000 + 12 * 0x2000, 0xAF000000 + 13 * 0x2000 - 1},
+		{0xAF000000 + 13 * 0x2000, 0xAF000000 + 14 * 0x2000 - 1},
+		{0xAF000000 + 14 * 0x2000, 0xAF000000 + 15 * 0x2000 - 1},
+		{0xAF000000 + 15 * 0x2000, 0xAF000000 + 16 * 0x2000 - 1},
+		{0xAF000000 + 16 * 0x2000, 0xAF000000 + 17 * 0x2000 - 1},
+		{0xAF000000 + 17 * 0x2000, 0xAF000000 + 18 * 0x2000 - 1},
+		{0xAF000000 + 18 * 0x2000, 0xAF000000 + 19 * 0x2000 - 1},
+		{0xAF000000 + 19 * 0x2000, 0xAF000000 + 20 * 0x2000 - 1},
+		{0xAF000000 + 20 * 0x2000, 0xAF000000 + 21 * 0x2000 - 1},
+		{0xAF000000 + 21 * 0x2000, 0xAF000000 + 22 * 0x2000 - 1},
+		{0xAF000000 + 22 * 0x2000, 0xAF000000 + 23 * 0x2000 - 1},
+		{0xAF000000 + 23 * 0x2000, 0xAF000000 + 24 * 0x2000 - 1},
+		{0xAF000000 + 24 * 0x2000, 0xAF000000 + 25 * 0x2000 - 1},
+		{0xAF000000 + 25 * 0x2000, 0xAF000000 + 26 * 0x2000 - 1},
+		{0xAF000000 + 26 * 0x2000, 0xAF000000 + 27 * 0x2000 - 1},
+		{0xAF000000 + 27 * 0x2000, 0xAF000000 + 28 * 0x2000 - 1},
+		{0xAF000000 + 28 * 0x2000, 0xAF000000 + 29 * 0x2000 - 1},
+		{0xAF000000 + 29 * 0x2000, 0xAF000000 + 30 * 0x2000 - 1},
+		{0xAF000000 + 30 * 0x2000, 0xAF000000 + 31 * 0x2000 - 1},
+		{0xAF000000 + 31 * 0x2000, 0xAF000000 + 32 * 0x2000 - 1},
+		{0xAF000000 + 32 * 0x2000, 0xAF000000 + 33 * 0x2000 - 1},
+		{0xAF000000 + 33 * 0x2000, 0xAF000000 + 34 * 0x2000 - 1},
+		{0xAF000000 + 34 * 0x2000, 0xAF000000 + 35 * 0x2000 - 1},
+		{0xAF000000 + 35 * 0x2000, 0xAF000000 + 36 * 0x2000 - 1},
+		{0xAF000000 + 36 * 0x2000, 0xAF000000 + 37 * 0x2000 - 1},
+		{0xAF000000 + 37 * 0x2000, 0xAF000000 + 38 * 0x2000 - 1},
+		{0xAF000000 + 38 * 0x2000, 0xAF000000 + 39 * 0x2000 - 1},
+		{0xAF000000 + 39 * 0x2000, 0xAF000000 + 40 * 0x2000 - 1},
+		{0xAF000000 + 40 * 0x2000, 0xAF000000 + 41 * 0x2000 - 1},
+		{0xAF000000 + 41 * 0x2000, 0xAF000000 + 42 * 0x2000 - 1},
+		{0xAF000000 + 42 * 0x2000, 0xAF000000 + 43 * 0x2000 - 1},
+		{0xAF000000 + 43 * 0x2000, 0xAF000000 + 44 * 0x2000 - 1},
+		{0xAF000000 + 44 * 0x2000, 0xAF000000 + 45 * 0x2000 - 1},
+		{0xAF000000 + 45 * 0x2000, 0xAF000000 + 46 * 0x2000 - 1},
+		{0xAF000000 + 46 * 0x2000, 0xAF000000 + 47 * 0x2000 - 1},
+		{0xAF000000 + 47 * 0x2000, 0xAF000000 + 48 * 0x2000 - 1},
+};
+
+const IfxFlash_flashSector IfxFlash_dFlashTableHsmLog[IFXFLASH_DFLASH_NUM_HSM_LOG_SECTORS] = {
+		{0xaf110000, 0xaf111fff},   // HSM0
+		{0xaf112000, 0xaf113fff},   // HSM1
+		{0xaf114000, 0xaf115fff},   // HSM2
+		{0xaf116000, 0xaf117fff},   // HSM3
+		{0xaf118000, 0xaf119fff},   // HSM4
+		{0xaf11a000, 0xaf11bfff},   // HSM5
+		{0xaf11c000, 0xaf11dfff},   // HSM6
+		{0xaf11e000, 0xaf11ffff},   // HSM7
+};
+
+const IfxFlash_flashSector IfxFlash_dFlashTablePhys[IFXFLASH_DFLASH_NUM_PHYSICAL_SECTORS] = {
+		{IFXFLASH_DFLASH_START, IFXFLASH_DFLASH_END},
+};
+
+void IfxFlash_eraseSector(uint32_t sectorAddr)
+{
+	volatile uint32_t *addr1 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa50);
+	volatile uint32_t *addr2 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa58);
+	volatile uint32_t *addr3 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
+	volatile uint32_t *addr4 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
+
+	*addr1 = sectorAddr;
+	*addr2 = 1;
+	*addr3 = 0x80;
+	*addr4 = 0x50;
+
+	_dsync();
+}
+
+void IfxFlash_loadPage2X32(uint32_t pageAddr, uint32_t wordL, uint32_t wordU)
+{
+	volatile uint32_t *addr1 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0x55f0);
+
+	*addr1 = wordL;
+	addr1++;
+	*addr1 = wordU;
+
+	_dsync();
+}
+
+uint8_t IfxFlash_waitUnbusy(uint32_t flash, IfxFlash_FlashType flashType)
+{
+	if (flash == 0)
+	{
+		while (FLASH0_FSR.U & (1 << flashType))
+		{}
+	}
+
+#if IFXFLASH_NUM_FLASH_MODULES > 1
+else if (flash == 1)
+{
+	while (FLASH1_FSR.U & (1 << flashType))
+	{}
+}
+#endif
+else
+{
+	return 1; // invalid flash selected
+}
+	_dsync();
+	return 0;     // finished
+}
+
+uint8_t IfxFlash_enterPageMode(uint32_t pageAddr)
+{
+	volatile uint32_t *addr1 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0x5554);
+
+	if ((pageAddr & 0xff000000) == 0xa0000000)    // program flash
+	{
+		*addr1 = 0x50;
+		return 0;
+	}
+	else if ((pageAddr & 0xff000000) == 0xaf000000)       // data flash
+	{
+		*addr1 = 0x5D;
+		return 0;
+	}
+
+	_dsync();
+	return 1; // invalid flash address
+}
+
+
+void IfxFlash_writePage(uint32_t pageAddr)
+{
+	volatile uint32_t *addr1 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa50);
+	volatile uint32_t *addr2 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa58);
+	volatile uint32_t *addr3 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
+	volatile uint32_t *addr4 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
+
+	*addr1 = pageAddr;
+	*addr2 = 0x00;
+	*addr3 = 0xa0;
+	*addr4 = 0xaa;
+
+	_dsync();
+}
+
+const uint32_t test_dflash_data[] = {0xAB886301, 0x68A9089B, 0xB421ED43, 0xE29F12EB, 0x5089EBB9, 0x59B7FB59, 0xD026A00F, 0x632764D6, 0x308CF937, 0x7631265D, 0x366B7F45, 0x4A19298E, 0x627BA510, 0x486D51C3, 0x1D61EFF0, 0x62F64F46, 0x8D716BF7, 0xF17F158A, 0xD7C75307, 0x0160A435, 0xE8CB0202, 0xF6C35094, 0x183F4A8C, 0x10BC6548, 0x57235099, 0xEDE43E96, 0x48937C58, 0xC8188B44, 0x60A7D5A7, 0xFDBD8EA4, 0x877B19A3, 0x3B35ECA4, };
+/** \brief D-Flash Demo
+ *
+ * This function is called from the run to demo the D-Flash Erase & Program functionality
+ */
+static void DFlashDemo(void) {
+	uint32_t errors = 0;
+	uint16_t endinitSfty_pw;
+	uint32_t offset;
+	uint32_t flash       = 0;
+	uint32_t sector_addr = IfxFlash_dFlashTableEepLog[0].start;
+
+	/* erase program flash */
+	unlock_safety_wdtcon();
+	IfxFlash_eraseSector(sector_addr);
+	lock_safety_wdtcon();
+
+	{
+#define DFLASH_SECTOR_SIZE	(8*1024)
+		//DFlash test
+		uint32_t df_addr = 0xAF000000;
+		printf("DFlash[%08X]:\n", df_addr);
+		for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {
+			printf("%08X ", *(uint32_t*)(df_addr+i));
+		}
+		printf("\n");
+	}
+	flush_stdout();
+
+	/* wait until unbusy */
+	IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
+
+	/* program the given no of pages */
+	for (uint16_t page = 0; page < 16; ++page) {
+		uint32_t pageAddr = sector_addr + page * IFXFLASH_DFLASH_PAGE_LENGTH;
+		errors = IfxFlash_enterPageMode(pageAddr);
+
+		/* wait until unbusy */
+		IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
+
+		IfxFlash_loadPage2X32(pageAddr, test_dflash_data[page*2], test_dflash_data[1+page*2]);
+		/* write page */
+		unlock_safety_wdtcon();
+		IfxFlash_writePage(pageAddr);
+		lock_safety_wdtcon();
+
+		/* wait until unbusy */
+		IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
+	}
+
+	{
+#define DFLASH_SECTOR_SIZE	(8*1024)
+		//DFlash test
+		uint32_t df_addr = 0xAF000000;
+		printf("DFlash[%08X]:\n", df_addr);
+		for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {
+			printf("%08X ", *(uint32_t*)(df_addr+i));
+		}
+		printf("\n");
+	}
+	flush_stdout();
+
+	/* Verify the programmed data */
+	for (uint16_t page = 0; page < 16; ++page) {
+		uint32_t pageAddr = sector_addr + page * IFXFLASH_DFLASH_PAGE_LENGTH;
+		volatile uint32_t *addr     = (uint32_t *)pageAddr;
+
+		if((addr[0]==test_dflash_data[page*2]) && (addr[1]==test_dflash_data[1+page*2])) {
+
+		} else {
+			printf("err %08X %08X %08X %08X %08X %08X\n",
+					&addr[0], &addr[1],
+					addr[0], addr[1],
+					test_dflash_data[page*2], test_dflash_data[1+page*2]);
+			flush_stdout();
+			errors ++;
+		}
+	}
+
+	if (errors) {
+		printf("ERROR: error while D-Flash erase / program\n");
+	} else {
+		printf("OK: D-Flash checks passed\n");
+	}
+	flush_stdout();
+}
+
 int core0_main(int argc, char** argv) {
 	prvSetupHardware();
 
@@ -379,7 +616,7 @@ int core0_main(int argc, char** argv) {
 					FLASH_SIZE_TABLE_KB[MODULE_SCU.CHIPID.B.FSIZE%0x0c],
 					(MODULE_SCU.CHIPID.B.SEC==1)?"Yes":"No",
 							MODULE_SCU.CHIPID.B.SP
-							);
+	);
 	flush_stdout();
 
 	printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,CE:%d\n",
@@ -394,12 +631,14 @@ int core0_main(int argc, char** argv) {
 
 	_syscall(101);
 
-//	test_tlf35584();
+	DFlashDemo();
+
+	//	test_tlf35584();
 
 	interface_init();
 	protocol_init();
 
-//	server_loop();
+	//	server_loop();
 
 	/* The following function will only create more tasks and timers if
 	mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY is set to 0 (at the top of this
@@ -451,36 +690,36 @@ void start_task(void *pvParameters) {
 }
 
 void maintaince_task(void *pvParameters) {
-//	char info_buf[512];
+	//	char info_buf[512];
 
 	while(1) {
-//		vTaskList(info_buf);
-//		if(NULL != MutexSemaphore) {
-//			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
-//				printf("%s\r\n",info_buf);
-//
-//				vTaskGetRunTimeStats(info_buf);
-//				printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
-//				printf("%s\r\n",info_buf);
-//
-//				printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
-//						__TRICORE_NAME__,
-//						__TRICORE_CORE__,
-//						SYSTEM_GetCpuClock()/1000000,
-//						SYSTEM_GetSysClock()/1000000,
-//						SYSTEM_GetStmClock()/1000000,
-//						system_GetPllClock()/1000000,
-//						system_GetIntClock()/1000000,
-//						SYSTEM_IsCacheEnabled());
-//				flush_stdout();
-//
-//				xSemaphoreGive(MutexSemaphore);
-//			}
-//		}
+		//		vTaskList(info_buf);
+		//		if(NULL != MutexSemaphore) {
+		//			if(pdTRUE == xSemaphoreTake(MutexSemaphore, portMAX_DELAY)) {
+		//				printf("%s\r\n",info_buf);
+		//
+		//				vTaskGetRunTimeStats(info_buf);
+		//				printf("RunTimeStats Len:%d\r\n", strlen(info_buf));
+		//				printf("%s\r\n",info_buf);
+		//
+		//				printf("Tricore %04X Core:%04X, CPU:%u MHz,Sys:%u MHz,STM:%u MHz,PLL:%u M,Int:%u M,CE:%d\n",
+		//						__TRICORE_NAME__,
+		//						__TRICORE_CORE__,
+		//						SYSTEM_GetCpuClock()/1000000,
+		//						SYSTEM_GetSysClock()/1000000,
+		//						SYSTEM_GetStmClock()/1000000,
+		//						system_GetPllClock()/1000000,
+		//						system_GetIntClock()/1000000,
+		//						SYSTEM_IsCacheEnabled());
+		//				flush_stdout();
+		//
+		//				xSemaphoreGive(MutexSemaphore);
+		//			}
+		//		}
 		start_dts_measure();
 
 		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
-						portMAX_DELAY );/* Block indefinitely. */
+				portMAX_DELAY );/* Block indefinitely. */
 		vTaskDelay(40 / portTICK_PERIOD_MS);
 	}
 }
