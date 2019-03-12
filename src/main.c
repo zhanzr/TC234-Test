@@ -353,57 +353,6 @@ void protocol_init(void){
 	printf("Port:%d\n",HTTP_PORT);
 }
 
-const IfxFlash_flashSector IfxFlash_dFlashTableEepLog[IFXFLASH_DFLASH_NUM_LOG_SECTORS] = {
-		{0xAF000000 + 0 * 0x2000,  0xAF000000 + 1 * 0x2000 - 1 },
-		{0xAF000000 + 1 * 0x2000,  0xAF000000 + 2 * 0x2000 - 1 },
-		{0xAF000000 + 2 * 0x2000,  0xAF000000 + 3 * 0x2000 - 1 },
-		{0xAF000000 + 3 * 0x2000,  0xAF000000 + 4 * 0x2000 - 1 },
-		{0xAF000000 + 4 * 0x2000,  0xAF000000 + 5 * 0x2000 - 1 },
-		{0xAF000000 + 5 * 0x2000,  0xAF000000 + 6 * 0x2000 - 1 },
-		{0xAF000000 + 6 * 0x2000,  0xAF000000 + 7 * 0x2000 - 1 },
-		{0xAF000000 + 7 * 0x2000,  0xAF000000 + 8 * 0x2000 - 1 },
-		{0xAF000000 + 8 * 0x2000,  0xAF000000 + 9 * 0x2000 - 1 },
-		{0xAF000000 + 9 * 0x2000,  0xAF000000 + 10 * 0x2000 - 1},
-		{0xAF000000 + 10 * 0x2000, 0xAF000000 + 11 * 0x2000 - 1},
-		{0xAF000000 + 11 * 0x2000, 0xAF000000 + 12 * 0x2000 - 1},
-		{0xAF000000 + 12 * 0x2000, 0xAF000000 + 13 * 0x2000 - 1},
-		{0xAF000000 + 13 * 0x2000, 0xAF000000 + 14 * 0x2000 - 1},
-		{0xAF000000 + 14 * 0x2000, 0xAF000000 + 15 * 0x2000 - 1},
-		{0xAF000000 + 15 * 0x2000, 0xAF000000 + 16 * 0x2000 - 1},
-		{0xAF000000 + 16 * 0x2000, 0xAF000000 + 17 * 0x2000 - 1},
-		{0xAF000000 + 17 * 0x2000, 0xAF000000 + 18 * 0x2000 - 1},
-		{0xAF000000 + 18 * 0x2000, 0xAF000000 + 19 * 0x2000 - 1},
-		{0xAF000000 + 19 * 0x2000, 0xAF000000 + 20 * 0x2000 - 1},
-		{0xAF000000 + 20 * 0x2000, 0xAF000000 + 21 * 0x2000 - 1},
-		{0xAF000000 + 21 * 0x2000, 0xAF000000 + 22 * 0x2000 - 1},
-		{0xAF000000 + 22 * 0x2000, 0xAF000000 + 23 * 0x2000 - 1},
-		{0xAF000000 + 23 * 0x2000, 0xAF000000 + 24 * 0x2000 - 1},
-		{0xAF000000 + 24 * 0x2000, 0xAF000000 + 25 * 0x2000 - 1},
-		{0xAF000000 + 25 * 0x2000, 0xAF000000 + 26 * 0x2000 - 1},
-		{0xAF000000 + 26 * 0x2000, 0xAF000000 + 27 * 0x2000 - 1},
-		{0xAF000000 + 27 * 0x2000, 0xAF000000 + 28 * 0x2000 - 1},
-		{0xAF000000 + 28 * 0x2000, 0xAF000000 + 29 * 0x2000 - 1},
-		{0xAF000000 + 29 * 0x2000, 0xAF000000 + 30 * 0x2000 - 1},
-		{0xAF000000 + 30 * 0x2000, 0xAF000000 + 31 * 0x2000 - 1},
-		{0xAF000000 + 31 * 0x2000, 0xAF000000 + 32 * 0x2000 - 1},
-		{0xAF000000 + 32 * 0x2000, 0xAF000000 + 33 * 0x2000 - 1},
-		{0xAF000000 + 33 * 0x2000, 0xAF000000 + 34 * 0x2000 - 1},
-		{0xAF000000 + 34 * 0x2000, 0xAF000000 + 35 * 0x2000 - 1},
-		{0xAF000000 + 35 * 0x2000, 0xAF000000 + 36 * 0x2000 - 1},
-		{0xAF000000 + 36 * 0x2000, 0xAF000000 + 37 * 0x2000 - 1},
-		{0xAF000000 + 37 * 0x2000, 0xAF000000 + 38 * 0x2000 - 1},
-		{0xAF000000 + 38 * 0x2000, 0xAF000000 + 39 * 0x2000 - 1},
-		{0xAF000000 + 39 * 0x2000, 0xAF000000 + 40 * 0x2000 - 1},
-		{0xAF000000 + 40 * 0x2000, 0xAF000000 + 41 * 0x2000 - 1},
-		{0xAF000000 + 41 * 0x2000, 0xAF000000 + 42 * 0x2000 - 1},
-		{0xAF000000 + 42 * 0x2000, 0xAF000000 + 43 * 0x2000 - 1},
-		{0xAF000000 + 43 * 0x2000, 0xAF000000 + 44 * 0x2000 - 1},
-		{0xAF000000 + 44 * 0x2000, 0xAF000000 + 45 * 0x2000 - 1},
-		{0xAF000000 + 45 * 0x2000, 0xAF000000 + 46 * 0x2000 - 1},
-		{0xAF000000 + 46 * 0x2000, 0xAF000000 + 47 * 0x2000 - 1},
-		{0xAF000000 + 47 * 0x2000, 0xAF000000 + 48 * 0x2000 - 1},
-};
-
 const IfxFlash_flashSector IfxFlash_dFlashTableHsmLog[IFXFLASH_DFLASH_NUM_HSM_LOG_SECTORS] = {
 		{0xaf110000, 0xaf111fff},   // HSM0
 		{0xaf112000, 0xaf113fff},   // HSM1
@@ -503,91 +452,62 @@ void IfxFlash_writePage(uint32_t pageAddr)
 	_dsync();
 }
 
-const uint32_t test_dflash_data[] = {0xAB886301, 0x68A9089B, 0xB421ED43, 0xE29F12EB, 0x5089EBB9, 0x59B7FB59, 0xD026A00F, 0x632764D6, 0x308CF937, 0x7631265D, 0x366B7F45, 0x4A19298E, 0x627BA510, 0x486D51C3, 0x1D61EFF0, 0x62F64F46, 0x8D716BF7, 0xF17F158A, 0xD7C75307, 0x0160A435, 0xE8CB0202, 0xF6C35094, 0x183F4A8C, 0x10BC6548, 0x57235099, 0xEDE43E96, 0x48937C58, 0xC8188B44, 0x60A7D5A7, 0xFDBD8EA4, 0x877B19A3, 0x3B35ECA4, };
-/** \brief D-Flash Demo
- *
- * This function is called from the run to demo the D-Flash Erase & Program functionality
- */
-static void DFlashDemo(void) {
-	uint32_t errors = 0;
-	uint16_t endinitSfty_pw;
-	uint32_t offset;
-	uint32_t flash       = 0;
-	uint32_t sector_addr = IfxFlash_dFlashTableEepLog[0].start;
+//const uint32_t test_dflash_data[] = {0xAB886301, 0x68A9089B, 0xB421ED43, 0xE29F12EB, 0x5089EBB9, 0x59B7FB59, 0xD026A00F, 0x632764D6, 0x308CF937, 0x7631265D, 0x366B7F45, 0x4A19298E, 0x627BA510, 0x486D51C3, 0x1D61EFF0, 0x62F64F46, 0x8D716BF7, 0xF17F158A, 0xD7C75307, 0x0160A435, 0xE8CB0202, 0xF6C35094, 0x183F4A8C, 0x10BC6548, 0x57235099, 0xEDE43E96, 0x48937C58, 0xC8188B44, 0x60A7D5A7, 0xFDBD8EA4, 0x877B19A3, 0x3B35ECA4, };
+//const uint32_t test_dflash_data[] = {
+//		0x3C70E0F4, 0xB3126DD5, 0xE9B08592, 0x85EA2E14, 0xEDDFF0F5, 0x31112720, 0x6A66F3E2, 0xE5B1D330, 0xA223D471, 0xFCF89257, 0x55CE4051, 0x473562F7, 0x7E5D9E47, 0xEEC4BD06, 0xB8DD2625, 0x07ED2F5A, 0x735892DF, 0x7E0D206E, 0x1EBD451D, 0xCE031F24, 0xAA6AB31C, 0x2CD673B8, 0x7B194BDF, 0xA46A96A5, 0xFB7EEFB2, 0xC939C96F, 0x1CB9EF37, 0x469B11A8, 0x113E33DC, 0x41AC3E9A, 0x56AEE5F2, 0xBD3AD630
+//};
 
+void dbg_dump(uint32_t addr, uint32_t u32_n) {
+	//DFlash test
+	printf("DFlash[%08X]:\n", addr);
+	for(uint32_t i=0; i<u32_n; i+=4) {
+		printf("%08X ", *(uint32_t*)(addr+i));
+	}
+	printf("\n");
+	flush_stdout();
+}
+
+void erase_sector(uint32_t s_addr) {
 	/* erase program flash */
 	unlock_safety_wdtcon();
-	IfxFlash_eraseSector(sector_addr);
+	IfxFlash_eraseSector(s_addr);
+	lock_safety_wdtcon();
+}
+
+void program_page(uint32_t page_addr, uint32_t u32_0, uint32_t u32_1) {
+	/* wait until unbusy */
+	IfxFlash_waitUnbusy(0, IfxFlash_FlashType_D0);
+
+	IfxFlash_loadPage2X32(page_addr, u32_0, u32_1);
+	/* write page */
+	unlock_safety_wdtcon();
+	IfxFlash_writePage(page_addr);
 	lock_safety_wdtcon();
 
-	{
-#define DFLASH_SECTOR_SIZE	(8*1024)
-		//DFlash test
-		uint32_t df_addr = 0xAF000000;
-		printf("DFlash[%08X]:\n", df_addr);
-		for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {
-			printf("%08X ", *(uint32_t*)(df_addr+i));
-		}
-		printf("\n");
-	}
-	flush_stdout();
-
 	/* wait until unbusy */
-	IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
+	IfxFlash_waitUnbusy(0, IfxFlash_FlashType_D0);
+}
+
+void DFlashDemo(uint8_t dflash_sec_n) {
+	uint32_t errors = 0;
+	uint32_t flash       = 0;
+	uint32_t sector_addr = IFXFLASH_DFLASH_START + dflash_sec_n*DFLASH_SECTOR_SIZE;
+
+	erase_sector(sector_addr);
+
+	dbg_dump(sector_addr, DFLASH_SECTOR_SIZE/32);
 
 	/* program the given no of pages */
 	for (uint16_t page = 0; page < 16; ++page) {
 		uint32_t pageAddr = sector_addr + page * IFXFLASH_DFLASH_PAGE_LENGTH;
 		errors = IfxFlash_enterPageMode(pageAddr);
 
-		/* wait until unbusy */
-		IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-
-		IfxFlash_loadPage2X32(pageAddr, test_dflash_data[page*2], test_dflash_data[1+page*2]);
-		/* write page */
-		unlock_safety_wdtcon();
-		IfxFlash_writePage(pageAddr);
-		lock_safety_wdtcon();
-
-		/* wait until unbusy */
-		IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
+		uint32_t u32_0 = rand();
+		uint32_t u32_1 = rand();
+		program_page(pageAddr, u32_0, u32_1);
 	}
 
-	{
-#define DFLASH_SECTOR_SIZE	(8*1024)
-		//DFlash test
-		uint32_t df_addr = 0xAF000000;
-		printf("DFlash[%08X]:\n", df_addr);
-		for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {
-			printf("%08X ", *(uint32_t*)(df_addr+i));
-		}
-		printf("\n");
-	}
-	flush_stdout();
-
-	/* Verify the programmed data */
-	for (uint16_t page = 0; page < 16; ++page) {
-		uint32_t pageAddr = sector_addr + page * IFXFLASH_DFLASH_PAGE_LENGTH;
-		volatile uint32_t *addr     = (uint32_t *)pageAddr;
-
-		if((addr[0]==test_dflash_data[page*2]) && (addr[1]==test_dflash_data[1+page*2])) {
-
-		} else {
-			printf("err %08X %08X %08X %08X %08X %08X\n",
-					&addr[0], &addr[1],
-					addr[0], addr[1],
-					test_dflash_data[page*2], test_dflash_data[1+page*2]);
-			flush_stdout();
-			errors ++;
-		}
-	}
-
-	if (errors) {
-		printf("ERROR: error while D-Flash erase / program\n");
-	} else {
-		printf("OK: D-Flash checks passed\n");
-	}
-	flush_stdout();
+	dbg_dump(sector_addr, DFLASH_SECTOR_SIZE/32);
 }
 
 int core0_main(int argc, char** argv) {
@@ -629,10 +549,11 @@ int core0_main(int argc, char** argv) {
 			SYSTEM_IsCacheEnabled());
 	flush_stdout();
 
-	_syscall(101);
+	_syscall(123);
 
-	DFlashDemo();
-
+	DFlashDemo(0);
+	DFlashDemo(1);
+	DFlashDemo(2);
 	//	test_tlf35584();
 
 	interface_init();

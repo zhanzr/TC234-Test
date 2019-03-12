@@ -276,18 +276,18 @@
     <InputSection Name="wm4.addr.h.6.aa1661b207b952b9e77fd5ef0e4f41be"/>
     <InputSection Name="wm4.masks.h.3.63403b7be0bffc80904db7034f507a3d"/>
     <InputSection Name="wm4.masks.h.3.e8524f2e240b43f145c9f6e901c714a0"/>
-    <InputSection Name="wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8"/>
     <InputSection Name="wm4.string.h.17.f8d12df81104836a3f2a5d589ae830d8"/>
     <InputSection Name="wm4.stdio.h.27.f2ac352bab34f31f9f478442827b2ba6"/>
-    <InputSection Name="wm4.timers.h.96.489fd98e23f60a1428d1c47e0ce13bb9"/>
-    <InputSection Name="wm4.croutine.h.246.9d5543f1c91c5e9bede3e818a7019f48"/>
     <InputSection Name="wm4.bspconfig_tc23x.h.55.e1d87cb2991eb49856b6a701bdf32c1d"/>
     <InputSection Name="wm4.enc28j60.h.2.c45d4928729f2bf853b38f9335d8b1e5"/>
     <InputSection Name="wm4.net.h.2.dc9a3e35f4e8cf81bdc2e152d2d819f2"/>
-    <InputSection Name="wm4.StackMacros.h.71.f4b392b8a8ca858f54a8e6627398533d"/>
+    <InputSection Name="wm4.stddef.h.39.daafd3d79fe2f3a84d2d73d7d4e706f8"/>
+    <InputSection Name="wm4.timers.h.96.489fd98e23f60a1428d1c47e0ce13bb9"/>
+    <InputSection Name="wm4.croutine.h.246.9d5543f1c91c5e9bede3e818a7019f48"/>
     <InputSection Name="wm4.interrupts_tc23x.h.15.e764addd0bb2b4fdbe0d7862e17a92e9"/>
     <InputSection Name="wm4.asm_prototype.h.44.b8add633cbb005089a124a3621c7279a"/>
-    <InputSection Name="wm4.data_flash.h.34.d104324a0cddfa9b019e1b5d1e00e4cf"/>
+    <InputSection Name="wm4.data_flash.h.34.d3ae18ee35c216a231cb610b4358d7a8"/>
+    <InputSection Name="wm4.StackMacros.h.71.f4b392b8a8ca858f54a8e6627398533d"/>
   </Input>
   <Files>
     <ObjectFile Name="src\system_tc23x.o"/>
