@@ -29,8 +29,9 @@
 #define DFLASH_SECTOR_SIZE	(8*1024)
 #define SECTOR_SIZE               DFLASH_SECTOR_SIZE
 
-#define EMU_EE_ADDR_START	0
-#define EMU_EE_ADDR_END	63
+//Emulate EE Address could be an erased value, for tricore: 0
+#define EMU_EE_ADDR_START	0x00000100
+#define EMU_EE_ADDR_END	(EMU_EE_ADDR_START+0x63)
 #define EMU_EE_ADDR_L	(EMU_EE_ADDR_END-EMU_EE_ADDR_START+1)
 
 /* EEPROM emulation start address in Flash */
@@ -38,22 +39,23 @@
 #define EEPROM_START_ADDRESS  ((uint32_t)DFLASH0_START+SECTOR_SIZE)
 
 /* Pages 0 and 1 base and end addresses */
-#define PAGE0_BASE_ADDRESS    ((uint32_t)(EEPROM_START_ADDRESS + 0x0000))
-#define PAGE0_END_ADDRESS     ((uint32_t)(EEPROM_START_ADDRESS + (SECTOR_SIZE - 1)))
+#define PAGE0_BASE_ADDRESS    EEPROM_START_ADDRESS
+#define PAGE0_END_ADDRESS     (EEPROM_START_ADDRESS + SECTOR_SIZE -1)
 
-#define PAGE0_ID               1
+#define PAGE0_ID               0
 
 #define PAGE1_BASE_ADDRESS    ((uint32_t)(EEPROM_START_ADDRESS + SECTOR_SIZE))
 #define PAGE1_END_ADDRESS     ((uint32_t)(EEPROM_START_ADDRESS + (2 * SECTOR_SIZE - 1)))
 
-#define PAGE1_ID               2
+#define PAGE1_ID               1
 
 #define	NO_VALID_PAGE	0x00AB
 
 /* Page status definitions */
 #define ERASED                ((uint64_t)0x0000000000000000)     /* Page is empty */
 #define RECEIVE_DATA          ((uint64_t)0xEEEEEEEEEEEEEEEE)     /* Page is marked to receive data */
-#define VALID_PAGE            ((uint64_t)0xFFFFFFFFFFFFFFFF)     /* Page containing valid data */
+#define VALID_PAGE            ((uint64_t)0xAAAAAAAAAAAAAAAA)     /* Page containing valid data */
+#define UKNOWN_STAT            ((uint64_t)0xF2345678F2345678)     /* Page containing valid data */
 
 /* Valid pages in read and write defines */
 #define READ_FROM_VALID_PAGE  ((uint8_t)0x00)

@@ -89,8 +89,8 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.277148049" name="ip_arp_udp_tcp.c" rcbsApplicability="disable" resourcePath="src/server_net/ip_arp_udp_tcp.c" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155.39070807">
-						<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155.39070807" name="TriCore C Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155"/>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.948172467" name="ee_emu.c" rcbsApplicability="disable" resourcePath="src/ee_emu.c" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155.388853219">
+						<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155.388853219" name="TriCore C Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155"/>
 					</fileInfo>
 					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.510529732" name="/" resourcePath="asm">
 						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.239742863" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable" unusedChildren="">

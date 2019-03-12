@@ -30,46 +30,11 @@ static uint16_t EE_VerifyPageFullWriteVariable(uint32_t VirtAddress, uint32_t Da
 static uint16_t EE_PageTransfer(uint16_t VirtAddress, uint32_t Data);
 static uint16_t EE_VerifyPageFullyErased(uint32_t Address);
 
-const IfxFlash_flashSector IfxFlash_dFlashTableEepLog[] = {
-		{0xAF000000 + 0 * 0x2000,  0xAF000000 + 1 * 0x2000 - 1 },
-		{0xAF000000 + 1 * 0x2000,  0xAF000000 + 2 * 0x2000 - 1 },
-		{0xAF000000 + 2 * 0x2000,  0xAF000000 + 3 * 0x2000 - 1 },
-		{0xAF000000 + 3 * 0x2000,  0xAF000000 + 4 * 0x2000 - 1 },
-		{0xAF000000 + 4 * 0x2000,  0xAF000000 + 5 * 0x2000 - 1 },
-		{0xAF000000 + 5 * 0x2000,  0xAF000000 + 6 * 0x2000 - 1 },
-		{0xAF000000 + 6 * 0x2000,  0xAF000000 + 7 * 0x2000 - 1 },
-		{0xAF000000 + 7 * 0x2000,  0xAF000000 + 8 * 0x2000 - 1 },
-		{0xAF000000 + 8 * 0x2000,  0xAF000000 + 9 * 0x2000 - 1 },
-		{0xAF000000 + 9 * 0x2000,  0xAF000000 + 10 * 0x2000 - 1},
-		{0xAF000000 + 10 * 0x2000, 0xAF000000 + 11 * 0x2000 - 1},
-		{0xAF000000 + 11 * 0x2000, 0xAF000000 + 12 * 0x2000 - 1},
-		{0xAF000000 + 12 * 0x2000, 0xAF000000 + 13 * 0x2000 - 1},
-		{0xAF000000 + 13 * 0x2000, 0xAF000000 + 14 * 0x2000 - 1},
-		{0xAF000000 + 14 * 0x2000, 0xAF000000 + 15 * 0x2000 - 1},
-		{0xAF000000 + 15 * 0x2000, 0xAF000000 + 16 * 0x2000 - 1},
-};
-
-const IfxFlash_flashSector IfxFlash_dFlashTableHsmLog[IFXFLASH_DFLASH_NUM_HSM_LOG_SECTORS] = {
-		{0xaf110000, 0xaf111fff},   // HSM0
-		{0xaf112000, 0xaf113fff},   // HSM1
-		{0xaf114000, 0xaf115fff},   // HSM2
-		{0xaf116000, 0xaf117fff},   // HSM3
-		{0xaf118000, 0xaf119fff},   // HSM4
-		{0xaf11a000, 0xaf11bfff},   // HSM5
-		{0xaf11c000, 0xaf11dfff},   // HSM6
-		{0xaf11e000, 0xaf11ffff},   // HSM7
-};
-
-const IfxFlash_flashSector IfxFlash_dFlashTablePhys[IFXFLASH_DFLASH_NUM_PHYSICAL_SECTORS] = {
-		{IFXFLASH_DFLASH_START, IFXFLASH_DFLASH_END},
-};
-
-void IfxFlash_eraseSector(uint32_t sectorAddr)
-{
-	uint32_t *addr1 = (uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa50);
-	uint32_t *addr2 = (uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa58);
-	uint32_t *addr3 = (uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
-	uint32_t *addr4 = (uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
+void IfxFlash_eraseSector(uint32_t sectorAddr) {
+	volatile uint32_t *addr1 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa50);
+	volatile uint32_t *addr2 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa58);
+	volatile uint32_t *addr3 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
+	volatile uint32_t *addr4 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
 
 	*addr1 = sectorAddr;
 	*addr2 = 1;
@@ -79,8 +44,8 @@ void IfxFlash_eraseSector(uint32_t sectorAddr)
 	_dsync();
 }
 
-void IfxFlash_loadPage2X32(uint32_t pageAddr, uint32_t wordL, uint32_t wordU){
-	uint32_t *addr1 = (uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0x55f0);
+void IfxFlash_loadPage2X32(uint32_t pageAddr, uint32_t wordL, uint32_t wordU) {
+	volatile uint32_t *addr1 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0x55f0);
 
 	*addr1 = wordL;
 	addr1++;
@@ -89,40 +54,25 @@ void IfxFlash_loadPage2X32(uint32_t pageAddr, uint32_t wordL, uint32_t wordU){
 	_dsync();
 }
 
-uint8_t IfxFlash_waitUnbusy(uint32_t flash, IfxFlash_FlashType flashType)
-{
-	if (flash == 0)
-	{
-		while (FLASH0_FSR.U & (1 << flashType))
-		{}
-	}
-
-#if IFXFLASH_NUM_FLASH_MODULES > 1
-	else if (flash == 1)
-	{
-		while (FLASH1_FSR.U & (1 << flashType))
-		{}
-	}
-#endif
-	else
-	{
+uint8_t IfxFlash_waitUnbusy(uint32_t flash, IfxFlash_FlashType flashType) {
+	if (flash == 0) {
+		while (FLASH0_FSR.U & (1 << flashType)){
+			;
+		}
+	} else {
 		return 1; // invalid flash selected
 	}
 	_dsync();
 	return 0;     // finished
 }
 
-uint8_t IfxFlash_enterPageMode(uint32_t pageAddr)
-{
-	uint32_t *addr1 = (uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0x5554);
+uint8_t IfxFlash_enterPageMode(uint32_t pageAddr) {
+	volatile uint32_t *addr1 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0x5554);
 
-	if ((pageAddr & 0xff000000) == 0xa0000000)    // program flash
-	{
+	if ((pageAddr & 0xff000000) == 0xa0000000) {
 		*addr1 = 0x50;
 		return 0;
-	}
-	else if ((pageAddr & 0xff000000) == 0xaf000000)       // data flash
-	{
+	} else if ((pageAddr & 0xff000000) == 0xaf000000) {
 		*addr1 = 0x5D;
 		return 0;
 	}
@@ -132,12 +82,11 @@ uint8_t IfxFlash_enterPageMode(uint32_t pageAddr)
 }
 
 
-void IfxFlash_writePage(uint32_t pageAddr)
-{
-	uint32_t *addr1 = (uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa50);
-	uint32_t *addr2 = (uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa58);
-	uint32_t *addr3 = (uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
-	uint32_t *addr4 = (uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
+void IfxFlash_writePage(uint32_t pageAddr) {
+	volatile uint32_t *addr1 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa50);
+	volatile uint32_t *addr2 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaa58);
+	volatile uint32_t *addr3 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
+	volatile uint32_t *addr4 = (volatile uint32_t *)(IFXFLASH_CMD_BASE_ADDRESS | 0xaaa8);
 
 	*addr1 = pageAddr;
 	*addr2 = 0x00;
@@ -147,6 +96,59 @@ void IfxFlash_writePage(uint32_t pageAddr)
 	_dsync();
 }
 
+void dbg_dump(uint32_t addr, uint32_t u32_n) {
+	//DFlash test
+	printf("DFlash[%08X]:\n", addr);
+	for(uint32_t i=0; i<u32_n; i+=4) {
+		printf("%08X ", *(uint32_t*)(addr+i));
+	}
+	printf("\n");
+	flush_stdout();
+}
+
+void erase_sector(uint32_t s_addr) {
+	/* erase program flash */
+	unlock_safety_wdtcon();
+	IfxFlash_eraseSector(s_addr);
+	lock_safety_wdtcon();
+}
+
+inline void program_page(uint32_t page_addr, uint32_t u32_0, uint32_t u32_1) {
+	printf("P[%08X]:%08X %08X\n", page_addr, u32_0, u32_1);
+
+	IfxFlash_enterPageMode(page_addr);
+
+	/* wait until unbusy */
+	IfxFlash_waitUnbusy(0, IfxFlash_FlashType_D0);
+
+	IfxFlash_loadPage2X32(page_addr, u32_0, u32_1);
+	/* write page */
+	unlock_safety_wdtcon();
+	IfxFlash_writePage(page_addr);
+	lock_safety_wdtcon();
+
+	/* wait until unbusy */
+	IfxFlash_waitUnbusy(0, IfxFlash_FlashType_D0);
+}
+
+void DFlashDemo(uint8_t dflash_sec_n) {
+	uint32_t sector_addr = IFXFLASH_DFLASH_START + dflash_sec_n*DFLASH_SECTOR_SIZE;
+
+	erase_sector(sector_addr);
+
+	dbg_dump(sector_addr, DFLASH_SECTOR_SIZE/32);
+
+	/* program the given no of pages */
+	for (uint16_t page = 0; page < 16; ++page) {
+		uint32_t pageAddr = sector_addr + page * IFXFLASH_DFLASH_PAGE_LENGTH;
+		uint32_t u32_0 = rand();
+		uint32_t u32_1 = rand();
+		program_page(pageAddr, u32_0, u32_1);
+	}
+
+	dbg_dump(sector_addr, DFLASH_SECTOR_SIZE/32);
+}
+
 /**
  * @brief  Restore the pages to a known good state in case of page's status
  *   corruption after a power loss.
@@ -154,78 +156,60 @@ void IfxFlash_writePage(uint32_t pageAddr)
  * @retval - Flash error code: on write Flash error
  *         - FLASH_COMPLETE: on success
  */
-uint32_t EE_Init(void)
-{
-	uint32_t flash       = 0;
-	uint64_t PageStatus0 = 6;
-	uint64_t PageStatus1 = 6;
+uint32_t EE_Init(void) {
+	uint64_t PageStatus0;
+	uint64_t PageStatus1;
 	uint16_t VarIdx = 0;
-	uint16_t EepromStatus = 0, ReadStatus = 0;
-	int16_t x = -1;
-	uint32_t SectorError = 0;
-
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
+	uint32_t ReadStatus = 1;
+	uint16_t EepromStatus = 0;
 
 	/* Get Page0 status */
 	PageStatus0 = (*(uint64_t*)PAGE0_BASE_ADDRESS);
 	/* Get Page1 status */
 	PageStatus1 = (*(uint64_t*)PAGE1_BASE_ADDRESS);
 
-	printf("%s %d\n", __func__, __LINE__);
+	printf("%s %d, p0_st:%016llX, p1_st:%016llX\n", __func__, __LINE__, PageStatus0, PageStatus1);
 	flush_stdout();
 
 	/* Check for invalid header states and repair if necessary */
 	switch (PageStatus0)
 	{
 	case ERASED:
-		printf("%s %d\n", __func__, __LINE__);
+		printf("%s %d p0 erased \n", __func__, __LINE__);
 		flush_stdout();
-		if (PageStatus1 == VALID_PAGE) /* Page0 erased, Page1 valid */
-		{
-			printf("%s %d\n", __func__, __LINE__);
+		if (PageStatus1 == VALID_PAGE) {
+		  /* Page0 erased, Page1 valid */
+			printf("%s %d Page0 erased, Page1 valid\n", __func__, __LINE__);
 			flush_stdout();
 			/* Erase Page0 */
-			if(!EE_VerifyPageFullyErased(PAGE0_BASE_ADDRESS))
-			{
+			if(!EE_VerifyPageFullyErased(PAGE0_BASE_ADDRESS)) {
 				printf("%s %d\n", __func__, __LINE__);
 				flush_stdout();
-				unlock_safety_wdtcon();
-				IfxFlash_eraseSector(PAGE0_BASE_ADDRESS);
-				lock_safety_wdtcon();
+
+				erase_sector(PAGE0_BASE_ADDRESS);
+
 				printf("%s %d\n", __func__, __LINE__);
 				flush_stdout();
 			}
-		}
-		else if (PageStatus1 == RECEIVE_DATA) /* Page0 erased, Page1 receive */
-		{
-			printf("%s %d\n", __func__, __LINE__);
+		} else if (PageStatus1 == RECEIVE_DATA) {
+			printf("%s %d  /* Page0 erased, Page1 receive */\n", __func__, __LINE__);
 			flush_stdout();
 			/* Erase Page0 */
 			if(!EE_VerifyPageFullyErased(PAGE0_BASE_ADDRESS))
 			{
 				printf("%s %d\n", __func__, __LINE__);
 				flush_stdout();
-				unlock_safety_wdtcon();
-				IfxFlash_eraseSector(PAGE0_BASE_ADDRESS);
-				lock_safety_wdtcon();
+
+				erase_sector(PAGE0_BASE_ADDRESS);
 			}
 			/* Mark Page1 as valid */
 			/* wait until unbusy */
 			printf("%s %d\n", __func__, __LINE__);
 			flush_stdout();
-			IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-			IfxFlash_loadPage2X32(PAGE1_BASE_ADDRESS, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
-			/* write page */
-			unlock_safety_wdtcon();
-			IfxFlash_writePage(PAGE1_BASE_ADDRESS);
-			lock_safety_wdtcon();
-			/* wait until unbusy */
-			IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-		}
-		else /* First EEPROM access (Page0&1 are erased) or invalid state -> format EEPROM */
-		{
-			printf("%s %d\n", __func__, __LINE__);
+
+			program_page(PAGE1_BASE_ADDRESS, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
+		} else {
+			printf("%s %d both page erased, need format\n", __func__, __LINE__);
 			flush_stdout();
 			/* Erase both Page0 and Page1 and set Page0 as valid page */
 			EE_Format();
@@ -233,123 +217,80 @@ uint32_t EE_Init(void)
 		break;
 
 	case RECEIVE_DATA:
-		printf("%s %d\n", __func__, __LINE__);
+		printf("%s %d p0 rcv\n", __func__, __LINE__);
 		flush_stdout();
-		if (PageStatus1 == VALID_PAGE) /* Page0 receive, Page1 valid */
-		{
+		if (PageStatus1 == VALID_PAGE) {
+			/* Page0 receive, Page1 valid */
 			/* Transfer data from Page1 to Page0 */
-			for (VarIdx = EMU_EE_ADDR_START; VarIdx < EMU_EE_ADDR_END; VarIdx++)
-			{
+			for (VarIdx = EMU_EE_ADDR_START; VarIdx < EMU_EE_ADDR_END; VarIdx++) {
 				/* Read the last variables' updates */
 				ReadStatus = EE_ReadVariable(VarIdx, &DataVar);
 				/* In case variable corresponding to the virtual address was found */
-				if (ReadStatus != 0x1)
-				{
+				if (ReadStatus != 0x1) {
 					/* Transfer the variable to the Page0 */
 					EepromStatus = EE_VerifyPageFullWriteVariable(VarIdx, DataVar);
 				}
 			}
 			/* Mark Page0 as valid */
-			/* wait until unbusy */
-			IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-			IfxFlash_loadPage2X32(PAGE0_BASE_ADDRESS, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
-			/* write page */
-			unlock_safety_wdtcon();
-			IfxFlash_writePage(PAGE0_BASE_ADDRESS);
-			lock_safety_wdtcon();
-			/* wait until unbusy */
-			IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
+			program_page(PAGE0_BASE_ADDRESS, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
 
 			/* Erase Page1 */
-			if(!EE_VerifyPageFullyErased(PAGE1_BASE_ADDRESS))
-			{
-				unlock_safety_wdtcon();
-				IfxFlash_eraseSector(PAGE1_BASE_ADDRESS);
-				lock_safety_wdtcon();
+			if(!EE_VerifyPageFullyErased(PAGE1_BASE_ADDRESS)) {
+				erase_sector(PAGE1_BASE_ADDRESS);
 			}
 		}
-		else if (PageStatus1 == ERASED) /* Page0 receive, Page1 erased */
-		{
+		else if (PageStatus1 == ERASED)	{
+			/* Page0 receive, Page1 erased */
 			/* Erase Page1 */
-			if(!EE_VerifyPageFullyErased(PAGE1_BASE_ADDRESS))
-			{
-				unlock_safety_wdtcon();
-				IfxFlash_eraseSector(PAGE1_BASE_ADDRESS);
-				lock_safety_wdtcon();
+			if(!EE_VerifyPageFullyErased(PAGE1_BASE_ADDRESS)) {
+				erase_sector(PAGE1_BASE_ADDRESS);
 			}
 			/* Mark Page0 as valid */
-			/* wait until unbusy */
-			IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-			IfxFlash_loadPage2X32(PAGE0_BASE_ADDRESS, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
-			/* write page */
-			unlock_safety_wdtcon();
-			IfxFlash_writePage(PAGE0_BASE_ADDRESS);
-			lock_safety_wdtcon();
-			/* wait until unbusy */
-			IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-		}
-		else /* Invalid state -> format eeprom */
-		{
+			program_page(PAGE0_BASE_ADDRESS, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
+		} else {
+			/* Invalid state -> format eeprom */
 			/* Erase both Page0 and Page1 and set Page0 as valid page */
 			EE_Format();
 		}
 		break;
 
 	case VALID_PAGE:
-		printf("%s %d\n", __func__, __LINE__);
+		printf("%s %d p0 valid\n", __func__, __LINE__);
 		flush_stdout();
-		if (PageStatus1 == VALID_PAGE) /* Invalid state -> format eeprom */
-		{
+		if (PageStatus1 == VALID_PAGE) {
+			/* Invalid state -> format eeprom */
 			/* Erase both Page0 and Page1 and set Page0 as valid page */
 			EE_Format();
-		}
-		else if (PageStatus1 == ERASED) /* Page0 valid, Page1 erased */
-		{
+		} else if (PageStatus1 == ERASED) {
+			 /* Page0 valid, Page1 erased */
 			/* Erase Page1 */
-			if(!EE_VerifyPageFullyErased(PAGE1_BASE_ADDRESS))
-			{
-				unlock_safety_wdtcon();
-				IfxFlash_eraseSector(PAGE1_BASE_ADDRESS);
-				lock_safety_wdtcon();
+			if(!EE_VerifyPageFullyErased(PAGE1_BASE_ADDRESS)) {
+				erase_sector(PAGE1_BASE_ADDRESS);
 			}
-		}
-		else /* Page0 valid, Page1 receive */
-		{
+		} else {
+			/* Page0 valid, Page1 receive */
 			/* Transfer data from Page0 to Page1 */
-			for (VarIdx = EMU_EE_ADDR_START; VarIdx < EMU_EE_ADDR_END; VarIdx++)
-			{
+			for (VarIdx = EMU_EE_ADDR_START; VarIdx < EMU_EE_ADDR_END; VarIdx++) {
 				/* Read the last variables' updates */
 				ReadStatus = EE_ReadVariable(VarIdx, &DataVar);
 				/* In case variable corresponding to the virtual address was found */
-				if (ReadStatus != 0x1)
-				{
-					/* Transfer the variable to the Page0 */
+				if (ReadStatus != 0x1) {
+					/* Transfer the variable to the Page1 */
 					EepromStatus = EE_VerifyPageFullWriteVariable(VarIdx, DataVar);
 				}
 			}
 			/* Mark Page1 as valid */
-			/* wait until unbusy */
-			IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-			IfxFlash_loadPage2X32(PAGE1_BASE_ADDRESS, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
-			/* write page */
-			unlock_safety_wdtcon();
-			IfxFlash_writePage(PAGE1_BASE_ADDRESS);
-			lock_safety_wdtcon();
-			/* wait until unbusy */
-			IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
+			program_page(PAGE1_BASE_ADDRESS, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
 
 			/* Erase Page0 */
-			if(!EE_VerifyPageFullyErased(PAGE0_BASE_ADDRESS))
-			{
-				unlock_safety_wdtcon();
-				IfxFlash_eraseSector(PAGE0_BASE_ADDRESS);
-				lock_safety_wdtcon();
+			if(!EE_VerifyPageFullyErased(PAGE0_BASE_ADDRESS)) {
+				erase_sector(PAGE0_BASE_ADDRESS);
 			}
 		}
 		break;
 
 	default:  /* Any other state -> format eeprom */
-		printf("%s %d\n", __func__, __LINE__);
+		printf("%s %d p0 any other st, go format\n", __func__, __LINE__);
 		flush_stdout();
 		/* Erase both Page0 and Page1 and set Page0 as valid page */
 		EE_Format();
@@ -369,35 +310,26 @@ uint32_t EE_Init(void)
  *           - 0: if Page not erased
  *           - 1: if Page erased
  */
-uint16_t EE_VerifyPageFullyErased(uint32_t addr_start)
-{
+uint16_t EE_VerifyPageFullyErased(uint32_t addr_start) {
 	uint32_t ReadStatus = 1;
 	uint64_t AddressValue;
 	uint32_t Address = addr_start;
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 
 	/* Check each active page address starting from end */
-	while (Address <= (addr_start+SECTOR_SIZE))
-	{
+	while (Address <= (addr_start+SECTOR_SIZE)) {
 		/* Get the current location content to be compared with virtual address */
 		AddressValue = (*(uint64_t*)Address);
 
 		/* Compare the read address with the virtual address */
-		if (AddressValue != ERASED)
-		{
-			printf("%s %d\n", __func__, __LINE__);
-			flush_stdout();
-
+		if (AddressValue != ERASED) {
 			/* In case variable value is read, reset ReadStatus flag */
 			ReadStatus = 0;
-
 			break;
 		}
 		/* Next address location */
-		Address = Address + 8;
+		Address = Address + IFXFLASH_DFLASH_PAGE_LENGTH;
 	}
-	printf("%s %d\n", __func__, __LINE__);
+	printf("%s %d %08X :%s\n", __func__, __LINE__, addr_start, (0==ReadStatus)?"Dirty":"Erased");
 	flush_stdout();
 
 	/* Return ReadStatus value: (0: Page not erased, 1: Sector erased) */
@@ -414,20 +346,21 @@ uint16_t EE_VerifyPageFullyErased(uint32_t addr_start)
  *           - 1: if the variable was not found
  *           - NO_VALID_PAGE: if no valid page was found.
  */
-uint16_t EE_ReadVariable(uint16_t VirtAddress, uint32_t* Data)
-{
+uint16_t EE_ReadVariable(uint16_t VirtAddress, uint32_t* pData) {
 	uint16_t ValidPage = PAGE0_ID;
-	uint16_t AddressValue = EMU_EE_ADDR_START;
+	uint16_t AddressValue;
 	uint16_t ReadStatus = 1;
-	uint32_t Address = EEPROM_START_ADDRESS;
-	uint32_t PageStartAddress = EEPROM_START_ADDRESS;
+	uint32_t Address;
+	uint32_t PageStartAddress;
+
+	printf("%s %d va:%08X\n", __func__, __LINE__, VirtAddress);
+	flush_stdout();
 
 	/* Get active Page for read operation */
 	ValidPage = EE_FindValidPage(READ_FROM_VALID_PAGE);
 
 	/* Check if there is no valid page */
-	if (ValidPage == NO_VALID_PAGE)
-	{
+	if (ValidPage == NO_VALID_PAGE) {
 		return  NO_VALID_PAGE;
 	}
 
@@ -435,32 +368,38 @@ uint16_t EE_ReadVariable(uint16_t VirtAddress, uint32_t* Data)
 	PageStartAddress = (uint32_t)(EEPROM_START_ADDRESS + (uint32_t)(ValidPage * SECTOR_SIZE));
 
 	/* Get the valid Page end Address */
-	Address = (uint32_t)((EEPROM_START_ADDRESS - 8) + (uint32_t)((1 + ValidPage) * SECTOR_SIZE));
+	Address = (uint32_t)((EEPROM_START_ADDRESS - IFXFLASH_DFLASH_PAGE_LENGTH) +
+			(uint32_t)((1 + ValidPage) * SECTOR_SIZE));
 
+	printf("%s %d search:%08X-%08X\n", __func__, __LINE__, PageStartAddress, Address);
+	flush_stdout();
 	/* Check each active page address starting from end */
-	while (Address > (PageStartAddress + 8))
-	{
+	while (Address >= (PageStartAddress + IFXFLASH_DFLASH_PAGE_LENGTH)) {
 		/* Get the current location content to be compared with virtual address */
 		AddressValue = (*(uint32_t*)Address);
 
+//		printf("...:[%08X]=%08X\t",  Address, AddressValue);
+//		flush_stdout();
 		/* Compare the read address with the virtual address */
-		if (AddressValue == VirtAddress)
-		{
-			/* Get content of Address-8 which is variable value */
-			*Data = (*(uint32_t*)(Address - 8));
+		if (AddressValue == VirtAddress) {
+			/* Get content*/
+			*pData = (*(uint32_t*)(Address + 4));
+
+			printf("%s %d got va:%08X ra:%08X dat:%08X\n", __func__, __LINE__, VirtAddress, Address, *pData);
+			flush_stdout();
 
 			/* In case variable value is read, reset ReadStatus flag */
 			ReadStatus = 0;
 
 			break;
-		}
-		else
-		{
+		} else {
 			/* Next address location */
-			Address = Address - 8;
+			Address = Address - IFXFLASH_DFLASH_PAGE_LENGTH;
 		}
 	}
 
+	printf("%s %d ret %u\n", __func__, __LINE__, ReadStatus);
+	flush_stdout();
 	/* Return ReadStatus value: (0: variable exist, 1: variable doesn't exist) */
 	return ReadStatus;
 }
@@ -475,16 +414,17 @@ uint16_t EE_ReadVariable(uint16_t VirtAddress, uint32_t* Data)
  *           - NO_VALID_PAGE: if no valid page was found
  *           - Flash error code: on write Flash error
  */
-uint16_t EE_WriteVariable(uint16_t VirtAddress, uint32_t Data)
-{
+uint16_t EE_WriteVariable(uint16_t VirtAddress, uint32_t Data) {
 	uint64_t Status = 0;
+
+	printf("%s %d va:%08X dat:%08X\n", __func__, __LINE__, VirtAddress, Data);
+	flush_stdout();
 
 	/* Write the variable virtual address and value in the EEPROM */
 	Status = EE_VerifyPageFullWriteVariable(VirtAddress, Data);
 
 	/* In case the EEPROM active page is full */
-	if (Status == PAGE_FULL)
-	{
+	if (Status == PAGE_FULL) {
 		/* Perform Page transfer */
 		Status = EE_PageTransfer(VirtAddress, Data);
 	}
@@ -499,50 +439,30 @@ uint16_t EE_WriteVariable(uint16_t VirtAddress, uint32_t Data)
  * @retval Status of the last operation (Flash write or erase) done during
  *         EEPROM formating
  */
-static uint32_t EE_Format(void)
-{
-	uint32_t flash = 0;
-	uint32_t FlashStatus = 0;
-	uint32_t SectorError = 0;
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
-
+static uint32_t EE_Format(void) {
 	/* Erase Page0 */
-	if(!EE_VerifyPageFullyErased(PAGE0_BASE_ADDRESS))
-	{
-		printf("%s %d\n", __func__, __LINE__);
+	if(!EE_VerifyPageFullyErased(PAGE0_BASE_ADDRESS)) {
+		printf("%s %d, need erase %08X\n", __func__, __LINE__, PAGE0_BASE_ADDRESS);
 		flush_stdout();
-		unlock_safety_wdtcon();
-		IfxFlash_eraseSector(PAGE0_BASE_ADDRESS);
-		lock_safety_wdtcon();
+
+		erase_sector(PAGE0_BASE_ADDRESS);
 	}
-	printf("%s %d\n", __func__, __LINE__);
+	printf("%s %d make valid for %08X\n", __func__, __LINE__, PAGE0_BASE_ADDRESS);
 	flush_stdout();
 	/* Set Page0 as valid page: Write VALID_PAGE at Page0 base address */
 	/* Mark Page0 as valid */
-	/* wait until unbusy */
-	IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-	IfxFlash_loadPage2X32(PAGE0_BASE_ADDRESS, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
-	/* write page */
-	unlock_safety_wdtcon();
-	IfxFlash_writePage(PAGE0_BASE_ADDRESS);
-	lock_safety_wdtcon();
-	/* wait until unbusy */
-	IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
+	program_page(PAGE0_BASE_ADDRESS, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
+
+	dbg_dump(PAGE0_BASE_ADDRESS, DFLASH_SECTOR_SIZE/32);
 
 	/* Erase Page1 */
-	if(!EE_VerifyPageFullyErased(PAGE1_BASE_ADDRESS))
-	{
-		printf("%s %d\n", __func__, __LINE__);
+	if(!EE_VerifyPageFullyErased(PAGE1_BASE_ADDRESS)) {
+		printf("%s %d, need erase %08X\n", __func__, __LINE__, PAGE1_BASE_ADDRESS);
 		flush_stdout();
-		unlock_safety_wdtcon();
-		IfxFlash_eraseSector(PAGE1_BASE_ADDRESS);
-		lock_safety_wdtcon();
+
+		erase_sector(PAGE1_BASE_ADDRESS);
 	}
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
+
 	return 0;
 }
 
@@ -617,80 +537,6 @@ static uint16_t EE_FindValidPage(uint8_t Operation)
 	}
 }
 
-
-const uint32_t test_dflash_data[] = {
-		0x3C70E0F4, 0xB3126DD5, 0xE9B08592, 0x85EA2E14, 0xEDDFF0F5, 0x31112720, 0x6A66F3E2, 0xE5B1D330, 0xA223D471, 0xFCF89257, 0x55CE4051, 0x473562F7, 0x7E5D9E47, 0xEEC4BD06, 0xB8DD2625, 0x07ED2F5A, 0x735892DF, 0x7E0D206E, 0x1EBD451D, 0xCE031F24, 0xAA6AB31C, 0x2CD673B8, 0x7B194BDF, 0xA46A96A5, 0xFB7EEFB2, 0xC939C96F, 0x1CB9EF37, 0x469B11A8, 0x113E33DC, 0x41AC3E9A, 0x56AEE5F2, 0xBD3AD630
-};
-
-void dbg_dump(uint32_t addr, uint32_t u32_n){
-	//DFlash test
-	printf("DFlash[%08X]:\n", addr);
-	for(uint32_t i=0; i<u32_n; i+=4) {
-		printf("%08X ", *(uint32_t*)(addr+i));
-		flush_stdout();
-	}
-	printf("\n");
-}
-
-void DFlashDemo(uint32_t df_sec_n) {
-	uint32_t errors = 0;
-	uint32_t flash       = 0;
-	uint32_t sector_addr = IfxFlash_dFlashTableEepLog[df_sec_n].start;
-
-	/* erase program flash */
-	unlock_safety_wdtcon();
-	IfxFlash_eraseSector(sector_addr);
-	lock_safety_wdtcon();
-
-	dbg_dump(sector_addr, DFLASH_SECTOR_SIZE/16);
-
-	/* wait until unbusy */
-	IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-
-	/* program the given no of pages */
-	for (uint16_t page = 0; page < 16; ++page) {
-		uint32_t pageAddr = sector_addr + page * IFXFLASH_DFLASH_PAGE_LENGTH;
-		errors = IfxFlash_enterPageMode(pageAddr);
-
-		/* wait until unbusy */
-		IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-
-		IfxFlash_loadPage2X32(pageAddr, test_dflash_data[page*2], test_dflash_data[1+page*2]);
-		/* write page */
-		unlock_safety_wdtcon();
-		IfxFlash_writePage(pageAddr);
-		lock_safety_wdtcon();
-
-		/* wait until unbusy */
-		IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-	}
-
-	dbg_dump(sector_addr, DFLASH_SECTOR_SIZE/16);
-
-	/* Verify the programmed data */
-	for (uint16_t page = 0; page < 16; ++page) {
-		uint32_t pageAddr = sector_addr + page * IFXFLASH_DFLASH_PAGE_LENGTH;
-		uint32_t *addr     = (uint32_t *)pageAddr;
-
-		if((addr[0]==test_dflash_data[page*2]) && (addr[1]==test_dflash_data[1+page*2])) {
-		} else {
-			printf("err %08X %08X %08X %08X %08X %08X\n",
-					&addr[0], &addr[1],
-					addr[0], addr[1],
-					test_dflash_data[page*2], test_dflash_data[1+page*2]);
-			flush_stdout();
-			errors ++;
-		}
-	}
-
-	if (errors) {
-		printf("ERROR: error while D-Flash erase / program\n");
-	} else {
-		printf("OK: D-Flash checks passed\n");
-	}
-	flush_stdout();
-}
-
 /**
  * @brief  Verify if active page is full and Writes variable in EEPROM.
  * @param  VirtAddress: 16 bit virtual address of the variable
@@ -701,70 +547,44 @@ void DFlashDemo(uint32_t df_sec_n) {
  *           - NO_VALID_PAGE: if no valid page was found
  *           - Flash error code: on write Flash error
  */
-static uint16_t EE_VerifyPageFullWriteVariable(uint32_t VirtAddress, uint32_t Data){
+static uint16_t EE_VerifyPageFullWriteVariable(uint32_t VirtAddress, uint32_t Data) {
 	uint32_t flash = 0;
 	uint16_t ValidPage = PAGE0_ID;
 	uint32_t Address;
 	uint32_t PageEndAddress;
 
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
-
 	/* Get valid Page for write operation */
 	ValidPage = EE_FindValidPage(WRITE_IN_VALID_PAGE);
 
-	printf("%s %d\n", __func__, __LINE__);
+	printf("%s %d va:%08X:dat:%08X,vp:%02X\n", __func__, __LINE__, VirtAddress, Data, ValidPage);
 	flush_stdout();
 
 	/* Check if there is no valid page */
-	if (ValidPage == NO_VALID_PAGE)
-	{
-		printf("%s %d\n", __func__, __LINE__);
-		flush_stdout();
+	if (ValidPage == NO_VALID_PAGE) {
 		return  NO_VALID_PAGE;
 	}
 
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
-
 	/* Get the valid Page start Address */
 	Address = (uint32_t)(EEPROM_START_ADDRESS + (uint32_t)(ValidPage * SECTOR_SIZE));
-	printf("%s %d\n", __func__, __LINE__);
-	flush_stdout();
 
 	/* Get the valid Page end Address */
 	PageEndAddress = (uint32_t)((EEPROM_START_ADDRESS - 1) + (uint32_t)((ValidPage + 1) * SECTOR_SIZE));
-	printf("%s %d\n", __func__, __LINE__);
+	printf("%s %d start:%08X, end:%08X\n", __func__, __LINE__, Address, PageEndAddress);
 	flush_stdout();
 
 	/* Check each active page address starting from begining */
-	while (Address < PageEndAddress)
-	{
-		printf("%s %d\n", __func__, __LINE__);
-		flush_stdout();
+	while (Address < PageEndAddress) {
 		/* Verify if Address and Address+4 contents are ERASED */
-		if ((*(uint64_t*)Address) == ERASED)
-		{
-			printf("%s %d\n", __func__, __LINE__);
+		if ((*(uint64_t*)Address) == ERASED) {
+			printf("%s %d found blank slot %08X\n", __func__, __LINE__, Address);
 			flush_stdout();
 			/* Set variable data */
-			/* wait until unbusy */
-			IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-			IfxFlash_loadPage2X32(Address, (uint32_t)VirtAddress, (uint32_t)(Data));
-			/* write page */
-			unlock_safety_wdtcon();
-			IfxFlash_writePage(Address);
-			lock_safety_wdtcon();
-			/* wait until unbusy */
-			IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
+			program_page(Address, (uint32_t)VirtAddress, (uint32_t)(Data));
+
 			return 0;
-		}
-		else
-		{
-			printf("%s %d\n", __func__, __LINE__);
-			flush_stdout();
+		} else {
 			/* Next address location */
-			Address = Address + 8;
+			Address = Address + IFXFLASH_DFLASH_PAGE_LENGTH;
 		}
 	}
 
@@ -824,15 +644,7 @@ static uint16_t EE_PageTransfer(uint16_t VirtAddress, uint32_t Data)
 	}
 
 	/* Set the new Page status to RECEIVE_DATA status */
-	/* wait until unbusy */
-	IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-	IfxFlash_loadPage2X32(NewPageAddress, (uint32_t)RECEIVE_DATA, (uint32_t)(RECEIVE_DATA>>32));
-	/* write page */
-	unlock_safety_wdtcon();
-	IfxFlash_writePage(NewPageAddress);
-	lock_safety_wdtcon();
-	/* wait until unbusy */
-	IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
+	program_page(NewPageAddress, (uint32_t)RECEIVE_DATA, (uint32_t)(RECEIVE_DATA>>32));
 
 	/* Write the variable passed as parameter in the new active page */
 	EepromStatus = EE_VerifyPageFullWriteVariable(VirtAddress, Data);
@@ -843,32 +655,19 @@ static uint16_t EE_PageTransfer(uint16_t VirtAddress, uint32_t Data)
 		/* Read the last variables' updates */
 		ReadStatus = EE_ReadVariable(VarIdx, &DataVar);
 		/* In case variable corresponding to the virtual address was found */
-		if (ReadStatus != 0x1)
-		{
-			/* Transfer the variable to the Page0 */
+		if (ReadStatus != 0x1) {
+			/* Transfer the variable to the new page */
 			EepromStatus = EE_VerifyPageFullWriteVariable(VarIdx, DataVar);
 		}
 	}
 
 	if(!EE_VerifyPageFullyErased(OldPageAddress))
 	{
-		unlock_safety_wdtcon();
-		IfxFlash_eraseSector(OldPageAddress);
-		lock_safety_wdtcon();
+		erase_sector(OldPageAddress);
 	}
 
-
 	/* Set new Page status to VALID_PAGE status */
-	/* wait until unbusy */
-	IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-	IfxFlash_loadPage2X32(NewPageAddress, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
-	/* write page */
-	unlock_safety_wdtcon();
-	IfxFlash_writePage(NewPageAddress);
-	lock_safety_wdtcon();
-	/* wait until unbusy */
-	IfxFlash_waitUnbusy(flash, IfxFlash_FlashType_D0);
-	/* Return last operation flash status */
+	program_page(NewPageAddress, (uint32_t)VALID_PAGE, (uint32_t)(VALID_PAGE>>32));
 
 	return 0;
 }
@@ -876,35 +675,25 @@ static uint16_t EE_PageTransfer(uint16_t VirtAddress, uint32_t Data)
 #define	Error_Handler() \
 		printf("%s %d\n", __func__, __LINE__);	\
 		flush_stdout();	\
-		{\
-			uint32_t df_addr = PAGE0_BASE_ADDRESS;\
-			printf("DFlash[%08X]:\n", df_addr);\
-			for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {\
-				printf("%08X ", *(uint32_t*)(df_addr+i));\
-				flush_stdout();\
-			}\
-			printf("\n");\
-		}\
-		\
-		{\
-			uint32_t df_addr = PAGE1_BASE_ADDRESS;\
-			printf("DFlash[%08X]:\n", df_addr);\
-			for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {\
-				printf("%08X ", *(uint32_t*)(df_addr+i));\
-				flush_stdout();\
-			}\
-			printf("\n");\
-		}	\
+		dbg_dump(PAGE0_BASE_ADDRESS, DFLASH_SECTOR_SIZE/32);\
+		dbg_dump(PAGE1_BASE_ADDRESS, DFLASH_SECTOR_SIZE/32);\
+		erase_sector(PAGE0_BASE_ADDRESS);\
+		erase_sector(PAGE1_BASE_ADDRESS);\
 		while(1);
 
 
 void ee_emu_test(void) {
-	uint32_t VarDataTab[3];
+//	DFlashDemo(0);
+//	DFlashDemo(1);
+//	DFlashDemo(2);
+//
+//	return;
+
+	uint32_t VarDataTab[] = {0x12345678, 0x55aacc33, 0x816495ac};
 	uint32_t VarDataTmp;
 
 	/* EEPROM Init */
-	if( EE_Init() != 0)
-	{
+	if( EE_Init() != 0) {
 		Error_Handler();
 	}
 
@@ -913,13 +702,11 @@ void ee_emu_test(void) {
 	for (uint32_t VarValue = 1; VarValue <= 2; VarValue++)
 	{
 		/* Sequence 1 */
-		if((EE_WriteVariable(0,  VarValue)) != 0)
-		{
+		if((EE_WriteVariable(EMU_EE_ADDR_START,  VarValue)) != 0) {
 			Error_Handler();
 		}
 
-		if((EE_ReadVariable(0,  &VarDataTab[0])) != 0)
-		{
+		if((EE_ReadVariable(EMU_EE_ADDR_START,  &VarDataTab[0])) != 0) {
 			Error_Handler();
 		}
 
@@ -929,189 +716,111 @@ void ee_emu_test(void) {
 		}
 
 		/* Sequence 2 */
-		if(EE_WriteVariable(1, ~VarValue) != 0)
-		{
+		if(EE_WriteVariable(EMU_EE_ADDR_START+1, ~VarValue) != 0) {
 			Error_Handler();
 		}
 
-		if(EE_ReadVariable(1,  &VarDataTab[1]) != 0)
-		{
-			Error_Handler();
-		}
-
-		if(((uint16_t)~VarValue) != VarDataTab[1])
-		{
+		if(EE_ReadVariable(EMU_EE_ADDR_START+1,  &VarDataTab[1]) != 0) {
 			Error_Handler();
 		}
 
 		/* Sequence 3 */
-		if(EE_WriteVariable(2,  VarValue << 1) != 0)
+		if(EE_WriteVariable(EMU_EE_ADDR_START+2,  VarValue << 1) != 0)
 		{
 			Error_Handler();
 		}
 
-		if(EE_ReadVariable(2,  &VarDataTab[2]) != 0)
+		if(EE_ReadVariable(EMU_EE_ADDR_START+2,  &VarDataTab[2]) != 0)
 		{
 			Error_Handler();
 		}
 
-		if ((VarValue << 1) != VarDataTab[2])
-		{
-			Error_Handler();
-		}
-
-		{
-			//DFlash test
-			uint32_t df_addr = PAGE0_BASE_ADDRESS;
-			printf("DFlash[%08X]:\n", df_addr);
-			for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {
-				printf("%08X ", *(uint32_t*)(df_addr+i));
-				flush_stdout();
-			}
-			printf("\n");
-		}
-
-		{
-			//DFlash test
-			uint32_t df_addr = PAGE1_BASE_ADDRESS;
-			printf("DFlash[%08X]:\n", df_addr);
-			for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {
-				printf("%08X ", *(uint32_t*)(df_addr+i));
-				flush_stdout();
-			}
-			printf("\n");
-		}
+		dbg_dump(PAGE0_BASE_ADDRESS, DFLASH_SECTOR_SIZE/32);
+		dbg_dump(PAGE1_BASE_ADDRESS, DFLASH_SECTOR_SIZE/32);
 	}
 
 	/* Store values of Variable2 in EEPROM */
-	for (uint32_t VarValue = 1; VarValue <= 2; VarValue++)
-	{
-		if(EE_WriteVariable(1, VarValue) != 0)
-		{
+	for (uint32_t VarValue = 1; VarValue <= 2; VarValue++) {
+		if(EE_WriteVariable(EMU_EE_ADDR_START + 1, VarValue) != 0) {
 			Error_Handler();
-		}
-		if(EE_ReadVariable(1, &VarDataTab[1]) != 0)
-		{
-			Error_Handler();
-		}
-		if(VarValue != VarDataTab[1])
-		{
-			Error_Handler();
-		}
-		{
-			//DFlash test
-			uint32_t df_addr = PAGE0_BASE_ADDRESS;
-			printf("DFlash[%08X]:\n", df_addr);
-			for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {
-				printf("%08X ", *(uint32_t*)(df_addr+i));
-				flush_stdout();
-			}
-			printf("\n");
 		}
 
-		{
-			//DFlash test
-			uint32_t df_addr = PAGE1_BASE_ADDRESS;
-			printf("DFlash[%08X]:\n", df_addr);
-			for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {
-				printf("%08X ", *(uint32_t*)(df_addr+i));
-				flush_stdout();
-			}
-			printf("\n");
+		if(EE_ReadVariable(EMU_EE_ADDR_START + 1, &VarDataTab[1]) != 0) {
+			Error_Handler();
 		}
+
+		if(VarValue != VarDataTab[1]) {
+			Error_Handler();
+		}
+		dbg_dump(PAGE0_BASE_ADDRESS, DFLASH_SECTOR_SIZE/32);
+		dbg_dump(PAGE1_BASE_ADDRESS, DFLASH_SECTOR_SIZE/32);
 	}
 
 	/* read the last stored variables data*/
-	if(EE_ReadVariable(0, &VarDataTmp) != 0)
-	{
-		Error_Handler();
-	}
-	if (VarDataTmp != VarDataTab[0])
-	{
+	if(EE_ReadVariable(EMU_EE_ADDR_START+0, &VarDataTmp) != 0) {
 		Error_Handler();
 	}
 
-	if(EE_ReadVariable(1, &VarDataTmp) != 0)
-	{
-		Error_Handler();
-	}
-	if (VarDataTmp != VarDataTab[1])
-	{
+	if (VarDataTmp != VarDataTab[0]) {
 		Error_Handler();
 	}
 
-	if(EE_ReadVariable(2, &VarDataTmp) != 0)
-	{
+	if(EE_ReadVariable(EMU_EE_ADDR_START + 1, &VarDataTmp) != 0) {
 		Error_Handler();
 	}
-	if (VarDataTmp != VarDataTab[2])
-	{
+
+	if (VarDataTmp != VarDataTab[1]) {
+		Error_Handler();
+	}
+
+	if(EE_ReadVariable(EMU_EE_ADDR_START + 2, &VarDataTmp) != 0) {
+		Error_Handler();
+	}
+
+	if (VarDataTmp != VarDataTab[2]) {
 		Error_Handler();
 	}
 
 	/* Store values of Variable3 in EEPROM */
-	for (uint32_t VarValue = 1; VarValue <= 2; VarValue++)
-	{
-		if(EE_WriteVariable(2, VarValue) != 0)
-		{
+	for (uint32_t VarValue = 1; VarValue <= 2; VarValue++) {
+		if(EE_WriteVariable(EMU_EE_ADDR_START + 2, VarValue) != 0) {
 			Error_Handler();
-		}
-		if(EE_ReadVariable(2, &VarDataTab[2]) != 0)
-		{
-			Error_Handler();
-		}
-		if(VarValue != VarDataTab[2])
-		{
-			Error_Handler();
-		}
-		{
-			//DFlash test
-			uint32_t df_addr = PAGE0_BASE_ADDRESS;
-			printf("DFlash[%08X]:\n", df_addr);
-			for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {
-				printf("%08X ", *(uint32_t*)(df_addr+i));
-				flush_stdout();
-			}
-			printf("\n");
 		}
 
-		{
-			//DFlash test
-			uint32_t df_addr = PAGE1_BASE_ADDRESS;
-			printf("DFlash[%08X]:\n", df_addr);
-			for(uint32_t i=0; i<DFLASH_SECTOR_SIZE; i+=4) {
-				printf("%08X ", *(uint32_t*)(df_addr+i));
-				flush_stdout();
-			}
-			printf("\n");
+		if(EE_ReadVariable(EMU_EE_ADDR_START + 2, &VarDataTab[2]) != 0) {
+			Error_Handler();
 		}
+
+		if(VarValue != VarDataTab[2]) {
+			Error_Handler();
+		}
+
+		dbg_dump(PAGE0_BASE_ADDRESS, DFLASH_SECTOR_SIZE/32);
+		dbg_dump(PAGE1_BASE_ADDRESS, DFLASH_SECTOR_SIZE/32);
 	}
 
 	/* read the last stored variables data*/
-	if(EE_ReadVariable(0, &VarDataTmp) != 0)
-	{
-		Error_Handler();
-	}
-	if (VarDataTmp != VarDataTab[0])
-	{
+	if(EE_ReadVariable(EMU_EE_ADDR_START + 0, &VarDataTmp) != 0) {
 		Error_Handler();
 	}
 
-	if(EE_ReadVariable(1, &VarDataTmp) != 0)
-	{
-		Error_Handler();
-	}
-	if (VarDataTmp != VarDataTab[1])
-	{
+	if (VarDataTmp != VarDataTab[0]) {
 		Error_Handler();
 	}
 
-	if(EE_ReadVariable(2, &VarDataTmp) != 0)
-	{
+	if(EE_ReadVariable(EMU_EE_ADDR_START + 1, &VarDataTmp) != 0) {
 		Error_Handler();
 	}
-	if (VarDataTmp != VarDataTab[2])
-	{
+
+	if (VarDataTmp != VarDataTab[1]) {
+		Error_Handler();
+	}
+
+	if(EE_ReadVariable(EMU_EE_ADDR_START + 2, &VarDataTmp) != 0) {
+		Error_Handler();
+	}
+
+	if (VarDataTmp != VarDataTab[2]) {
 		Error_Handler();
 	}
 }

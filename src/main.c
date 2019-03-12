@@ -354,7 +354,6 @@ void protocol_init(void){
 }
 
 extern 	void ee_emu_test(void);
-extern void DFlashDemo(uint32_t df_sec_n);
 
 int core0_main(int argc, char** argv) {
 	prvSetupHardware();
@@ -395,14 +394,10 @@ int core0_main(int argc, char** argv) {
 			SYSTEM_IsCacheEnabled());
 	flush_stdout();
 
-	_syscall(222);
+	_syscall(121);
+	flush_stdout();
 
-	DFlashDemo(0);
-	DFlashDemo(1);
-	DFlashDemo(2);
-
-//	ee_emu_test();
-	//	test_tlf35584();
+	ee_emu_test();
 
 	interface_init();
 	protocol_init();

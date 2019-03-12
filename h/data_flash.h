@@ -32,6 +32,7 @@
 /** \brief base address for general command sequences
  */
 #define IFXFLASH_CMD_BASE_ADDRESS (0xaf000000)
+#define	DFLASH_SECTOR_SIZE	(8*1024)
 
 /** \brief number of flash modules
  */
