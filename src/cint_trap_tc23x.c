@@ -308,6 +308,10 @@ static void __class_4_trap_handler(int tin)
 	_out_uart(']');
 	flush_stdout_trap();
 
+	while(1) {
+		;
+	}
+
 	switch (tin)
 	{
 	case 1:
