@@ -355,6 +355,53 @@ void protocol_init(void){
 
 extern 	void ee_emu_test(void);
 
+uint32_t g_a10_val[6];
+uint32_t g_a11_val[6];
+uint32_t g_pc_val[6];
+
+__attribute__( ( always_inline ) ) static inline uint32_t __get_A10(void) {
+  register uint32_t result;
+
+  __asm__ volatile ("mov.d %[d], %%a10" : [d] "=d" (result) : );
+
+  return(result);
+}
+
+__attribute__( ( always_inline ) ) static inline uint32_t __get_A11(void) {
+  register uint32_t result;
+
+  __asm__ volatile ("mov.d %[d], %%a11" : [d] "=d" (result) : );
+  return(result);
+}
+
+void test_func_4(void) {
+	g_a10_val[5] = __get_A10();
+	g_a11_val[5] = __get_A11();
+	g_pc_val[5] = _mfcr(CPU_PC);
+}
+
+void test_func_3(void) {
+	g_a10_val[4] = __get_A10();
+	g_a11_val[4] = __get_A11();
+	g_pc_val[4] = _mfcr(CPU_PC);
+}
+
+void test_func_2(void) {
+	g_a10_val[3] = __get_A10();
+	g_a11_val[3] = __get_A11();
+	g_pc_val[3] = _mfcr(CPU_PC);
+
+	test_func_3();
+}
+
+void test_func_1(void) {
+	g_a10_val[1] = __get_A10();
+	g_a11_val[1] = __get_A11();
+	g_pc_val[1] = _mfcr(CPU_PC);
+}
+
+extern void label_after_call_main(void);
+
 int core0_main(int argc, char** argv) {
 	prvSetupHardware();
 
@@ -397,7 +444,34 @@ int core0_main(int argc, char** argv) {
 	_syscall(121);
 	flush_stdout();
 
-	ee_emu_test();
+	g_a10_val[0] = __get_A10();
+	g_a11_val[0] = __get_A11();
+	g_pc_val[0] = _mfcr(CPU_PC);
+	test_func_1();
+	g_a10_val[2] = __get_A10();
+	g_a11_val[2] = __get_A11();
+	g_pc_val[2] = _mfcr(CPU_PC);
+	test_func_2();
+
+	test_func_4();
+
+	printf("test_func_1->%08X\n", (uint32_t)test_func_1);
+	printf("test_func_2->%08X\n", (uint32_t)test_func_2);
+	printf("test_func_3->%08X\n", (uint32_t)test_func_3);
+	printf("test_func_4->%08X\n", (uint32_t)test_func_4);
+	printf("label_after_call_main->%08X\n", (uint32_t)label_after_call_main);
+	printf("core0_main->%08X\n", (uint32_t)core0_main);
+	flush_stdout();
+
+	for(uint32_t i=0; i<6; ++i) {
+		printf("A10[%u] = %08X, A11[%u] = %08X, PC[%u] = %08X\n",
+				i, g_a10_val[i],
+				i, g_a11_val[i],
+				i, g_pc_val[i]);
+	}
+	flush_stdout();
+
+//	ee_emu_test();
 
 	interface_init();
 	protocol_init();

@@ -7,6 +7,8 @@ SCU_WDTSCON0	= 0xf00360F0
 SCU_WDTSCON1	= 0xf00360F4
 
 .global __TRICORE_DERIVATE_NAME__
+.global label_after_call_main
+
 .type __TRICORE_DERIVATE_NAME__,@object
 .set __TRICORE_DERIVATE_NAME__,__TRICORE_NAME__
 
@@ -178,6 +180,7 @@ __remapped:
 	mov.aa	%a4,%sp				// argv
 
 	call	core0_main				// int retval = core0_main (0, NULL);
+label_after_call_main:
 	debug					// should never come here
 
 //	mov	%d4,%d2
