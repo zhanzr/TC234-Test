@@ -98,7 +98,7 @@ extern "C" {
 #include TC_INCLUDE(TCPATH/IfxSrc_bf.h)
 
 #include "cint_trap_tc23x.h"
-
+#include "asm_prototype.h"
 /*-----------------------------------------------------------
  * Port specific definitions.
  *
@@ -160,9 +160,6 @@ extern void vTaskExitCritical(void);
 #define portEXIT_CRITICAL()				vTaskExitCritical()
 /*---------------------------------------------------------------------------*/
 
-/* CSA Manipulation. */
-#define portCSA_TO_ADDRESS( pCSA )			( ( uint32_t * )( ( ( ( pCSA ) & 0x000F0000 ) << 12 ) | ( ( ( pCSA ) & 0x0000FFFF ) << 6 ) ) )
-#define portADDRESS_TO_CSA( pAddress )		( ( uint32_t )( ( ( ( (uint32_t)( pAddress ) ) & 0xF0000000 ) >> 12 ) | ( ( ( uint32_t )( pAddress ) & 0x003FFFC0 ) >> 6 ) ) )
 /*---------------------------------------------------------------------------*/
 
 #define portYIELD()								_syscall( 0 )

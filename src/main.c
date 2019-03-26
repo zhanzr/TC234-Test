@@ -358,6 +358,16 @@ extern 	void ee_emu_test(void);
 uint32_t g_a10_val[6];
 uint32_t g_a11_val[6];
 uint32_t g_pc_val[6];
+uint32_t g_psw_val[6];
+//uint32_t g_cdc_val[6];
+uint32_t g_fcx_val[6];
+uint32_t g_lcx_val[6];
+uint32_t g_pcxi_val[6];
+
+extern void label_after_call_main(void);
+extern void __CSA_SIZE(void);
+extern void __CSA_BEGIN(void);
+extern void __CSA_END(void);
 
 __attribute__( ( always_inline ) ) static inline uint32_t __get_A10(void) {
   register uint32_t result;
@@ -378,18 +388,35 @@ void test_func_4(void) {
 	g_a10_val[5] = __get_A10();
 	g_a11_val[5] = __get_A11();
 	g_pc_val[5] = _mfcr(CPU_PC);
+	g_psw_val[5] = _mfcr(CPU_PSW);
+	//g_cdc_val[5] = CPU0_PSW.B.CDC;
+	g_fcx_val[5] = _mfcr(CPU_FCX);
+	g_lcx_val[5] = _mfcr(CPU_LCX);
+	g_pcxi_val[5] = _mfcr(CPU_PCXI);
 }
 
 void test_func_3(void) {
 	g_a10_val[4] = __get_A10();
 	g_a11_val[4] = __get_A11();
 	g_pc_val[4] = _mfcr(CPU_PC);
+	g_psw_val[4] = _mfcr(CPU_PSW);
+	//g_cdc_val[4] = CPU0_PSW.B.CDC;
+	g_fcx_val[4] = _mfcr(CPU_FCX);
+	g_lcx_val[4] = _mfcr(CPU_LCX);
+	g_pcxi_val[4] = _mfcr(CPU_PCXI);
+
+	test_func_4();
 }
 
 void test_func_2(void) {
 	g_a10_val[3] = __get_A10();
 	g_a11_val[3] = __get_A11();
 	g_pc_val[3] = _mfcr(CPU_PC);
+	g_psw_val[3] = _mfcr(CPU_PSW);
+	//g_cdc_val[3] = CPU0_PSW.B.CDC;
+	g_fcx_val[3] = _mfcr(CPU_FCX);
+	g_lcx_val[3] = _mfcr(CPU_LCX);
+	g_pcxi_val[3] = _mfcr(CPU_PCXI);
 
 	test_func_3();
 }
@@ -398,9 +425,37 @@ void test_func_1(void) {
 	g_a10_val[1] = __get_A10();
 	g_a11_val[1] = __get_A11();
 	g_pc_val[1] = _mfcr(CPU_PC);
+	g_psw_val[1] = _mfcr(CPU_PSW);
+	//g_cdc_val[1] = CPU0_PSW.B.CDC;
+	g_fcx_val[1] = _mfcr(CPU_FCX);
+	g_lcx_val[1] = _mfcr(CPU_LCX);
+	g_pcxi_val[1] = _mfcr(CPU_PCXI);
 }
 
-extern void label_after_call_main(void);
+uint32_t test_func_recursive(uint32_t in) {
+	uint32_t fcx = _mfcr(CPU_FCX);
+	uint32_t lcx = _mfcr(CPU_LCX);
+	uint32_t pcxi = _mfcr(CPU_PCXI);
+
+	uint32_t ret_val;
+
+	printf("\n FCX[%u]->[%08X] %u, LCX[%u]->[%08X] %u, PCXI[%u]->[%08X] %u\n",
+			in, portCSA_TO_ADDRESS(fcx),
+			((uint32_t)(portCSA_TO_ADDRESS(fcx))-(uint32_t)__CSA_BEGIN)>>6,
+			in, portCSA_TO_ADDRESS(lcx),
+			((uint32_t)(portCSA_TO_ADDRESS(lcx))-(uint32_t)__CSA_BEGIN)>>6,
+			in, portCSA_TO_ADDRESS(pcxi),
+			((uint32_t)(portCSA_TO_ADDRESS(pcxi))-(uint32_t)__CSA_BEGIN)>>6);
+	flush_stdout();
+
+	if(0==in) {
+		ret_val = 1;
+	} else {
+		ret_val = in*test_func_recursive(in-1);
+	}
+
+	return ret_val;
+}
 
 int core0_main(int argc, char** argv) {
 	prvSetupHardware();
@@ -447,13 +502,23 @@ int core0_main(int argc, char** argv) {
 	g_a10_val[0] = __get_A10();
 	g_a11_val[0] = __get_A11();
 	g_pc_val[0] = _mfcr(CPU_PC);
+	g_psw_val[0] = _mfcr(CPU_PSW);
+	//g_cdc_val[0] = CPU0_PSW.B.CDC;
+	g_fcx_val[0] = _mfcr(CPU_FCX);
+	g_lcx_val[0] = _mfcr(CPU_LCX);
+	g_pcxi_val[0] = _mfcr(CPU_PCXI);
 	test_func_1();
+
 	g_a10_val[2] = __get_A10();
 	g_a11_val[2] = __get_A11();
 	g_pc_val[2] = _mfcr(CPU_PC);
-	test_func_2();
+	g_psw_val[2] = _mfcr(CPU_PSW);
+	//g_cdc_val[2] = CPU0_PSW.B.CDC;
+	g_fcx_val[2] = _mfcr(CPU_FCX);
+	g_lcx_val[2] = _mfcr(CPU_LCX);
+	g_pcxi_val[2] = _mfcr(CPU_PCXI);
 
-	test_func_4();
+	test_func_2();
 
 	printf("test_func_1->%08X\n", (uint32_t)test_func_1);
 	printf("test_func_2->%08X\n", (uint32_t)test_func_2);
@@ -461,14 +526,33 @@ int core0_main(int argc, char** argv) {
 	printf("test_func_4->%08X\n", (uint32_t)test_func_4);
 	printf("label_after_call_main->%08X\n", (uint32_t)label_after_call_main);
 	printf("core0_main->%08X\n", (uint32_t)core0_main);
+	printf("CSA_SIZE = %08X(%u)\n", (uint32_t)__CSA_SIZE, ((uint32_t)__CSA_SIZE)>>6);
+	printf("__CSA_BEGIN->%08X\n", (uint32_t)__CSA_BEGIN);
+	printf("__CSA_END->%08X\n", (uint32_t)__CSA_END);
 	flush_stdout();
 
 	for(uint32_t i=0; i<6; ++i) {
-		printf("A10[%u] = %08X, A11[%u] = %08X, PC[%u] = %08X\n",
-				i, g_a10_val[i],
-				i, g_a11_val[i],
-				i, g_pc_val[i]);
+//		printf("A10[%u] = %08X, A11[%u] = %08X, PC[%u] = %08X\n",
+//				i, g_a10_val[i],
+//				i, g_a11_val[i],
+//				i, g_pc_val[i]);
+
+		printf("\n FCX[%u]->[%08X] %u, LCX[%u]->[%08X] %u, PCXI[%u]->[%08X] %u\n",
+				i, portCSA_TO_ADDRESS(g_fcx_val[i]),
+				((uint32_t)(portCSA_TO_ADDRESS(g_fcx_val[i]))-(uint32_t)__CSA_BEGIN)>>6,
+				i, portCSA_TO_ADDRESS(g_lcx_val[i]),
+				((uint32_t)(portCSA_TO_ADDRESS(g_lcx_val[i]))-(uint32_t)__CSA_BEGIN)>>6,
+				i, portCSA_TO_ADDRESS(g_pcxi_val[i]),
+				((uint32_t)(portCSA_TO_ADDRESS(g_pcxi_val[i]))-(uint32_t)__CSA_BEGIN)>>6);
 	}
+	flush_stdout();
+
+	uint32_t tmp_ret = test_func_recursive(10);
+	printf("recursive(10)=%u\n", tmp_ret);
+	flush_stdout();
+
+	tmp_ret = test_func_recursive(62);
+	printf("recursive(62)=%u\n", tmp_ret);
 	flush_stdout();
 
 //	ee_emu_test();

@@ -56,6 +56,7 @@ typedef union union_pack64
 #define	P_BMHD_2	((const BMHD_t*)BMHD_ADDR_2)
 #define	P_BMHD_3	((const BMHD_t*)BMHD_ADDR_3)
 
+// CSA Manipulation.
 #define portCSA_TO_ADDRESS( pCSA )			( ( uint32_t * )( ( ( ( pCSA ) & 0x000F0000 ) << 12 ) | ( ( ( pCSA ) & 0x0000FFFF ) << 6 ) ) )
 #define portADDRESS_TO_CSA( pAddress )		( ( uint32_t )( ( ( ( (uint32_t)( pAddress ) ) & 0xF0000000 ) >> 12 ) | ( ( ( uint32_t )( pAddress ) & 0x003FFFC0 ) >> 6 ) ) )
 
