@@ -466,7 +466,7 @@ int core0_main(int argc, char** argv) {
 
 	config_dts();
 
-	printf("%s %s\n", _NEWLIB_VERSION, __func__);
+	printf("%s %s %s-%s\n", _NEWLIB_VERSION, __func__, __DATE__, __TIME__);
 
 	const uint32_t FLASH_SIZE_TABLE_KB[]={256, 512, 1024, 1536, 2048, 2560, 3072, 4096, 5120, 1024*6, 1024*7, 1024*8};
 	printf("CHIPID:%X\n"\

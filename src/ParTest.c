@@ -83,7 +83,7 @@ void vParTestInitialise( void ) {
 }
 /*---------------------------------------------------------------------------*/
 
-void vParTestSetLED( unsigned portBASE_TYPE uxLED, signed portBASE_TYPE xValue ) {
+void vParTestSetLED( UBaseType_t uxLED, BaseType_t xValue ) {
 	if( xValue != 0 ) {
 		led_off(uxLED);
 	} else {
@@ -92,7 +92,7 @@ void vParTestSetLED( unsigned portBASE_TYPE uxLED, signed portBASE_TYPE xValue )
 }
 /*---------------------------------------------------------------------------*/
 
-void vParTestToggleLED( unsigned portBASE_TYPE uxLED ) {
+void vParTestToggleLED( UBaseType_t uxLED ) {
 	led_toggle(uxLED);
 }
 /*---------------------------------------------------------------------------*/
