@@ -5,16 +5,16 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976" moduleId="org.eclipse.cdt.core.settings" name="iROM">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="HelloSerialInterrupt_AppKit-TC234TFT" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="" id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976" name="iROM" parent="com.rt.hightec.buildsystem.tricore.new.configuration.excutable" postbuildStep="tricore-objcopy HelloSerialInterrupt_AppKit-TC234TFT.elf  -O ihex t234.hex">
+				<configuration artifactName="HelloSerialInterrupt_AppKit-TC234TFT" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" description="" id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976" name="iROM" parent="com.rt.hightec.buildsystem.tricore.new.configuration.excutable" postbuildStep="tricore-objcopy HelloSerialInterrupt_AppKit-TC234TFT.elf  -O ihex t234.hex">
 					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976." name="/" resourcePath="">
 						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.857902312" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable">
 							<option id="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919" name="CPU type (-mcpu)" superClass="com.rt.hightec.buildsystem.tricore.new.mcpu" value="TC23XX" valueType="enumerated"/>
@@ -89,9 +89,6 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver"/>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.948172467" name="ee_emu.c" rcbsApplicability="disable" resourcePath="src/ee_emu.c" toolsToInvoke="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155.388853219">
-						<tool id="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155.388853219" name="TriCore C Compiler" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155"/>
-					</fileInfo>
 					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.510529732" name="/" resourcePath="asm">
 						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.239742863" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable" unusedChildren="">
 							<option id="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919.82621482" name="CPU type (-mcpu)" superClass="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919"/>
@@ -128,16 +125,16 @@
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1223551526" moduleId="org.eclipse.cdt.core.settings" name="Default">
 				<externalSettings/>
 				<extensions>
-					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-				<configuration artifactName="HelloSerialInterrupt_AppKit-TC234TFT" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug" description="" id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1223551526" name="Default" parent="com.rt.hightec.buildsystem.tricore.new.configuration.excutable">
+				<configuration artifactName="HelloSerialInterrupt_AppKit-TC234TFT" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.exe" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.exe" description="" id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1223551526" name="Default" parent="com.rt.hightec.buildsystem.tricore.new.configuration.excutable">
 					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1223551526." name="/" resourcePath="">
 						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.537517513" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable">
 							<option id="com.rt.hightec.buildsystem.tricore.new.mcpu.1893304292" name="CPU type (-mcpu)" superClass="com.rt.hightec.buildsystem.tricore.new.mcpu" value="TC23XX" valueType="enumerated"/>
@@ -237,10 +234,10 @@
 		</buildTargets>
 	</storageModule>
 	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="iROM">
+		<configuration configurationName="Default">
 			<resource resourceType="PROJECT" workspacePath="/HelloSerialInterrupt_AppKit-TC234TFT"/>
 		</configuration>
-		<configuration configurationName="Default">
+		<configuration configurationName="iROM">
 			<resource resourceType="PROJECT" workspacePath="/HelloSerialInterrupt_AppKit-TC234TFT"/>
 		</configuration>
 	</storageModule>

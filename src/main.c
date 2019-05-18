@@ -460,7 +460,7 @@ uint32_t test_func_recursive(uint32_t in) {
 int core0_main(int argc, char** argv) {
 	prvSetupHardware();
 
-	//	SYSTEM_EnaDisCache(1);
+	//SYSTEM_EnaDisCache(1);
 
 	uart_init(mainCOM_TEST_BAUD_RATE);
 
@@ -641,7 +641,7 @@ void maintaince_task(void *pvParameters) {
 		start_dts_measure();
 
 		uint32_t NotifyValue=ulTaskNotifyTake( pdTRUE, /* Clear the notification value on exit. */
-				portMAX_DELAY );/* Block indefinitely. */
+				portMAX_DELAY );
 		vTaskDelay(40 / portTICK_PERIOD_MS);
 	}
 }
