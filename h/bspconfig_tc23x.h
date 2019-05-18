@@ -38,6 +38,14 @@ extern "C" {
 #define TIM_SCALE				(CPU_CLOCK / TIM_CLOCK)
 #define GET_CORE_ID()			(_mfcr(CPU_CORE_ID) & IFX_CPU_CORE_ID_CORE_ID_MSK)
 
+/* Constants for the ComTest tasks. */
+//#define mainCOM_TEST_BAUD_RATE	( ( uint32_t ) 115200 )
+//#define mainCOM_TEST_BAUD_RATE	( ( uint32_t ) 230400 )
+//#define mainCOM_TEST_BAUD_RATE	( ( uint32_t ) 460800 )
+//#define mainCOM_TEST_BAUD_RATE	( ( uint32_t ) 576000 )
+#define mainCOM_TEST_BAUD_RATE	( ( uint32_t ) 1562500 )
+#define	BAUDRATE_PRESCALE	(4)
+
 #ifndef DEFAULT_PLL_VALUE
 #define DEFAULT_PLL_VALUE		PLL_VALUE_200_100
 #endif /* DEFAULT_PLL_VALUE */
@@ -53,13 +61,6 @@ static Ifx_ASCLIN * const asclin0 = (Ifx_ASCLIN *)&MODULE_ASCLIN0;
 static Ifx_P * const port_UART = (Ifx_P *)&MODULE_P14;
 
 #define UARTBASE				asclin0
-
-/* baud rate values at SysClock 100 MHz */
-#define NUMERATOR_BAUD_9600				(48 * 1)
-#define NUMERATOR_BAUD_19200			(48 * 2)
-#define NUMERATOR_BAUD_38400			(48 * 4)
-#define NUMERATOR_BAUD_57600			(48 * 6)
-#define NUMERATOR_BAUD_115200			(48 * 12)
 
 /* Port Modes */
 #define IN_NOPULL0				0x00	/* Port Input No Pull Device */

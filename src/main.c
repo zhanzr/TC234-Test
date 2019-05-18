@@ -64,9 +64,6 @@ SemaphoreHandle_t CountSemaphore;
 SemaphoreHandle_t MutexSemaphore;
 /*----------------------------------------------------------*/
 
-/* Constants for the ComTest tasks. */
-#define mainCOM_TEST_BAUD_RATE		( ( uint32_t ) BAUDRATE )
-
 #define mainCOM_TEST_LED			( 4 )
 /* Set mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY to 1 to create a simple demo.
 Set mainCREATE_SIMPLE_LED_FLASHER_DEMO_ONLY to 0 to create a much more
@@ -459,14 +456,22 @@ uint32_t test_func_recursive(uint32_t in) {
 
 int core0_main(int argc, char** argv) {
 	prvSetupHardware();
-
 	//SYSTEM_EnaDisCache(1);
 
 	uart_init(mainCOM_TEST_BAUD_RATE);
 
 	config_dts();
 
-	printf("%s %s %s-%s\n", _NEWLIB_VERSION, __func__, __DATE__, __TIME__);
+	printf("Baudrate:%u prescal:%u\n", mainCOM_TEST_BAUD_RATE, BAUDRATE_PRESCALE);
+	flush_stdout();
+
+	printf("ticks per sec:%u, timticks:%u, time scale:%u \n",
+			TICKS_PER_SEC, TIMTICKS, TIM_SCALE);
+	flush_stdout();
+
+	printf("%s %s %s-%s @%u\n",
+			_NEWLIB_VERSION, __func__, __DATE__, __TIME__, GET_CORE_ID());
+	flush_stdout();
 
 	const uint32_t FLASH_SIZE_TABLE_KB[]={256, 512, 1024, 1536, 2048, 2560, 3072, 4096, 5120, 1024*6, 1024*7, 1024*8};
 	printf("CHIPID:%X\n"\
@@ -480,9 +485,9 @@ int core0_main(int argc, char** argv) {
 			(MODULE_SCU.CHIPID.B.CHREV/0x10)+'A',
 			MODULE_SCU.CHIPID.B.CHTEC,
 			(MODULE_SCU.CHIPID.B.EEA==1)?"Yes":"No",
-					FLASH_SIZE_TABLE_KB[MODULE_SCU.CHIPID.B.FSIZE%0x0c],
-					(MODULE_SCU.CHIPID.B.SEC==1)?"Yes":"No",
-							MODULE_SCU.CHIPID.B.SP
+			FLASH_SIZE_TABLE_KB[MODULE_SCU.CHIPID.B.FSIZE%0x0c],
+			(MODULE_SCU.CHIPID.B.SEC==1)?"Yes":"No",
+			MODULE_SCU.CHIPID.B.SP
 	);
 	flush_stdout();
 
@@ -497,6 +502,10 @@ int core0_main(int argc, char** argv) {
 	flush_stdout();
 
 	_syscall(121);
+	flush_stdout();
+
+	printf("ticks per sec:%u, timticks:%u, time scale:%u \n",
+			TICKS_PER_SEC, TIMTICKS, TIM_SCALE);
 	flush_stdout();
 
 	g_a10_val[0] = __get_A10();
@@ -531,29 +540,29 @@ int core0_main(int argc, char** argv) {
 	printf("__CSA_END->%08X\n", (uint32_t)__CSA_END);
 	flush_stdout();
 
-	for(uint32_t i=0; i<6; ++i) {
-//		printf("A10[%u] = %08X, A11[%u] = %08X, PC[%u] = %08X\n",
-//				i, g_a10_val[i],
-//				i, g_a11_val[i],
-//				i, g_pc_val[i]);
+//	for(uint32_t i=0; i<6; ++i) {
+////		printf("A10[%u] = %08X, A11[%u] = %08X, PC[%u] = %08X\n",
+////				i, g_a10_val[i],
+////				i, g_a11_val[i],
+////				i, g_pc_val[i]);
+//
+//		printf("\n FCX[%u]->[%08X] %u, LCX[%u]->[%08X] %u, PCXI[%u]->[%08X] %u\n",
+//				i, portCSA_TO_ADDRESS(g_fcx_val[i]),
+//				((uint32_t)(portCSA_TO_ADDRESS(g_fcx_val[i]))-(uint32_t)__CSA_BEGIN)>>6,
+//				i, portCSA_TO_ADDRESS(g_lcx_val[i]),
+//				((uint32_t)(portCSA_TO_ADDRESS(g_lcx_val[i]))-(uint32_t)__CSA_BEGIN)>>6,
+//				i, portCSA_TO_ADDRESS(g_pcxi_val[i]),
+//				((uint32_t)(portCSA_TO_ADDRESS(g_pcxi_val[i]))-(uint32_t)__CSA_BEGIN)>>6);
+//	}
+//	flush_stdout();
 
-		printf("\n FCX[%u]->[%08X] %u, LCX[%u]->[%08X] %u, PCXI[%u]->[%08X] %u\n",
-				i, portCSA_TO_ADDRESS(g_fcx_val[i]),
-				((uint32_t)(portCSA_TO_ADDRESS(g_fcx_val[i]))-(uint32_t)__CSA_BEGIN)>>6,
-				i, portCSA_TO_ADDRESS(g_lcx_val[i]),
-				((uint32_t)(portCSA_TO_ADDRESS(g_lcx_val[i]))-(uint32_t)__CSA_BEGIN)>>6,
-				i, portCSA_TO_ADDRESS(g_pcxi_val[i]),
-				((uint32_t)(portCSA_TO_ADDRESS(g_pcxi_val[i]))-(uint32_t)__CSA_BEGIN)>>6);
-	}
-	flush_stdout();
-
-	uint32_t tmp_ret = test_func_recursive(10);
-	printf("recursive(10)=%u\n", tmp_ret);
-	flush_stdout();
-
-	tmp_ret = test_func_recursive(62);
-	printf("recursive(62)=%u\n", tmp_ret);
-	flush_stdout();
+//	uint32_t tmp_ret = test_func_recursive(10);
+//	printf("recursive(10)=%u\n", tmp_ret);
+//	flush_stdout();
+//
+//	tmp_ret = test_func_recursive(62);
+//	printf("recursive(62)=%u\n", tmp_ret);
+//	flush_stdout();
 
 //	ee_emu_test();
 

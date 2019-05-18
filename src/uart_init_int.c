@@ -24,32 +24,6 @@ void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_i
 	port_UART->IOCR0.B.PC0 = OUT_PPALT2;
 	port_UART->OMR.B.PS0 = 1;
 
-	uint32_t numerator;
-	switch (baudrate) {
-	case   9600 :
-		numerator = NUMERATOR_BAUD_9600;
-		break;
-
-	case  19200 :
-		numerator = NUMERATOR_BAUD_19200;
-		break;
-
-	case  38400 :
-		numerator = NUMERATOR_BAUD_38400;
-		break;
-
-	case  57600 :
-		numerator = NUMERATOR_BAUD_57600;
-		break;
-
-	case 115200 :
-		numerator =NUMERATOR_BAUD_115200;
-		break;
-
-	default:
-		break;
-	}
-
 	/* Enable ASCn */
 	unlock_wdtcon();
 	UARTBASE->CLC.U = 0;
@@ -71,15 +45,23 @@ void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_i
 								  | (1 << 1)	/* ENI */
 								  | (1 << 0);	/* FLUSH */
 
-	UARTBASE->BITCON.U = ( 9 << 0)		/* PRESCALER: 10 */
-							   | (15 << 16)		/* OVERSAMPLING: 16 */
-							   | ( 9 << 24)		/* SAMPLEPOINT: position 7,8,9 */
-							   | (1u << 31);	/* SM: 3 samples per bit */
+	/* PRESCALER: */
+	UARTBASE->BITCON.B.PRESCALER = (BAUDRATE_PRESCALE-1);
+	/* OVERSAMPLING: 16 */
+	UARTBASE->BITCON.B.OVERSAMPLING = (16-1);
+	/* SAMPLEPOINT: position 7,8,9 */
+	UARTBASE->BITCON.B.SAMPLEPOINT = (9);
+	/* SM: 3 samples per bit */
+	UARTBASE->BITCON.B.SM = 1;
 
 	/* data format: 8N1 */
-	UARTBASE->FRAMECON.U = (1 << 9)		/* STOP: 1 bit */
-								 | (0 << 16)	/* MODE: Init */
-								 | (0 << 30);	/* PEN: no parity */
+	/* STOP: 1 bit */
+	UARTBASE->FRAMECON.B.STOP = 1;
+	/* MODE: Init */
+	UARTBASE->FRAMECON.B.MODE = 0;
+	/* PEN: no parity */
+	UARTBASE->FRAMECON.B.PEN = 0;
+
 	UARTBASE->DATCON.B.DATLEN = 7;		/* DATLEN: 8 bit */
 
 	uint32_t clk_sys = SYSTEM_GetSysClock();
@@ -87,6 +69,8 @@ void _uart_init_bsp(int baudrate, void (*uart_rx_isr)(int arg), void (*uart_tx_i
 	uint32_t denominator = clk_sys/32000;
 	/* set baudrate value */
 	UARTBASE->BRG.B.DENOMINATOR = denominator;
+
+	uint32_t numerator = baudrate/500;
 	UARTBASE->BRG.B.NUMERATOR = numerator;
 
 	UARTBASE->FRAMECON.B.MODE = 1;			/* ASC mode */

@@ -13,8 +13,6 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define BAUDRATE	115200
-
 void uart_init(uint32_t baudrate);
 int _uart_send(const char *buffer, int len);
 int _uart_puts(const char *str);
