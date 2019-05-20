@@ -52,7 +52,6 @@
 #include "enc28j60.h"
 #include "ip_arp_udp_tcp.h"
 #include "net.h"
-#include "timer.h"
 
 #define MESSAGE_Q_NUM   2
 QueueHandle_t Message_Queue;
@@ -508,37 +507,14 @@ int core0_main(int argc, char** argv) {
 			TICKS_PER_SEC, TIMTICKS, TIM_SCALE);
 	flush_stdout();
 
-	g_a10_val[0] = __get_A10();
-	g_a11_val[0] = __get_A11();
-	g_pc_val[0] = _mfcr(CPU_PC);
-	g_psw_val[0] = _mfcr(CPU_PSW);
-	//g_cdc_val[0] = CPU0_PSW.B.CDC;
-	g_fcx_val[0] = _mfcr(CPU_FCX);
-	g_lcx_val[0] = _mfcr(CPU_LCX);
-	g_pcxi_val[0] = _mfcr(CPU_PCXI);
-	test_func_1();
-
-	g_a10_val[2] = __get_A10();
-	g_a11_val[2] = __get_A11();
-	g_pc_val[2] = _mfcr(CPU_PC);
-	g_psw_val[2] = _mfcr(CPU_PSW);
-	//g_cdc_val[2] = CPU0_PSW.B.CDC;
-	g_fcx_val[2] = _mfcr(CPU_FCX);
-	g_lcx_val[2] = _mfcr(CPU_LCX);
-	g_pcxi_val[2] = _mfcr(CPU_PCXI);
-
-	test_func_2();
-
-	printf("test_func_1->%08X\n", (uint32_t)test_func_1);
-	printf("test_func_2->%08X\n", (uint32_t)test_func_2);
-	printf("test_func_3->%08X\n", (uint32_t)test_func_3);
-	printf("test_func_4->%08X\n", (uint32_t)test_func_4);
 	printf("label_after_call_main->%08X\n", (uint32_t)label_after_call_main);
 	printf("core0_main->%08X\n", (uint32_t)core0_main);
 	printf("CSA_SIZE = %08X(%u)\n", (uint32_t)__CSA_SIZE, ((uint32_t)__CSA_SIZE)>>6);
 	printf("__CSA_BEGIN->%08X\n", (uint32_t)__CSA_BEGIN);
 	printf("__CSA_END->%08X\n", (uint32_t)__CSA_END);
 	flush_stdout();
+
+//	test_led_cpp();
 
 //	for(uint32_t i=0; i<6; ++i) {
 ////		printf("A10[%u] = %08X, A11[%u] = %08X, PC[%u] = %08X\n",

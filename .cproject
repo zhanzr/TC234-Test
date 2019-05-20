@@ -89,6 +89,14 @@
 							<tool id="com.rt.hightec.buildsystem.tricore.new.archiver.1510945982" name="TriCore Archiver" superClass="com.rt.hightec.buildsystem.tricore.new.archiver"/>
 						</toolChain>
 					</folderInfo>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1386074534" name="ledp.cpp" rcbsApplicability="disable" resourcePath="src/ledp.cpp" toolsToInvoke="">
+						<tool customBuildStep="true" id="org.eclipse.cdt.managedbuilder.ui.rcbs.1977698276" name="Resource Custom Build Step">
+							<inputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.inputtype.136460672" name="Resource Custom Build Step Input Type">
+								<additionalInput kind="additionalinputdependency" paths=""/>
+							</inputType>
+							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1555957910" name="Resource Custom Build Step Output Type"/>
+						</tool>
+					</fileInfo>
 					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.510529732" name="/" resourcePath="asm">
 						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.239742863" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable" unusedChildren="">
 							<option id="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919.82621482" name="CPU type (-mcpu)" superClass="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919"/>
@@ -112,10 +120,12 @@
 						</toolChain>
 					</folderInfo>
 					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1125921551" name="generate_template.py" rcbsApplicability="disable" resourcePath="asm/generate_template.py" toolsToInvoke=""/>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.172980990" name="ledp.hpp" rcbsApplicability="disable" resourcePath="h/ledp.hpp" toolsToInvoke=""/>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.632712090" name="led.h" rcbsApplicability="disable" resourcePath="h/led.h" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry excluding="test_M_1.S|test_S_2.S|test_G_I.S|test_B_C.S|generate_template.py|test_ABSS.S|test_D.S|test_S_1.S|test_M_3_N.S|test_AND.S|test_O.S|test_ABSDIF.S|test_J.S|test_ADD.A.S|test_L.S|test_E_F.S|test_ADDS.S|test_T_U_X.S|test_M_2.S|test_ABSDIFS.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
-						<entry excluding="LwIP/src/core/dns.c|LwIP/src/netif/FILES|LwIP/src/netif/ppp|LwIP/src/netif/ethernetif_template.c|LwIP/src/netif/slipif.c|LwIP/src/netif/lowpan6.c|scu_eru.c|gpsr.c|LwIP/src/core/ipv6|data_flash.c|LwIP/src/apps/lwiperf|LwIP/src/apps/mdns|LwIP/src/apps/mqtt|LwIP/src/apps/netbiosns|LwIP/src/apps/snmp|LwIP/src/apps/sntp|LwIP/src/apps/tftp|LwIP/src/apps/httpd/fsdata.c|httpserver-netconn.c|fsdata_custom.c|LwIP/doc|LwIP/src/apps/httpd/makefsdata|LwIP/src/apps/httpd/fs|LwIP/test|LwIP/test/unit|LwIP/test/fuzz/fuzz.c|server_net/simple_server.c|md5.c|sha1.c|tc234_dma_crc32.c|FreeRTOS_Source/portable/MemMang/heap_2.c|FreeRTOS_Source/portable/GCC/TriCore_1782/porttrap.c|crt0.S|uart_init_poll.c|applproc0_loop.c|crt0-tc23x.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
+						<entry excluding="ledp.hpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
+						<entry excluding="ledp.cpp|LwIP/src/core/dns.c|LwIP/src/netif/FILES|LwIP/src/netif/ppp|LwIP/src/netif/ethernetif_template.c|LwIP/src/netif/slipif.c|LwIP/src/netif/lowpan6.c|scu_eru.c|gpsr.c|LwIP/src/core/ipv6|data_flash.c|LwIP/src/apps/lwiperf|LwIP/src/apps/mdns|LwIP/src/apps/mqtt|LwIP/src/apps/netbiosns|LwIP/src/apps/snmp|LwIP/src/apps/sntp|LwIP/src/apps/tftp|LwIP/src/apps/httpd/fsdata.c|httpserver-netconn.c|fsdata_custom.c|LwIP/doc|LwIP/src/apps/httpd/makefsdata|LwIP/src/apps/httpd/fs|LwIP/test|LwIP/test/unit|LwIP/test/fuzz/fuzz.c|server_net/simple_server.c|md5.c|sha1.c|tc234_dma_crc32.c|FreeRTOS_Source/portable/MemMang/heap_2.c|FreeRTOS_Source/portable/GCC/TriCore_1782/porttrap.c|crt0.S|uart_init_poll.c|applproc0_loop.c|crt0-tc23x.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -244,13 +254,13 @@
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		<scannerConfigBuildInfo instanceId="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976;com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.;com.rt.hightec.buildsystem.tricore.new.assembler.gtm.373372830;gtm.input.1992958358">
+		<scannerConfigBuildInfo instanceId="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976;com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.;com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155;com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType.439893687">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.rt.hightec.framework.buildsystem.HighTecGCCManagedMakePerProjectProfile"/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976;com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.;com.rt.hightec.buildsystem.tricore.new.compiler.pcp.1265890664;com.rt.hightec.buildsystem.tricore.new.compiler.c.input.cpcp.655712165">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.rt.hightec.framework.buildsystem.HighTecGCCManagedMakePerProjectProfile"/>
 		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976;com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.;com.rt.hightec.buildsystem.tricore.new.compiler.c.819302155;com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType.439893687">
+		<scannerConfigBuildInfo instanceId="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976;com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.;com.rt.hightec.buildsystem.tricore.new.assembler.gtm.373372830;gtm.input.1992958358">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.rt.hightec.framework.buildsystem.HighTecGCCManagedMakePerProjectProfile"/>
 		</scannerConfigBuildInfo>
 	</storageModule>

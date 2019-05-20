@@ -353,6 +353,7 @@
     <ObjectFile Name="src\server_net\ip_arp_udp_tcp.o"/>
     <ObjectFile Name="src\server_net\simple_server.o"/>
     <ObjectFile Name="src\ee_emu.o"/>
+    <ObjectFile Name="src\ledp.o"/>
   </Files>
   <LocalAliases>
     <Alias Description="Alias for Code" Name="CODE" Region="TC23xx.mdm#//@Memory.0/@Region.0"/>

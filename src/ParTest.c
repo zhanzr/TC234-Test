@@ -73,6 +73,8 @@
 /* Demo Includes. */
 #include "partest.h"
 
+#include "led.h"
+
 /*---------------------------------------------------------------------------*/
 extern void spi_init(void);
 void vParTestInitialise( void ) {
