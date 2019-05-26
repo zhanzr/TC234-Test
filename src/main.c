@@ -514,32 +514,6 @@ int core0_main(int argc, char** argv) {
 	printf("__CSA_END->%08X\n", (uint32_t)__CSA_END);
 	flush_stdout();
 
-//	test_led_cpp();
-
-//	for(uint32_t i=0; i<6; ++i) {
-////		printf("A10[%u] = %08X, A11[%u] = %08X, PC[%u] = %08X\n",
-////				i, g_a10_val[i],
-////				i, g_a11_val[i],
-////				i, g_pc_val[i]);
-//
-//		printf("\n FCX[%u]->[%08X] %u, LCX[%u]->[%08X] %u, PCXI[%u]->[%08X] %u\n",
-//				i, portCSA_TO_ADDRESS(g_fcx_val[i]),
-//				((uint32_t)(portCSA_TO_ADDRESS(g_fcx_val[i]))-(uint32_t)__CSA_BEGIN)>>6,
-//				i, portCSA_TO_ADDRESS(g_lcx_val[i]),
-//				((uint32_t)(portCSA_TO_ADDRESS(g_lcx_val[i]))-(uint32_t)__CSA_BEGIN)>>6,
-//				i, portCSA_TO_ADDRESS(g_pcxi_val[i]),
-//				((uint32_t)(portCSA_TO_ADDRESS(g_pcxi_val[i]))-(uint32_t)__CSA_BEGIN)>>6);
-//	}
-//	flush_stdout();
-
-//	uint32_t tmp_ret = test_func_recursive(10);
-//	printf("recursive(10)=%u\n", tmp_ret);
-//	flush_stdout();
-//
-//	tmp_ret = test_func_recursive(62);
-//	printf("recursive(62)=%u\n", tmp_ret);
-//	flush_stdout();
-
 //	ee_emu_test();
 
 	interface_init();
@@ -596,6 +570,134 @@ void start_task(void *pvParameters) {
 	vTaskDelete(StartTask_Handler);
 }
 
+#define	TEST_LOOP_N	2000000
+
+#pragma section ".ram_code" ax
+void test_div_psram_1(void)
+{
+	printf("%s %p\n", __func__, test_div_psram_1);
+
+	for(uint32_t i=0; i<TEST_LOOP_N; ++i)
+	{
+		//Test unsigned integer division
+		{
+			volatile uint32_t au = 101;
+			volatile uint32_t bu = 10;
+			volatile uint32_t cu = au/bu;
+			volatile uint32_t du = au%bu;
+
+			//		printf("%u %u -> %u %u\n",
+			//				au, bu, cu, du);
+		}
+
+		//Test signed integer division
+		{
+			volatile int32_t ai = 101;
+			volatile int32_t bi = 10;
+			volatile int32_t ci = ai/bi;
+			volatile int32_t di = ai%bi;
+
+			//		printf("%i %i -> %i %i\n",
+			//				ai, bi, ci, di);
+		}
+
+		//Test float division
+		{
+			volatile float af = 101.0;
+			volatile float bf = 10.0;
+			volatile float cf = af/bf;
+			//		float df = af%bf;
+
+			//		printf("%f %f -> %f\n",
+			//				af, bf, cf);
+		}
+	}
+}
+
+#pragma section
+
+void __attribute__((section(".ram_code"))) test_div_psram_2(void)
+{
+	printf("%s %p\n", __func__, test_div_psram_2);
+
+	for(uint32_t i=0; i<TEST_LOOP_N; ++i)
+	{
+		//Test unsigned integer division
+		{
+			volatile uint32_t au = 101;
+			volatile uint32_t bu = 10;
+			volatile uint32_t cu = au/bu;
+			volatile uint32_t du = au%bu;
+
+			//		printf("%u %u -> %u %u\n",
+			//				au, bu, cu, du);
+		}
+
+		//Test signed integer division
+		{
+			volatile int32_t ai = 101;
+			volatile int32_t bi = 10;
+			volatile int32_t ci = ai/bi;
+			volatile int32_t di = ai%bi;
+
+			//		printf("%i %i -> %i %i\n",
+			//				ai, bi, ci, di);
+		}
+
+		//Test float division
+		{
+			volatile float af = 101.0;
+			volatile float bf = 10.0;
+			volatile float cf = af/bf;
+			//		float df = af%bf;
+
+			//		printf("%f %f -> %f\n",
+			//				af, bf, cf);
+		}
+	}
+}
+
+void test_div_flash(void)
+{
+	printf("%s %p\n", __func__, test_div_flash);
+
+	for(uint32_t i=0; i<TEST_LOOP_N; ++i)
+	{
+		//Test unsigned integer division
+		{
+			volatile uint32_t au = 101;
+			volatile uint32_t bu = 10;
+			volatile uint32_t cu = au/bu;
+			volatile uint32_t du = au%bu;
+
+			//		printf("%u %u -> %u %u\n",
+			//				au, bu, cu, du);
+		}
+
+		//Test signed integer division
+		{
+			volatile int32_t ai = 101;
+			volatile int32_t bi = 10;
+			volatile int32_t ci = ai/bi;
+			volatile int32_t di = ai%bi;
+
+			//		printf("%i %i -> %i %i\n",
+			//				ai, bi, ci, di);
+		}
+
+		//Test float division
+		{
+			volatile float af = 101.0;
+			volatile float bf = 10.0;
+			volatile float cf = af/bf;
+			//		float df = af%bf;
+
+			//		printf("%f %f -> %f\n",
+			//				af, bf, cf);
+		}
+	}
+}
+
 void maintaince_task(void *pvParameters) {
 	//	char info_buf[512];
 
@@ -640,111 +742,22 @@ void print_task(void *pvParameters) {
 	int16_t cmd16;
 
 	while(true) {
-		payloadlen = enc28j60PacketReceive(MAX_FRAMELEN, net_buf);
+		TickType_t tmp_tick0 = xTaskGetTickCount();
+		test_div_psram_1();
+		TickType_t tmp_tick1 = xTaskGetTickCount();
+		test_div_flash();
+		TickType_t tmp_tick2 = xTaskGetTickCount();
+		test_div_psram_2();
+		TickType_t tmp_tick3 = xTaskGetTickCount();
 
-		if(payloadlen==0) {
-			vTaskDelay(20 / portTICK_PERIOD_MS);
-			continue;
-		} else if(eth_type_is_arp_and_my_ip(net_buf,payloadlen)) {
-			//Process ARP Request
-			make_arp_answer_from_request(net_buf);
-			continue;
-		} else if(eth_type_is_ip_and_my_ip(net_buf,payloadlen)==0) {
-			//Only Process IP Packet destinated at me
-			printf("$");
-			continue;
-		} else if(net_buf[IP_PROTO_P]==IP_PROTO_ICMP_V && net_buf[ICMP_TYPE_P]==ICMP_TYPE_ECHOREQUEST_V){
-			//Process ICMP packet
-			printf("Rxd ICMP from [%d.%d.%d.%d]\n",net_buf[ETH_ARP_SRC_IP_P],net_buf[ETH_ARP_SRC_IP_P+1],
-					net_buf[ETH_ARP_SRC_IP_P+2],net_buf[ETH_ARP_SRC_IP_P+3]);
-			make_echo_reply_from_request(net_buf, payloadlen);
-			continue;
-		} else if (net_buf[IP_PROTO_P]==IP_PROTO_TCP_V&&net_buf[TCP_DST_PORT_H_P]==0&&net_buf[TCP_DST_PORT_L_P]==HTTP_PORT) {
-			//Process TCP packet with HTTP_PORT
-			printf("Rxd TCP http pkt\n");
-			if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_SYN_V) {
-				printf("Type SYN\n");
-				make_tcp_synack_from_syn(net_buf);
-				continue;
-			}
-			if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_ACK_V) {
-				printf("Type ACK\n");
-				init_len_info(net_buf); // init some data structures
-				dat_p=get_tcp_data_pointer();
-				if (dat_p==0) {
-					if (net_buf[TCP_FLAGS_P] & TCP_FLAGS_FIN_V) {
-						make_tcp_ack_from_any(net_buf);
-					}
-					continue;
-				}
-				// Process Telnet request
-				if (strncmp("GET ",(char *)&(net_buf[dat_p]),4)!=0){
-					payloadlen=fill_tcp_data_p(net_buf,0,("Tricore\r\n\n\rHTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n<h1>200 OK</h1>"));
-					goto SENDTCP;
-				}
-				//Process HTTP Request
-				if (strncmp("/ ",(char *)&(net_buf[dat_p+4]),2)==0) {
-					//Update Web Page Content
-					payloadlen=prepare_page(net_buf);
-					goto SENDTCP;
-				}
+		printf("%u %u %u %u [%u] [%u] [%u]\r\n",
+				tmp_tick0, tmp_tick1, tmp_tick2,  tmp_tick3,
+				tmp_tick1-tmp_tick0, tmp_tick2-tmp_tick1, tmp_tick3-tmp_tick2);
+		flush_stdout();
 
-				//Analysis the command in the URL
-				cmd16 = analyse_get_url((char *)&(net_buf[dat_p+5]));
-				if (cmd16 < 0) {
-					payloadlen=fill_tcp_data_p(net_buf,0,("HTTP/1.0 401 Unauthorized\r\nContent-Type: text/html\r\n\r\n<h1>401 Unauthorized</h1>"));
-					goto SENDTCP;
-				}
-				if (CMD_LD0_ON == cmd16)	{
-					if(LED_ON_STAT != led_stat(0)) {
-						led_on(0);
-					} else {
-						;
-					}
-				} else if (CMD_LD0_OFF == cmd16) {
-					if(LED_OFF_STAT != led_stat(0)) {
-						led_off(0);
-					} else {
-						;
-					}
-				} else if (CMD_LD1_ON == cmd16)	{
-					if(LED_ON_STAT != led_stat(1)) {
-						led_on(1);
-					}
-				} else if (CMD_LD1_OFF == cmd16) {
-					if(LED_OFF_STAT != led_stat(1)) {
-						led_off(1);
-					}
-				} else if (CMD_LD2_ON == cmd16)	{
-					if(LED_ON_STAT != led_stat(2)) {
-						led_on(2);
-					}
-				} else if (CMD_LD2_OFF == cmd16) {
-					if(LED_OFF_STAT != led_stat(2)) {
-						led_off(2);
-					}
-				} else if (CMD_LD3_ON == cmd16)	{
-					if(LED_ON_STAT != led_stat(3)) {
-						led_on(3);
-					}
-				} else if (CMD_LD3_OFF == cmd16) {
-					if(LED_OFF_STAT != led_stat(3)) {
-						led_off(3);
-					}
-				}
-				//Update Web Page Content
-				payloadlen=prepare_page(net_buf);
-
-				SENDTCP:
-				// send ack for http get
-				make_tcp_ack_from_any(net_buf);
-				// send data
-				make_tcp_ack_with_data(net_buf,payloadlen);
-				continue;
-			}
-		} else {
-			//;
-		}
+		printf("DieTempSensor: %f 'C\r\n", read_dts_celsius());
+		flush_stdout();
+		vTaskDelay(2000 / portTICK_PERIOD_MS);
 	}
 }
 
