@@ -52,12 +52,12 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src/FreeRTOS_Source/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/src}&quot;"/>
 								</option>
-								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization.111267155" name="Optimization Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.code.optimization.normal" valueType="enumerated"/>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization.111267155" name="Optimization Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.optimization.optimization" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.code.optimization.none" valueType="enumerated"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.830677023" name="Debug Level" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.debug.info.3" valueType="enumerated"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.language.standard.1156215739" name="C Standard (-std)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.language.standard" value="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.language.standard.gnu99" valueType="enumerated"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.FShortDouble.6464758" name="Treat double as float (-fshort-double)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.FShortDouble" value="false" valueType="boolean"/>
 								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.mversioninfo.540244200" name="Generate version info (-mversion-info)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.CodeGeneration.mversioninfo" value="false" valueType="boolean"/>
-								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.output.adhlms.lst.454918579" name="Create assembler listing (-Wa,-ahlms=${OutputFileBaseName}.lst)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.output.adhlms.lst" value="false" valueType="boolean"/>
+								<option id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.output.adhlms.lst.454918579" name="Create assembler listing (-Wa,-ahlms=${OutputFileBaseName}.lst)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.output.adhlms.lst" value="true" valueType="boolean"/>
 								<option id="com.rt.hightec.buildsystem.tricore.new.compiler.architecture.EABIConform.c.2009658635" name="EABI conform (-meabi)" superClass="com.rt.hightec.buildsystem.tricore.new.compiler.architecture.EABIConform.c" value="true" valueType="boolean"/>
 								<inputType id="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType.439893687" name="Compiler Input (C)" superClass="com.rt.hightec.framework.buildsystem.abstract.hightec.tool.compiler.c.inputType"/>
 							</tool>
@@ -97,6 +97,8 @@
 							<outputType id="org.eclipse.cdt.managedbuilder.ui.rcbs.outputtype.1555957910" name="Resource Custom Build Step Output Type"/>
 						</tool>
 					</fileInfo>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.172980990" name="ledp.hpp" rcbsApplicability="disable" resourcePath="h/ledp.hpp" toolsToInvoke=""/>
+					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.632712090" name="led.h" rcbsApplicability="disable" resourcePath="h/led.h" toolsToInvoke=""/>
 					<folderInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.510529732" name="/" resourcePath="asm">
 						<toolChain id="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable.239742863" name="TriCore Toolchain" superClass="com.rt.hightec.buildsystem.tricore.new.toolchain.new.executable" unusedChildren="">
 							<option id="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919.82621482" name="CPU type (-mcpu)" superClass="com.rt.hightec.buildsystem.tricore.new.mcpu.868602919"/>
@@ -120,8 +122,6 @@
 						</toolChain>
 					</folderInfo>
 					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.1125921551" name="generate_template.py" rcbsApplicability="disable" resourcePath="asm/generate_template.py" toolsToInvoke=""/>
-					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.172980990" name="ledp.hpp" rcbsApplicability="disable" resourcePath="h/ledp.hpp" toolsToInvoke=""/>
-					<fileInfo id="com.rt.hightec.buildsystem.tricore.new.configuration.excutable.1115310976.632712090" name="led.h" rcbsApplicability="disable" resourcePath="h/led.h" toolsToInvoke=""/>
 					<sourceEntries>
 						<entry excluding="test_M_1.S|test_S_2.S|test_G_I.S|test_B_C.S|generate_template.py|test_ABSS.S|test_D.S|test_S_1.S|test_M_3_N.S|test_AND.S|test_O.S|test_ABSDIF.S|test_J.S|test_ADD.A.S|test_L.S|test_E_F.S|test_ADDS.S|test_T_U_X.S|test_M_2.S|test_ABSDIFS.S|test_ABS.S" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="asm"/>
 						<entry excluding="ledp.hpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="h"/>
