@@ -1,0 +1,5 @@
+.ude/
+makefile.*
+*.imt
+iROM/*
+
